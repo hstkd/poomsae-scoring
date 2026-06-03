@@ -1,5 +1,308 @@
 <!DOCTYPE html>
-<html>
-<head><title>Mesa / Juez / Pantalla</title></head>
-<body><h1>En construcción</h1></body>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pantalla - Poomsae</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
+    .hidden { display: none; }
+
+    /* LOGIN */
+    #seccion-login { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px; }
+    #seccion-login input { width: 100%; max-width: 320px; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #444; background: #0f3460; color: #fff; font-size: 1.1rem; text-align: center; }
+    #seccion-login button { width: 100%; max-width: 320px; padding: 14px; background: #e94560; color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; }
+
+    /* HEADER */
+    #header { background: #0f3460; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+    .header-titulo { font-size: 1.2rem; font-weight: bold; color: #e94560; }
+    .header-sala { font-size: 0.9rem; color: #aaa; }
+    .jueces-dots { display: flex; gap: 6px; }
+    .dot { width: 12px; height: 12px; border-radius: 50%; background: #444; }
+    .dot.activo { background: #27ae60; }
+
+    /* ESPERA */
+    #estado-espera { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; }
+    .espera-titulo { font-size: 3rem; font-weight: bold; color: #e94560; margin-bottom: 10px; }
+    .espera-sub { font-size: 1.2rem; color: #888; }
+
+    /* TURNO ACTIVO */
+    #estado-activo { padding: 30px; }
+
+    /* 1v1 */
+    .vs-wrapper { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+    .comp-panel { flex: 1; min-width: 250px; background: #16213e; border-radius: 16px; padding: 25px; text-align: center; }
+    .comp-nombre { font-size: 2rem; font-weight: bold; margin-bottom: 8px; }
+    .comp-puntaje { font-size: 4rem; font-weight: bold; color: #e94560; margin: 15px 0; }
+    .comp-detalle { font-size: 0.9rem; color: #aaa; }
+    .vs-separador { font-size: 3rem; font-weight: bold; color: #444; }
+    .ganador-badge { background: #f39c12; color: #1a1a2e; border-radius: 8px; padding: 5px 15px; font-size: 0.9rem; font-weight: bold; display: inline-block; margin-top: 10px; }
+    .perdedor { opacity: 0.5; }
+
+    /* CUTOFF / FREESTYLE */
+    .cutoff-wrapper { max-width: 700px; margin: 0 auto; }
+    .turno-actual-grande { background: #16213e; border-radius: 16px; padding: 30px; text-align: center; margin-bottom: 25px; }
+    .turno-nombre-grande { font-size: 2.5rem; font-weight: bold; }
+    .turno-puntaje-grande { font-size: 5rem; font-weight: bold; color: #e94560; margin: 15px 0; }
+    .turno-detalle { font-size: 1rem; color: #aaa; }
+    .turno-contador { font-size: 1rem; color: #888; margin-bottom: 10px; }
+
+    /* RANKING */
+    .ranking-titulo { font-size: 1rem; color: #aaa; text-transform: uppercase; margin-bottom: 12px; }
+    .ranking-item { display: flex; align-items: center; background: #16213e; border-radius: 10px; padding: 12px 18px; margin-bottom: 8px; }
+    .ranking-pos { font-size: 1.5rem; font-weight: bold; color: #f39c12; width: 40px; }
+    .ranking-nombre { flex: 1; font-size: 1.1rem; }
+    .ranking-total { font-size: 1.3rem; font-weight: bold; color: #e94560; }
+    .ranking-item.corte-pasa { border-left: 4px solid #27ae60; }
+    .ranking-item.corte-fuera { border-left: 4px solid #e94560; opacity: 0.6; }
+    .ranking-item.activo-ahora { border-left: 4px solid #f39c12; background: #1e2d50; }
+
+    /* JUECES STATUS */
+    .jueces-status { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .juez-circle { width: 45px; height: 45px; border-radius: 50%; background: #444; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; }
+    .juez-circle.listo { background: #27ae60; }
+    .juez-circle.conectado { background: #0f3460; border: 2px solid #27ae60; }
+
+    /* REVEAL ANIMATION */
+    @keyframes revelar { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .revelar-anim { animation: revelar 0.5s ease-out; }
+
+    /* CORTE LINE */
+    .linea-corte { border: none; border-top: 2px dashed #f39c12; margin: 10px 0; }
+    .corte-label { text-align: center; font-size: 0.8rem; color: #f39c12; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="seccion-login">
+  <h1 style="color:#e94560; margin-bottom:30px; font-size:2rem;">📺 Pantalla</h1>
+  <input type="text" id="input-sala" placeholder="CÓDIGO DE SALA" maxlength="8" style="text-transform:uppercase">
+  <button onclick="conectar()">Conectar</button>
+</div>
+
+<!-- HEADER -->
+<div id="header" class="hidden">
+  <div class="header-titulo">🥋 Poomsae Scoring</div>
+  <div class="header-sala" id="header-sala"></div>
+  <div class="jueces-dots" id="jueces-dots"></div>
+</div>
+
+<!-- CONTENIDO -->
+<div id="contenido" class="hidden">
+
+  <!-- ESPERA -->
+  <div id="estado-espera">
+    <div class="espera-titulo">POOMSAE</div>
+    <div class="espera-sub" id="espera-info">Esperando inicio...</div>
+  </div>
+
+  <!-- ACTIVO -->
+  <div id="estado-activo" class="hidden">
+
+    <!-- JUECES STATUS -->
+    <div class="jueces-status" id="jueces-status"></div>
+
+    <!-- 1V1 -->
+    <div id="vista-1v1" class="hidden">
+      <div class="vs-wrapper">
+        <div class="comp-panel" id="panel-A">
+          <div class="comp-nombre" id="nombre-A">—</div>
+          <div class="comp-puntaje" id="puntaje-A">—</div>
+          <div class="comp-detalle" id="detalle-A"></div>
+        </div>
+        <div class="vs-separador">VS</div>
+        <div class="comp-panel" id="panel-B">
+          <div class="comp-nombre" id="nombre-B">—</div>
+          <div class="comp-puntaje" id="puntaje-B">—</div>
+          <div class="comp-detalle" id="detalle-B"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUTOFF / FREESTYLE -->
+    <div id="vista-cutoff" class="hidden">
+      <div class="cutoff-wrapper">
+        <div class="turno-actual-grande" id="turno-grande">
+          <div class="turno-contador" id="turno-contador"></div>
+          <div class="turno-nombre-grande" id="turno-nombre">—</div>
+          <div class="turno-puntaje-grande" id="turno-puntaje">—</div>
+          <div class="turno-detalle" id="turno-detalle"></div>
+        </div>
+        <div class="ranking-titulo">Ranking</div>
+        <div id="ranking-lista"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  let salaInfo = {};
+  let numJueces = 3;
+  let juecesConectados = [];
+  let puntajesRecibidos = {};
+  let topN = null;
+
+  function conectar() {
+    const codigo = document.getElementById('input-sala').value.trim().toUpperCase();
+    if (!codigo) return alert('Ingresa el código');
+    socket.emit('juez-unirse', { codigo, nombre: 'Pantalla', numJuez: 0 });
+  }
+
+  // ── SOCKET ──
+  socket.on('juez-ok', (data) => {
+    salaInfo = data.sala;
+    numJueces = salaInfo.numJueces;
+    document.getElementById('seccion-login').classList.add('hidden');
+    document.getElementById('header').classList.remove('hidden');
+    document.getElementById('contenido').classList.remove('hidden');
+    document.getElementById('header-sala').textContent =
+      `${salaInfo.codigo} · ${salaInfo.tipo} · ${salaInfo.modo}`;
+    renderDots([]);
+    document.getElementById('espera-info').textContent =
+      `${salaInfo.tipo.toUpperCase()} · ${salaInfo.modo}`;
+  });
+
+  socket.on('juez-conectado', (data) => {
+    juecesConectados = data.jueces;
+    renderDots(data.jueces);
+  });
+
+  socket.on('juez-desconectado', (data) => {
+    juecesConectados = data.jueces;
+    renderDots(data.jueces);
+  });
+
+  socket.on('competencia-iniciada', (data) => {
+    salaInfo.tipo = data.tipo;
+    salaInfo.modo = data.modo;
+    document.getElementById('estado-espera').classList.add('hidden');
+    document.getElementById('estado-activo').classList.remove('hidden');
+  });
+
+  socket.on('turno-actualizado', (data) => {
+    const turno = data.turno;
+    puntajesRecibidos = {};
+    renderJuecesStatus({});
+
+    if (turno.tipo === '1v1-simultaneo' || turno.tipo === '1v1-secuencial') {
+      document.getElementById('vista-1v1').classList.remove('hidden');
+      document.getElementById('vista-cutoff').classList.add('hidden');
+      document.getElementById('nombre-A').textContent = turno.competidorA?.nombre || '—';
+      document.getElementById('nombre-B').textContent = turno.competidorB?.nombre || '—';
+      document.getElementById('puntaje-A').textContent = '—';
+      document.getElementById('puntaje-B').textContent = '—';
+      document.getElementById('detalle-A').textContent = '';
+      document.getElementById('detalle-B').textContent = '';
+      document.getElementById('panel-A').classList.remove('ganador-badge', 'perdedor');
+      document.getElementById('panel-B').classList.remove('ganador-badge', 'perdedor');
+    } else {
+      document.getElementById('vista-cutoff').classList.remove('hidden');
+      document.getElementById('vista-1v1').classList.add('hidden');
+      const comp = turno.competidor;
+      document.getElementById('turno-contador').textContent =
+        `Competidor ${turno.numero} de ${turno.total}`;
+      document.getElementById('turno-nombre').textContent = comp?.nombre || '—';
+      document.getElementById('turno-puntaje').textContent = '—';
+      document.getElementById('turno-detalle').textContent = '';
+    }
+  });
+
+  socket.on('puntaje-recibido', (data) => {
+    if (!puntajesRecibidos[data.competidorId]) puntajesRecibidos[data.competidorId] = 0;
+    puntajesRecibidos[data.competidorId]++;
+    renderJuecesStatus(puntajesRecibidos);
+  });
+
+  socket.on('puntaje-revelado', (data) => {
+    if (data.tipo === '1v1') {
+      const a = data.competidorA;
+      const b = data.competidorB;
+      const ta = a?.total;
+      const tb = b?.total;
+
+      document.getElementById('puntaje-A').textContent = ta !== null && ta !== undefined ? ta.toFixed(2) : '—';
+      document.getElementById('puntaje-B').textContent = tb !== null && tb !== undefined ? tb.toFixed(2) : '—';
+      document.getElementById('puntaje-A').classList.add('revelar-anim');
+      document.getElementById('puntaje-B').classList.add('revelar-anim');
+
+      if (ta !== null && tb !== null) {
+        if (ta > tb) {
+          document.getElementById('detalle-A').innerHTML = '<span class="ganador-badge">🏆 GANADOR</span>';
+          document.getElementById('panel-B').classList.add('perdedor');
+        } else if (tb > ta) {
+          document.getElementById('detalle-B').innerHTML = '<span class="ganador-badge">🏆 GANADOR</span>';
+          document.getElementById('panel-A').classList.add('perdedor');
+        } else {
+          document.getElementById('detalle-A').textContent = 'EMPATE';
+          document.getElementById('detalle-B').textContent = 'EMPATE';
+        }
+      }
+    } else {
+      const c = data.competidor;
+      document.getElementById('turno-puntaje').textContent =
+        c?.total !== null && c?.total !== undefined ? c.total.toFixed(2) : '—';
+      document.getElementById('turno-puntaje').classList.add('revelar-anim');
+      if (data.ranking) renderRanking(data.ranking);
+    }
+  });
+
+  socket.on('ranking-actualizado', (data) => {
+    renderRanking(data.ranking);
+  });
+
+  socket.on('corte-aplicado', (data) => {
+    topN = data.topN;
+    renderRanking(data.ranking);
+  });
+
+  // ── RENDER ──
+  function renderDots(jueces) {
+    const div = document.getElementById('jueces-dots');
+    let html = '';
+    for (let i = 1; i <= numJueces; i++) {
+      const conectado = jueces.find(j => j.num === i);
+      html += `<div class="dot ${conectado ? 'activo' : ''}"></div>`;
+    }
+    div.innerHTML = html;
+  }
+
+  function renderJuecesStatus(recibidos) {
+    const div = document.getElementById('jueces-status');
+    let html = '';
+    for (let i = 1; i <= numJueces; i++) {
+      const count = Object.values(recibidos).filter(v => v >= 1).length;
+      const listo = recibidos[i] > 0;
+      html += `<div class="juez-circle ${listo ? 'listo' : 'conectado'}">J${i}</div>`;
+    }
+    div.innerHTML = html;
+  }
+
+  function renderRanking(ranking) {
+    const lista = document.getElementById('ranking-lista');
+    if (!lista) return;
+    let html = '';
+    ranking.forEach((c, i) => {
+      let clase = '';
+      if (topN !== null) {
+        clase = i < topN ? 'corte-pasa' : 'corte-fuera';
+      }
+      if (i === topN && topN !== null) {
+        html += `<div class="linea-corte"></div><div class="corte-label">— CORTE —</div>`;
+      }
+      html += `
+        <div class="ranking-item ${clase}">
+          <span class="ranking-pos">${i + 1}</span>
+          <span class="ranking-nombre">${c.nombre}</span>
+          <span class="ranking-total">${c.total !== null ? c.total.toFixed(2) : '—'}</span>
+        </div>`;
+    });
+    lista.innerHTML = html;
+  }
+</script>
+</body>
 </html>
