@@ -4,138 +4,310 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pantalla - Poomsae</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
-    .hidden { display: none; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a; color: white;
+      font-family: 'Inter', sans-serif;
+      height: 100vh; display: flex; flex-direction: column;
+      overflow: hidden; user-select: none;
+    }
 
-    /* LOGIN */
-    #seccion-login { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 30px; }
-    #seccion-login input { width: 100%; max-width: 320px; padding: 12px; margin-bottom: 12px; border-radius: 8px; border: 1px solid #444; background: #0f3460; color: #fff; font-size: 1.1rem; text-align: center; }
-    #seccion-login button { width: 100%; max-width: 320px; padding: 14px; background: #e94560; color: #fff; border: none; border-radius: 8px; font-size: 1.1rem; cursor: pointer; }
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(90deg, #0a0a0a, #1a1a1a, #0a0a0a);
+      border-bottom: 2px solid #c9a84c;
+      padding: 10px 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .header-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 26px; letter-spacing: 5px; color: #c9a84c;
+    }
+    .header-centro {
+      font-size: 10px; font-weight: 700; letter-spacing: 4px;
+      color: #555; text-transform: uppercase; text-align: center;
+    }
+    .header-sala {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px; letter-spacing: 4px; color: #c9a84c;
+    }
+    .jueces-dots { display: flex; gap: 6px; align-items: center; margin-left: 16px; }
+    .jdot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #222; border: 1px solid #333; transition: all 0.3s;
+    }
+    .jdot.activo { background: #22c55e; border-color: #22c55e; box-shadow: 0 0 6px #22c55e; }
 
-    /* HEADER */
-    #header { background: #0f3460; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-    .header-titulo { font-size: 1.2rem; font-weight: bold; color: #e94560; }
-    .header-sala { font-size: 0.9rem; color: #aaa; }
-    .jueces-dots { display: flex; gap: 6px; }
-    .dot { width: 12px; height: 12px; border-radius: 50%; background: #444; }
-    .dot.activo { background: #27ae60; }
+    /* ── LOGIN OVERLAY ── */
+    #overlay-login {
+      position: fixed; inset: 0; background: #0a0a0a;
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center; gap: 16px; z-index: 999;
+    }
+    .login-titulo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 60px; letter-spacing: 10px; color: #c9a84c;
+      text-shadow: 0 0 40px rgba(201,168,76,0.4);
+    }
+    .login-sub {
+      font-size: 10px; font-weight: 700; letter-spacing: 5px;
+      color: #444; text-transform: uppercase; margin-top: -10px;
+    }
+    .login-input {
+      background: #111; border: 1px solid #2a2a2a; border-radius: 10px;
+      color: #fff; padding: 14px 24px;
+      font-size: 28px; font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 8px; outline: none; text-align: center; width: 320px;
+    }
+    .login-input:focus { border-color: #c9a84c; }
+    .btn-login {
+      background: #c9a84c; color: #000; border: none;
+      padding: 14px 40px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
+    }
+    .btn-login:active { filter: brightness(0.85); }
 
-    /* ESPERA */
-    #estado-espera { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 80vh; }
-    .espera-titulo { font-size: 3rem; font-weight: bold; color: #e94560; margin-bottom: 10px; }
-    .espera-sub { font-size: 1.2rem; color: #888; }
+    /* ── ESPERA ── */
+    #estado-espera {
+      flex: 1; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; gap: 14px;
+    }
+    .espera-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 100px; letter-spacing: 14px; color: #141414;
+    }
+    .espera-sub {
+      font-size: 10px; font-weight: 700; letter-spacing: 6px;
+      color: #2a2a2a; text-transform: uppercase;
+    }
 
-    /* TURNO ACTIVO */
-    #estado-activo { padding: 30px; }
+    /* ── BODY ── */
+    #cuerpo { flex: 1; display: flex; position: relative; overflow: hidden; }
 
-    /* 1v1 */
-    .vs-wrapper { display: flex; align-items: center; justify-content: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
-    .comp-panel { flex: 1; min-width: 250px; background: #16213e; border-radius: 16px; padding: 25px; text-align: center; }
-    .comp-nombre { font-size: 2rem; font-weight: bold; margin-bottom: 8px; }
-    .comp-puntaje { font-size: 4rem; font-weight: bold; color: #e94560; margin: 15px 0; }
-    .comp-detalle { font-size: 0.9rem; color: #aaa; }
-    .vs-separador { font-size: 3rem; font-weight: bold; color: #444; }
-    .ganador-badge { background: #f39c12; color: #1a1a2e; border-radius: 8px; padding: 5px 15px; font-size: 0.9rem; font-weight: bold; display: inline-block; margin-top: 10px; }
-    .perdedor { opacity: 0.5; }
+    /* ── JUECES STATUS BAR ── */
+    .jueces-bar {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      display: flex; gap: 8px; z-index: 20;
+    }
+    .jcircle {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #111; border: 1px solid #222;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
+      letter-spacing: 1px; color: #444; transition: all 0.3s;
+    }
+    .jcircle.listo {
+      background: #16a34a; border-color: #22c55e; color: #fff;
+      box-shadow: 0 0 14px rgba(34,197,94,0.5);
+    }
 
-    /* CUTOFF / FREESTYLE */
-    .cutoff-wrapper { max-width: 700px; margin: 0 auto; }
-    .turno-actual-grande { background: #16213e; border-radius: 16px; padding: 30px; text-align: center; margin-bottom: 25px; }
-    .turno-nombre-grande { font-size: 2.5rem; font-weight: bold; }
-    .turno-puntaje-grande { font-size: 5rem; font-weight: bold; color: #e94560; margin: 15px 0; }
-    .turno-detalle { font-size: 1rem; color: #aaa; }
-    .turno-contador { font-size: 1rem; color: #888; margin-bottom: 10px; }
+    /* ── VISTA 1V1 ── */
+    #vista-1v1 { flex: 1; display: none; }
+    #vista-1v1.visible { display: flex; }
+    .lado {
+      flex: 1; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; position: relative;
+    }
+    .lado-izq {
+      background: linear-gradient(135deg, #0d0d0d, #141414);
+      border-right: 1px solid #222;
+    }
+    .lado-der {
+      background: linear-gradient(225deg, #0d0d0d, #141414);
+      border-left: 1px solid #222;
+    }
+    .lado-izq::before, .lado-der::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, #c9a84c, #f0d080);
+    }
+    .comp-etiqueta {
+      font-size: 10px; font-weight: 700; letter-spacing: 5px;
+      color: #555; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .comp-nombre-g {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 52px; letter-spacing: 5px; margin-bottom: 16px;
+    }
+    .comp-score-g {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 160px; line-height: 1; color: #c9a84c;
+      text-shadow: 0 10px 40px rgba(201,168,76,0.3);
+      transition: all 0.3s;
+    }
+    .comp-badge {
+      margin-top: 20px; height: 36px;
+    }
+    .ganador-tag {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px; letter-spacing: 4px;
+      background: #c9a84c; color: #000;
+      padding: 6px 24px; border-radius: 30px;
+    }
+    .lado.ganador { background: linear-gradient(135deg, #1a1400, #2a2000) !important; }
+    .lado.perdedor { opacity: 0.3; }
 
-    /* RANKING */
-    .ranking-titulo { font-size: 1rem; color: #aaa; text-transform: uppercase; margin-bottom: 12px; }
-    .ranking-item { display: flex; align-items: center; background: #16213e; border-radius: 10px; padding: 12px 18px; margin-bottom: 8px; }
-    .ranking-pos { font-size: 1.5rem; font-weight: bold; color: #f39c12; width: 40px; }
-    .ranking-nombre { flex: 1; font-size: 1.1rem; }
-    .ranking-total { font-size: 1.3rem; font-weight: bold; color: #e94560; }
-    .ranking-item.corte-pasa { border-left: 4px solid #27ae60; }
-    .ranking-item.corte-fuera { border-left: 4px solid #e94560; opacity: 0.6; }
-    .ranking-item.activo-ahora { border-left: 4px solid #f39c12; background: #1e2d50; }
+    .centro-vs {
+      width: 120px; display: flex; flex-direction: column;
+      justify-content: center; align-items: center; gap: 10px;
+      background: #0a0a0a; border-left: 1px solid #1a1a1a; border-right: 1px solid #1a1a1a;
+    }
+    .vs-txt {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: 4px; color: #222;
+    }
 
-    /* JUECES STATUS */
-    .jueces-status { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-    .juez-circle { width: 45px; height: 45px; border-radius: 50%; background: #444; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: bold; }
-    .juez-circle.listo { background: #27ae60; }
-    .juez-circle.conectado { background: #0f3460; border: 2px solid #27ae60; }
+    /* ── VISTA CUTOFF / FREESTYLE ── */
+    #vista-cutoff { flex: 1; display: none; }
+    #vista-cutoff.visible {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+    }
 
-    /* REVEAL ANIMATION */
-    @keyframes revelar { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-    .revelar-anim { animation: revelar 0.5s ease-out; }
+    .panel-turno {
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      background: #0a0a0a; border-right: 1px solid #1a1a1a;
+      padding: 40px;
+    }
+    .turno-etiqueta {
+      font-size: 10px; font-weight: 700; letter-spacing: 5px;
+      color: #444; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .turno-nombre-grande {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px; letter-spacing: 6px; text-align: center;
+      margin-bottom: 16px;
+    }
+    .turno-score-grande {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 180px; line-height: 1; color: #c9a84c;
+      text-shadow: 0 10px 60px rgba(201,168,76,0.4);
+    }
+    @keyframes revelar {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .revelar-anim { animation: revelar 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 
-    /* CORTE LINE */
-    .linea-corte { border: none; border-top: 2px dashed #f39c12; margin: 10px 0; }
-    .corte-label { text-align: center; font-size: 0.8rem; color: #f39c12; margin-bottom: 8px; }
+    .panel-ranking {
+      background: #0f0f0f; border-left: 1px solid #1a1a1a;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .ranking-header {
+      padding: 16px 20px; border-bottom: 1px solid #1a1a1a;
+      font-size: 9px; font-weight: 700; letter-spacing: 4px;
+      color: #555; text-transform: uppercase;
+    }
+    .ranking-scroll { flex: 1; overflow-y: auto; padding: 10px; }
+    .rank-item {
+      display: flex; align-items: center; gap: 12px;
+      background: #141414; border: 1px solid #1a1a1a;
+      border-radius: 8px; padding: 10px 14px; margin-bottom: 5px;
+      transition: all 0.3s;
+    }
+    .rank-pos {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; color: #c9a84c; width: 28px;
+    }
+    .rank-nombre { flex: 1; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+    .rank-total {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; color: #c9a84c;
+    }
+    .rank-item.pasa { border-left: 3px solid #22c55e; }
+    .rank-item.fuera { border-left: 3px solid #dc2626; opacity: 0.4; }
+    .rank-item.activo-ahora { border-left: 3px solid #c9a84c; background: #1a1500; }
+    .linea-corte { border: none; border-top: 1px dashed #c9a84c; margin: 6px 0; }
+    .corte-label {
+      text-align: center; font-size: 8px; font-weight: 700;
+      letter-spacing: 4px; color: #c9a84c; text-transform: uppercase; margin-bottom: 5px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #0a0a0a; border-top: 1px solid #1a1a1a;
+      padding: 7px 40px; display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+    .footer-txt { font-size: 9px; letter-spacing: 2px; color: #2a2a2a; text-transform: uppercase; }
+
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div id="seccion-login">
-  <h1 style="color:#e94560; margin-bottom:30px; font-size:2rem;">📺 Pantalla</h1>
-  <input type="text" id="input-sala" placeholder="CÓDIGO DE SALA" maxlength="8" style="text-transform:uppercase">
-  <button onclick="conectar()">Conectar</button>
+<div id="overlay-login">
+  <div class="login-titulo">POOMSAE</div>
+  <div class="login-sub">Pantalla de Resultados</div>
+  <input class="login-input" id="input-sala" type="text" maxlength="8"
+    placeholder="CÓDIGO" style="text-transform:uppercase"
+    onkeydown="if(event.key==='Enter') conectar()">
+  <button class="btn-login" onclick="conectar()">CONECTAR</button>
 </div>
 
 <!-- HEADER -->
-<div id="header" class="hidden">
-  <div class="header-titulo">🥋 Poomsae Scoring</div>
-  <div class="header-sala" id="header-sala"></div>
-  <div class="jueces-dots" id="jueces-dots"></div>
+<div class="header hidden" id="header">
+  <div class="header-logo">POOMSAE</div>
+  <div class="header-centro" id="header-centro">—</div>
+  <div style="display:flex; align-items:center; gap:16px">
+    <div class="header-sala" id="header-sala">—</div>
+    <div class="jueces-dots" id="jueces-dots"></div>
+  </div>
 </div>
 
-<!-- CONTENIDO -->
-<div id="contenido" class="hidden">
+<!-- ESPERA -->
+<div id="estado-espera" class="hidden">
+  <div class="espera-logo">POOMSAE</div>
+  <div class="espera-sub" id="espera-sub">Esperando inicio</div>
+</div>
 
-  <!-- ESPERA -->
-  <div id="estado-espera">
-    <div class="espera-titulo">POOMSAE</div>
-    <div class="espera-sub" id="espera-info">Esperando inicio...</div>
+<!-- CUERPO -->
+<div id="cuerpo" class="hidden">
+
+  <!-- JUECES STATUS -->
+  <div class="jueces-bar" id="jueces-bar"></div>
+
+  <!-- 1V1 -->
+  <div id="vista-1v1">
+    <div class="lado lado-izq" id="panel-A">
+      <div class="comp-etiqueta">Competidor A</div>
+      <div class="comp-nombre-g" id="nombre-A">—</div>
+      <div class="comp-score-g" id="score-A">—</div>
+      <div class="comp-badge" id="badge-A"></div>
+    </div>
+    <div class="centro-vs"><div class="vs-txt">VS</div></div>
+    <div class="lado lado-der" id="panel-B">
+      <div class="comp-etiqueta">Competidor B</div>
+      <div class="comp-nombre-g" id="nombre-B">—</div>
+      <div class="comp-score-g" id="score-B">—</div>
+      <div class="comp-badge" id="badge-B"></div>
+    </div>
   </div>
 
-  <!-- ACTIVO -->
-  <div id="estado-activo" class="hidden">
-
-    <!-- JUECES STATUS -->
-    <div class="jueces-status" id="jueces-status"></div>
-
-    <!-- 1V1 -->
-    <div id="vista-1v1" class="hidden">
-      <div class="vs-wrapper">
-        <div class="comp-panel" id="panel-A">
-          <div class="comp-nombre" id="nombre-A">—</div>
-          <div class="comp-puntaje" id="puntaje-A">—</div>
-          <div class="comp-detalle" id="detalle-A"></div>
-        </div>
-        <div class="vs-separador">VS</div>
-        <div class="comp-panel" id="panel-B">
-          <div class="comp-nombre" id="nombre-B">—</div>
-          <div class="comp-puntaje" id="puntaje-B">—</div>
-          <div class="comp-detalle" id="detalle-B"></div>
-        </div>
-      </div>
+  <!-- CUTOFF / FREESTYLE -->
+  <div id="vista-cutoff">
+    <div class="panel-turno">
+      <div class="turno-etiqueta" id="turno-etiqueta">—</div>
+      <div class="turno-nombre-grande" id="turno-nombre">—</div>
+      <div class="turno-score-grande" id="turno-score">—</div>
     </div>
-
-    <!-- CUTOFF / FREESTYLE -->
-    <div id="vista-cutoff" class="hidden">
-      <div class="cutoff-wrapper">
-        <div class="turno-actual-grande" id="turno-grande">
-          <div class="turno-contador" id="turno-contador"></div>
-          <div class="turno-nombre-grande" id="turno-nombre">—</div>
-          <div class="turno-puntaje-grande" id="turno-puntaje">—</div>
-          <div class="turno-detalle" id="turno-detalle"></div>
-        </div>
-        <div class="ranking-titulo">Ranking</div>
-        <div id="ranking-lista"></div>
-      </div>
+    <div class="panel-ranking">
+      <div class="ranking-header">Ranking</div>
+      <div class="ranking-scroll" id="ranking-lista"></div>
     </div>
-
   </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer hidden" id="footer">
+  <div class="footer-txt">Poomsae Scoring System</div>
+  <div class="footer-txt" id="footer-modo">—</div>
+  <div class="footer-txt">⬤ En vivo</div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -143,165 +315,169 @@
   const socket = io();
   let salaInfo = {};
   let numJueces = 3;
-  let juecesConectados = [];
   let puntajesRecibidos = {};
-  let topN = null;
+  let topNActual = null;
+  let turnoIndexActual = 0;
 
   function conectar() {
     const codigo = document.getElementById('input-sala').value.trim().toUpperCase();
-    if (!codigo) return alert('Ingresa el código');
+    if (!codigo) return;
     socket.emit('juez-unirse', { codigo, nombre: 'Pantalla', numJuez: 0 });
   }
 
-  // ── SOCKET ──
   socket.on('juez-ok', (data) => {
     salaInfo = data.sala;
     numJueces = salaInfo.numJueces;
-    document.getElementById('seccion-login').classList.add('hidden');
+    document.getElementById('overlay-login').classList.add('hidden');
     document.getElementById('header').classList.remove('hidden');
-    document.getElementById('contenido').classList.remove('hidden');
-    document.getElementById('header-sala').textContent =
-      `${salaInfo.codigo} · ${salaInfo.tipo} · ${salaInfo.modo}`;
-    renderDots([]);
-    document.getElementById('espera-info').textContent =
+    document.getElementById('estado-espera').classList.remove('hidden');
+    document.getElementById('footer').classList.remove('hidden');
+    document.getElementById('header-sala').textContent = salaInfo.codigo;
+    document.getElementById('header-centro').textContent =
       `${salaInfo.tipo.toUpperCase()} · ${salaInfo.modo}`;
+    document.getElementById('footer-modo').textContent =
+      `${salaInfo.tipo.toUpperCase()} · ${salaInfo.modo} · ${numJueces} jueces`;
+    document.getElementById('espera-sub').textContent =
+      `${salaInfo.tipo.toUpperCase()} · ${salaInfo.modo}`;
+    renderDots([]);
+    renderJuecesBar({});
   });
 
-  socket.on('juez-conectado', (data) => {
-    juecesConectados = data.jueces;
-    renderDots(data.jueces);
-  });
-
-  socket.on('juez-desconectado', (data) => {
-    juecesConectados = data.jueces;
-    renderDots(data.jueces);
-  });
+  socket.on('juez-conectado', (data) => { renderDots(data.jueces); });
+  socket.on('juez-desconectado', (data) => { renderDots(data.jueces); });
 
   socket.on('competencia-iniciada', (data) => {
     salaInfo.tipo = data.tipo;
     salaInfo.modo = data.modo;
     document.getElementById('estado-espera').classList.add('hidden');
-    document.getElementById('estado-activo').classList.remove('hidden');
+    document.getElementById('cuerpo').classList.remove('hidden');
+    configurarVista(data.modo);
   });
 
   socket.on('turno-actualizado', (data) => {
     const turno = data.turno;
     puntajesRecibidos = {};
-    renderJuecesStatus({});
+    renderJuecesBar({});
+    turnoIndexActual = turno.numero ? turno.numero - 1 : 0;
 
     if (turno.tipo === '1v1-simultaneo' || turno.tipo === '1v1-secuencial') {
-      document.getElementById('vista-1v1').classList.remove('hidden');
-      document.getElementById('vista-cutoff').classList.add('hidden');
       document.getElementById('nombre-A').textContent = turno.competidorA?.nombre || '—';
       document.getElementById('nombre-B').textContent = turno.competidorB?.nombre || '—';
-      document.getElementById('puntaje-A').textContent = '—';
-      document.getElementById('puntaje-B').textContent = '—';
-      document.getElementById('detalle-A').textContent = '';
-      document.getElementById('detalle-B').textContent = '';
-      document.getElementById('panel-A').classList.remove('ganador-badge', 'perdedor');
-      document.getElementById('panel-B').classList.remove('ganador-badge', 'perdedor');
+      document.getElementById('score-A').textContent = '—';
+      document.getElementById('score-B').textContent = '—';
+      document.getElementById('badge-A').innerHTML = '';
+      document.getElementById('badge-B').innerHTML = '';
+      document.getElementById('panel-A').className = 'lado lado-izq';
+      document.getElementById('panel-B').className = 'lado lado-der';
     } else {
-      document.getElementById('vista-cutoff').classList.remove('hidden');
-      document.getElementById('vista-1v1').classList.add('hidden');
-      const comp = turno.competidor;
-      document.getElementById('turno-contador').textContent =
+      document.getElementById('turno-etiqueta').textContent =
         `Competidor ${turno.numero} de ${turno.total}`;
-      document.getElementById('turno-nombre').textContent = comp?.nombre || '—';
-      document.getElementById('turno-puntaje').textContent = '—';
-      document.getElementById('turno-detalle').textContent = '';
+      document.getElementById('turno-nombre').textContent = turno.competidor?.nombre || '—';
+      document.getElementById('turno-score').textContent = '—';
+      renderRankingActivo(turnoIndexActual);
     }
   });
 
   socket.on('puntaje-recibido', (data) => {
-    if (!puntajesRecibidos[data.competidorId]) puntajesRecibidos[data.competidorId] = 0;
-    puntajesRecibidos[data.competidorId]++;
-    renderJuecesStatus(puntajesRecibidos);
+    puntajesRecibidos[data.juezNum] = true;
+    renderJuecesBar(puntajesRecibidos);
   });
 
   socket.on('puntaje-revelado', (data) => {
     if (data.tipo === '1v1') {
-      const a = data.competidorA;
-      const b = data.competidorB;
-      const ta = a?.total;
-      const tb = b?.total;
+      const ta = data.competidorA?.total;
+      const tb = data.competidorB?.total;
+      const sa = document.getElementById('score-A');
+      const sb = document.getElementById('score-B');
+      sa.textContent = ta != null ? ta.toFixed(2) : '—';
+      sb.textContent = tb != null ? tb.toFixed(2) : '—';
+      sa.classList.add('revelar-anim');
+      sb.classList.add('revelar-anim');
+      setTimeout(() => { sa.classList.remove('revelar-anim'); sb.classList.remove('revelar-anim'); }, 600);
 
-      document.getElementById('puntaje-A').textContent = ta !== null && ta !== undefined ? ta.toFixed(2) : '—';
-      document.getElementById('puntaje-B').textContent = tb !== null && tb !== undefined ? tb.toFixed(2) : '—';
-      document.getElementById('puntaje-A').classList.add('revelar-anim');
-      document.getElementById('puntaje-B').classList.add('revelar-anim');
-
-      if (ta !== null && tb !== null) {
+      if (ta != null && tb != null) {
         if (ta > tb) {
-          document.getElementById('detalle-A').innerHTML = '<span class="ganador-badge">🏆 GANADOR</span>';
-          document.getElementById('panel-B').classList.add('perdedor');
+          document.getElementById('panel-A').className = 'lado lado-izq ganador';
+          document.getElementById('panel-B').className = 'lado lado-der perdedor';
+          document.getElementById('badge-A').innerHTML = '<span class="ganador-tag">🏆 GANADOR</span>';
         } else if (tb > ta) {
-          document.getElementById('detalle-B').innerHTML = '<span class="ganador-badge">🏆 GANADOR</span>';
-          document.getElementById('panel-A').classList.add('perdedor');
+          document.getElementById('panel-B').className = 'lado lado-der ganador';
+          document.getElementById('panel-A').className = 'lado lado-izq perdedor';
+          document.getElementById('badge-B').innerHTML = '<span class="ganador-tag">🏆 GANADOR</span>';
         } else {
-          document.getElementById('detalle-A').textContent = 'EMPATE';
-          document.getElementById('detalle-B').textContent = 'EMPATE';
+          document.getElementById('badge-A').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:3px;color:#888;font-size:16px">EMPATE</span>';
+          document.getElementById('badge-B').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:3px;color:#888;font-size:16px">EMPATE</span>';
         }
       }
     } else {
-      const c = data.competidor;
-      document.getElementById('turno-puntaje').textContent =
-        c?.total !== null && c?.total !== undefined ? c.total.toFixed(2) : '—';
-      document.getElementById('turno-puntaje').classList.add('revelar-anim');
-      if (data.ranking) renderRanking(data.ranking);
+      const score = document.getElementById('turno-score');
+      score.textContent = data.competidor?.total != null ? data.competidor.total.toFixed(2) : '—';
+      score.classList.add('revelar-anim');
+      setTimeout(() => score.classList.remove('revelar-anim'), 600);
+      if (data.ranking) renderRanking(data.ranking, topNActual);
     }
   });
 
   socket.on('ranking-actualizado', (data) => {
-    renderRanking(data.ranking);
+    renderRanking(data.ranking, topNActual);
   });
 
   socket.on('corte-aplicado', (data) => {
-    topN = data.topN;
-    renderRanking(data.ranking);
+    topNActual = data.topN;
+    renderRanking(data.ranking, data.topN);
   });
 
-  // ── RENDER ──
+  // ── HELPERS ──
+  function configurarVista(modo) {
+    if (modo === '1v1-simultaneo' || modo === '1v1-secuencial') {
+      document.getElementById('vista-1v1').classList.add('visible');
+      document.getElementById('vista-cutoff').classList.remove('visible');
+    } else {
+      document.getElementById('vista-cutoff').classList.add('visible');
+      document.getElementById('vista-1v1').classList.remove('visible');
+    }
+  }
+
   function renderDots(jueces) {
-    const div = document.getElementById('jueces-dots');
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
-      const conectado = jueces.find(j => j.num === i);
-      html += `<div class="dot ${conectado ? 'activo' : ''}"></div>`;
+      const activo = jueces.find(j => j.num === i);
+      html += `<div class="jdot ${activo ? 'activo' : ''}"></div>`;
     }
-    div.innerHTML = html;
+    document.getElementById('jueces-dots').innerHTML = html;
   }
 
-  function renderJuecesStatus(recibidos) {
-    const div = document.getElementById('jueces-status');
+  function renderJuecesBar(recibidos) {
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
-      const count = Object.values(recibidos).filter(v => v >= 1).length;
-      const listo = recibidos[i] > 0;
-      html += `<div class="juez-circle ${listo ? 'listo' : 'conectado'}">J${i}</div>`;
+      html += `<div class="jcircle ${recibidos[i] ? 'listo' : ''}">J${i}</div>`;
     }
-    div.innerHTML = html;
+    document.getElementById('jueces-bar').innerHTML = html;
   }
 
-  function renderRanking(ranking) {
+  function renderRanking(ranking, topN) {
     const lista = document.getElementById('ranking-lista');
-    if (!lista) return;
     let html = '';
     ranking.forEach((c, i) => {
       let clase = '';
-      if (topN !== null) {
-        clase = i < topN ? 'corte-pasa' : 'corte-fuera';
-      }
-      if (i === topN && topN !== null) {
+      if (topN != null) clase = i < topN ? 'pasa' : 'fuera';
+      if (topN != null && i === topN) {
         html += `<div class="linea-corte"></div><div class="corte-label">— CORTE —</div>`;
       }
       html += `
-        <div class="ranking-item ${clase}">
-          <span class="ranking-pos">${i + 1}</span>
-          <span class="ranking-nombre">${c.nombre}</span>
-          <span class="ranking-total">${c.total !== null ? c.total.toFixed(2) : '—'}</span>
+        <div class="rank-item ${clase}">
+          <span class="rank-pos">${i + 1}</span>
+          <span class="rank-nombre">${c.nombre}</span>
+          <span class="rank-total">${c.total != null ? c.total.toFixed(2) : '—'}</span>
         </div>`;
     });
     lista.innerHTML = html;
+  }
+
+  function renderRankingActivo(turnoIdx) {
+    // Resalta el competidor activo en el ranking
+    const items = document.querySelectorAll('.rank-item');
+    items.forEach(el => el.classList.remove('activo-ahora'));
   }
 </script>
 </body>
