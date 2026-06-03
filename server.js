@@ -122,16 +122,46 @@ io.on('connection', (socket) => {
     socket.data.numJuez = numJuez;
 
     socket.emit('juez-ok', {
-      sala: {
-        codigo: sala.codigo,
-        tipo: sala.tipo,
-        modo: sala.modo,
-        numJueces: sala.numJueces,
-        estado: sala.estado,
-        competidores: sala.competidores,
-        turnoIndex: sala.turnoIndex
-      }
-    });
+  sala: {
+    codigo: sala.codigo,
+    tipo: sala.tipo,
+    modo: sala.modo,
+    numJueces: sala.numJueces,
+    estado: sala.estado,
+    competidores: sala.competidores,
+    turnoIndex: sala.turnoIndex
+  }
+});
+
+// Si ya hay competencia activa, enviar turno actual
+if (sala.estado === 'activo' && sala.competidores.length > 0) {
+  const turnoIndex = sala.turnoIndex;
+  const modo = sala.modo;
+  let turno = {};
+  if (modo === '1v1-simultaneo') {
+    turno = {
+      tipo: '1v1-simultaneo',
+      competidorA: sala.competidores[turnoIndex] || null,
+      competidorB: sala.competidores[turnoIndex + 1] || null
+    };
+  } else if (modo === '1v1-secuencial') {
+    turno = {
+      tipo: '1v1-secuencial',
+      competidorA: sala.competidores[turnoIndex] || null,
+      competidorB: sala.competidores[turnoIndex + 1] || null,
+      fase: 'A'
+    };
+  } else {
+    turno = {
+      tipo: 'cutoff',
+      competidor: sala.competidores[turnoIndex] || null,
+      numero: turnoIndex + 1,
+      total: sala.competidores.length
+    };
+  }
+  socket.emit('turno-actualizado', { turno, salaInfo: { tipo: sala.tipo } });
+}
+
 
     io.to(codigo).emit('juez-conectado', { jueces: sala.jueces, nombre });
     console.log(`Juez ${numJuez} (${nombre}) en sala ${codigo}`);
