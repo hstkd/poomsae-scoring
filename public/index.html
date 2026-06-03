@@ -1,10 +1,109 @@
 <!DOCTYPE html>
-<html>
-<head><title>Poomsae Scoring</title></head>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Poomsae Scoring</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a; color: white;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh; display: flex; flex-direction: column;
+      justify-content: center; align-items: center;
+      padding: 30px;
+    }
+
+    .logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 64px; letter-spacing: 12px; color: #c9a84c;
+      text-shadow: 0 0 40px rgba(201,168,76,0.3);
+      text-align: center; line-height: 1;
+    }
+    .logo-sub {
+      font-size: 10px; font-weight: 700; letter-spacing: 6px;
+      color: #444; text-transform: uppercase;
+      text-align: center; margin-top: 8px; margin-bottom: 50px;
+    }
+
+    .menu {
+      display: flex; flex-direction: column;
+      gap: 12px; width: 100%; max-width: 340px;
+    }
+
+    .menu-btn {
+      display: flex; align-items: center; gap: 16px;
+      background: #141414; border: 1px solid #222;
+      border-radius: 12px; padding: 18px 20px;
+      text-decoration: none; color: white;
+      transition: all 0.2s; cursor: pointer;
+    }
+    .menu-btn:active { border-color: #c9a84c; background: #1a1500; }
+
+    .menu-icon {
+      font-size: 28px; width: 40px; text-align: center; flex-shrink: 0;
+    }
+    .menu-texto { flex: 1; }
+    .menu-titulo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: 3px; color: #fff;
+      line-height: 1;
+    }
+    .menu-desc {
+      font-size: 10px; font-weight: 700; letter-spacing: 2px;
+      color: #555; text-transform: uppercase; margin-top: 3px;
+    }
+    .menu-arrow {
+      font-size: 18px; color: #333;
+    }
+
+    .menu-btn.gold { border-color: #c9a84c; }
+    .menu-btn.gold .menu-titulo { color: #c9a84c; }
+    .menu-btn.gold .menu-arrow { color: #c9a84c; }
+
+    .footer-line {
+      margin-top: 50px;
+      font-size: 9px; font-weight: 700; letter-spacing: 3px;
+      color: #2a2a2a; text-transform: uppercase; text-align: center;
+    }
+  </style>
+</head>
 <body>
-  <h1>Sistema de Calificación Poomsae</h1>
-  <a href="/mesa.html">Mesa Central</a><br>
-  <a href="/juez.html">Juez</a><br>
-  <a href="/pantalla.html">Pantalla</a>
+
+  <div class="logo">POOMSAE</div>
+  <div class="logo-sub">Sistema de Calificación</div>
+
+  <div class="menu">
+    <a href="/mesa.html" class="menu-btn gold">
+      <div class="menu-icon">⚙️</div>
+      <div class="menu-texto">
+        <div class="menu-titulo">Mesa Central</div>
+        <div class="menu-desc">Control y administración</div>
+      </div>
+      <div class="menu-arrow">›</div>
+    </a>
+
+    <a href="/juez.html" class="menu-btn">
+      <div class="menu-icon">🥋</div>
+      <div class="menu-texto">
+        <div class="menu-titulo">Juez</div>
+        <div class="menu-desc">Ingresar calificaciones</div>
+      </div>
+      <div class="menu-arrow">›</div>
+    </a>
+
+    <a href="/pantalla.html" class="menu-btn">
+      <div class="menu-icon">📺</div>
+      <div class="menu-texto">
+        <div class="menu-titulo">Pantalla</div>
+        <div class="menu-desc">Resultados en vivo</div>
+      </div>
+      <div class="menu-arrow">›</div>
+    </a>
+  </div>
+
+  <div class="footer-line">HS-SS Taekwondo · Poomsae Scoring System</div>
+
 </body>
 </html>
