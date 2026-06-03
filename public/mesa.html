@@ -1,5 +1,294 @@
 <!DOCTYPE html>
-<html>
-<head><title>Mesa / Juez / Pantalla</title></head>
-<body><h1>En construcción</h1></body>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesa Central - Poomsae</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #1a1a2e; color: #eee; padding: 20px; }
+    h1 { text-align: center; color: #e94560; margin-bottom: 20px; }
+    .card { background: #16213e; border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+    h2 { color: #e94560; margin-bottom: 15px; font-size: 1rem; text-transform: uppercase; }
+    input, select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #444; background: #0f3460; color: #fff; font-size: 1rem; }
+    button { width: 100%; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; cursor: pointer; margin-bottom: 8px; }
+    .btn-primary { background: #e94560; color: #fff; }
+    .btn-secondary { background: #0f3460; color: #fff; }
+    .btn-success { background: #27ae60; color: #fff; }
+    .btn-warning { background: #f39c12; color: #fff; }
+    .btn-sm { padding: 6px 12px; font-size: 0.85rem; width: auto; }
+    .sala-info { background: #0f3460; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 10px; }
+    .sala-codigo { font-size: 2.5rem; font-weight: bold; color: #e94560; letter-spacing: 6px; }
+    .sala-modo { font-size: 0.9rem; color: #aaa; margin-top: 5px; }
+    .jueces-lista { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .juez-badge { background: #27ae60; color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; }
+    .juez-badge.vacio { background: #444; }
+    .competidor-item { display: flex; justify-content: space-between; align-items: center; background: #0f3460; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+    .competidor-nombre { font-weight: bold; }
+    .competidor-puntaje { color: #f39c12; font-size: 1.1rem; font-weight: bold; }
+    .turno-actual { background: #e94560; border-radius: 8px; padding: 15px; text-align: center; margin-bottom: 10px; }
+    .turno-nombre { font-size: 1.5rem; font-weight: bold; }
+    .vs-container { display: flex; gap: 10px; }
+    .vs-container .turno-actual { flex: 1; }
+    .estado-badge { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 0.8rem; }
+    .estado-espera { background: #444; }
+    .estado-activo { background: #e94560; }
+    .estado-listo { background: #27ae60; }
+    .hidden { display: none; }
+    .ranking-pos { font-size: 1.2rem; font-weight: bold; color: #f39c12; width: 30px; }
+    #log { font-size: 0.8rem; color: #888; margin-top: 10px; max-height: 80px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+<h1>⚡ Mesa Central</h1>
+
+<!-- SETUP INICIAL -->
+<div id="seccion-setup" class="card">
+  <h2>Crear Sala</h2>
+  <input type="text" id="input-codigo" placeholder="Código de sala (ej: FINAL1)" maxlength="8">
+  <select id="input-tipo">
+    <option value="traditional">Traditional</option>
+    <option value="freestyle">Freestyle</option>
+  </select>
+  <select id="input-modo">
+    <option value="1v1-simultaneo">1v1 Simultáneo</option>
+    <option value="1v1-secuencial">1v1 Secuencial</option>
+    <option value="cutoff">Cut Off / Todos contra todos</option>
+  </select>
+  <select id="input-jueces">
+    <option value="3">3 Jueces</option>
+    <option value="5">5 Jueces</option>
+    <option value="7">7 Jueces</option>
+  </select>
+  <button class="btn-primary" onclick="crearSala()">Crear Sala</button>
+</div>
+
+<!-- SALA ACTIVA -->
+<div id="seccion-sala" class="hidden">
+
+  <div class="card">
+    <div class="sala-info">
+      <div class="sala-codigo" id="display-codigo"></div>
+      <div class="sala-modo" id="display-modo"></div>
+    </div>
+    <div>
+      <strong>Jueces conectados:</strong>
+      <div class="jueces-lista" id="display-jueces"></div>
+    </div>
+    <div id="log"></div>
+  </div>
+
+  <!-- AGREGAR COMPETIDORES -->
+  <div class="card" id="seccion-competidores">
+    <h2>Competidores</h2>
+    <input type="text" id="input-competidor" placeholder="Nombre del competidor">
+    <button class="btn-secondary" onclick="agregarCompetidor()">+ Agregar</button>
+    <div id="lista-competidores"></div>
+    <button class="btn-success" id="btn-iniciar" onclick="iniciarCompetencia()" style="margin-top:10px">
+      ▶ Iniciar Competencia
+    </button>
+  </div>
+
+  <!-- CONTROL DE TURNO -->
+  <div class="card hidden" id="seccion-control">
+    <h2>Control de Turno</h2>
+    <div id="display-turno"></div>
+    <button class="btn-primary" id="btn-revelar" onclick="revelarPuntaje()" style="margin-top:10px">
+      👁 Revelar Puntaje
+    </button>
+    <button class="btn-warning hidden" id="btn-siguiente" onclick="siguienteTurno()" style="margin-top:5px">
+      ⏭ Siguiente
+button>
+    </div>
+
+  <!-- RANKING (Cut Off / Freestyle) -->
+  <div class="card hidden" id="seccion-ranking">
+    <h2>Ranking</h2>
+    <div id="display-ranking"></div>
+    <input type="number" id="input-topN" placeholder="¿Cuántos pasan? (ej: 8)" min="1">
+    <button class="btn-warning" onclick="definirCorte()">✂ Aplicar Corte</button>
+  </div>
+
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  let salaActual = null;
+  let competidores = [];
+  let turnoIndex = 0;
+  let modo = '';
+  let tipo = '';
+  let numJueces = 3;
+
+  // ── CREAR SALA ──
+  function crearSala() {
+    const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
+    tipo = document.getElementById('input-tipo').value;
+    modo = document.getElementById('input-modo').value;
+    numJueces = parseInt(document.getElementById('input-jueces').value);
+
+    if (!codigo) return alert('Ingresa un código de sala');
+
+    salaActual = codigo;
+    socket.emit('mesa-crear-sala', { codigo, tipo, modo, numJueces });
+  }
+
+  // ── AGREGAR COMPETIDOR ──
+  function agregarCompetidor() {
+    const nombre = document.getElementById('input-competidor').value.trim();
+    if (!nombre) return;
+    competidores.push({ nombre, puntajes: [], total: null });
+    document.getElementById('input-competidor').value = '';
+    renderCompetidores();
+  }
+
+  function renderCompetidores() {
+    const lista = document.getElementById('lista-competidores');
+    lista.innerHTML = competidores.map((c, i) => `
+      <div class="competidor-item">
+        <span class="competidor-nombre">${i + 1}. ${c.nombre}</span>
+        <button class="btn-sm btn-secondary" onclick="eliminarCompetidor(${i})">✕</button>
+      </div>
+    `).join('');
+  }
+
+  function eliminarCompetidor(i) {
+    competidores.splice(i, 1);
+    renderCompetidores();
+  }
+
+  // ── INICIAR COMPETENCIA ──
+  function iniciarCompetencia() {
+    if (competidores.length < 2) return alert('Agrega al menos 2 competidores');
+    turnoIndex = 0;
+    socket.emit('mesa-iniciar', { codigo: salaActual, competidores, modo, tipo });
+    document.getElementById('seccion-competidores').classList.add('hidden');
+    document.getElementById('seccion-control').classList.remove('hidden');
+    if (modo === 'cutoff' || tipo === 'freestyle') {
+      document.getElementById('seccion-ranking').classList.remove('hidden');
+    }
+    mostrarTurnoActual();
+  }
+
+  // ── MOSTRAR TURNO ──
+  function mostrarTurnoActual() {
+    const div = document.getElementById('display-turno');
+    if (modo === '1v1-simultaneo' || modo === '1v1-secuencial') {
+      const a = competidores[turnoIndex];
+      const b = competidores[turnoIndex + 1];
+      if (!a || !b) {
+        div.innerHTML = '<p style="text-align:center;color:#27ae60">✅ Competencia finalizada</p>';
+        document.getElementById('btn-revelar').classList.add('hidden');
+        document.getElementById('btn-siguiente').classList.add('hidden');
+        return;
+      }
+      if (modo === '1v1-simultaneo') {
+        div.innerHTML = `
+          <div class="vs-container">
+            <div class="turno-actual"><div class="turno-nombre">${a.nombre}</div></div>
+            <div style="align-self:center;font-size:1.5rem;font-weight:bold">VS</div>
+            <div class="turno-actual"><div class="turno-nombre">${b.nombre}</div></div>
+          </div>`;
+      } else {
+        div.innerHTML = `<div class="turno-actual"><div class="turno-nombre">${a.nombre}</div><div style="font-size:0.85rem;margin-top:5px">luego → ${b.nombre}</div></div>`;
+      }
+    } else {
+      const c = competidores[turnoIndex];
+      if (!c) {
+        div.innerHTML = '<p style="text-align:center;color:#27ae60">✅ Todos han competido</p>';
+        document.getElementById('btn-revelar').classList.add('hidden');
+        document.getElementById('btn-siguiente').classList.add('hidden');
+        return;
+      }
+      div.innerHTML = `<div class="turno-actual"><div class="turno-nombre">${c.nombre}</div><div style="font-size:0.85rem;margin-top:5px">${turnoIndex + 1} de ${competidores.length}</div></div>`;
+    }
+    document.getElementById('btn-revelar').classList.remove('hidden');
+    document.getElementById('btn-siguiente').classList.add('hidden');
+    socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
+  }
+
+  // ── REVELAR PUNTAJE ──
+  function revelarPuntaje() {
+    socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
+    document.getElementById('btn-revelar').classList.add('hidden');
+    document.getElementById('btn-siguiente').classList.remove('hidden');
+  }
+
+  // ── SIGUIENTE TURNO ──
+  function siguienteTurno() {
+    if (modo === '1v1-simultaneo' || modo === '1v1-secuencial') {
+      turnoIndex += 2;
+    } else {
+      turnoIndex += 1;
+    }
+    mostrarTurnoActual();
+  }
+
+  // ── CORTE ──
+  function definirCorte() {
+    const topN = parseInt(document.getElementById('input-topN').value);
+    if (!topN) return alert('Ingresa cuántos pasan');
+    socket.emit('mesa-corte', { codigo: salaActual, topN });
+  }
+
+  // ── SOCKET EVENTOS ──
+  socket.on('sala-creada', (data) => {
+    document.getElementById('seccion-setup').classList.add('hidden');
+    document.getElementById('seccion-sala').classList.remove('hidden');
+    document.getElementById('display-codigo').textContent = data.codigo;
+    document.getElementById('display-modo').textContent = `${data.tipo.toUpperCase()} · ${data.modo} · ${data.numJueces} jueces`;
+    log('Sala creada: ' + data.codigo);
+  });
+
+  socket.on('juez-conectado', (data) => {
+    renderJueces(data.jueces);
+    log('Juez conectado: ' + data.nombre);
+  });
+
+  socket.on('juez-desconectado', (data) => {
+    renderJueces(data.jueces);
+    log('Juez desconectado');
+  });
+
+  socket.on('puntaje-recibido', (data) => {
+    log(`Puntaje recibido de Juez ${data.juezNum}`);
+  });
+
+  socket.on('ranking-actualizado', (data) => {
+    renderRanking(data.ranking);
+  });
+
+  function renderJueces(jueces) {
+    const div = document.getElementById('display-jueces');
+    const total = numJueces;
+    let html = '';
+    for (let i = 1; i <= total; i++) {
+      const conectado = jueces.find(j => j.num === i);
+      html += conectado
+        ? `<span class="juez-badge">J${i} ${conectado.nombre || ''}</span>`
+        : `<span class="juez-badge vacio">J${i}</span>`;
+    }
+    div.innerHTML = html;
+  }
+
+  function renderRanking(ranking) {
+    const div = document.getElementById('display-ranking');
+    div.innerHTML = ranking.map((c, i) => `
+      <div class="competidor-item">
+        <span class="ranking-pos">${i + 1}</span>
+        <span class="competidor-nombre">${c.nombre}</span>
+        <span class="competidor-puntaje">${c.total !== null ? c.total.toFixed(2) : '—'}</span>
+      </div>
+    `).join('');
+  }
+
+  function log(msg) {
+    const div = document.getElementById('log');
+    div.innerHTML += `<div>${new Date().toLocaleTimeString()} — ${msg}</div>`;
+    div.scrollTop = div.scrollHeight;
+  }
+</script>
+</body>
 </html>
