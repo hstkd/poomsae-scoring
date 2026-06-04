@@ -235,25 +235,18 @@
   .header-logo { font-size: 12px; letter-spacing: 3px; }
   .juez-badge  { font-size: 10px; padding: 1px 8px; }
 
-  /* ── El panel llena exactamente lo que queda debajo del header ── */
-  /* NO usar height:100% — solo flex:1 para que respete el header  */
+  /* ── El panel no bloquea el scroll del hijo ── */
   #panel-calificacion {
     flex: 1;
     min-height: 0;
-    overflow: hidden;
+    overflow-y: auto;
   }
 
-  /* ── paso-prec: 3 filas explícitas — header / botones / confirmar ── */
-  /* Grid garantiza que confirmar SIEMPRE tenga su espacio al fondo    */
+  /* ── paso-prec scrolleable en landscape ── */
   .paso-prec {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
-    padding: 2px 4px;
-    gap: 2px;
-    flex: 1;
-    min-height: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    padding: 2px 4px;
   }
 
   /* Ocultar label que consume espacio */
@@ -502,7 +495,8 @@
   // ── BLOQUEAR SCROLL / ZOOM ──
   document.addEventListener('touchmove', (e) => {
     const isLandscape = window.innerWidth > window.innerHeight;
-    const allowed = e.target.closest('input[type=range]') || e.target.closest('.paso-pres') || e.target.closest('.paso-prec') && isLandscape;
+    if (isLandscape) return;
+    const allowed = e.target.closest('input[type=range]') || e.target.closest('.paso-pres');
     if (!allowed) e.preventDefault();
   }, { passive: false });
 
