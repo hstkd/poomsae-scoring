@@ -10,41 +10,47 @@
     body {
       background: #0d0d0d; color: white;
       font-family: 'Inter', sans-serif;
-      min-height: 100dvh; padding: 12px;
+      height: 100dvh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
       user-select: none; -webkit-user-select: none;
       touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
+
+    /* ── HEADER ── */
     .header {
+      padding: 6px 14px;
       display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 12px; padding-bottom: 10px;
-      border-bottom: 1px solid #1a1a1a;
+      flex-shrink: 0; border-bottom: 1px solid #1a1a1a;
     }
-    .header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 4px; color: #c9a84c; }
+    .header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px; color: #c9a84c; }
     .juez-badge {
       font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 3px;
-      padding: 4px 14px; border-radius: 20px;
+      padding: 3px 12px; border-radius: 20px;
       border: 1px solid #c9a84c; background: #1a1500; color: #c9a84c;
     }
 
-    /* OVERLAYS */
-    .overlay {
+    /* ── OVERLAYS ── */
+    .overlay-full {
       position: fixed; inset: 0; background: #0d0d0d;
       display: flex; flex-direction: column;
       justify-content: center; align-items: center;
-      gap: 14px; padding: 30px; z-index: 999;
+      gap: 14px; padding: 24px; z-index: 999;
+      overflow-y: auto;
     }
-    .overlay.hidden { display: none; }
+    .overlay-full.hidden { display: none; }
+
     .overlay-semi {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.93);
+      position: fixed; inset: 0; background: rgba(0,0,0,0.94);
       display: flex; flex-direction: column;
-      justify-content: center; align-items: center; gap: 12px; z-index: 90;
+      justify-content: center; align-items: center; gap: 12px;
+      z-index: 90; padding: 20px;
     }
     .overlay-semi.hidden { display: none; }
-    @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-    .pop { animation: popIn 0.3s ease-out; }
 
-    /* LOGIN */
-    .login-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 6px; color: #c9a84c; }
+    /* ── LOGIN ── */
+    .login-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 6px; color: #c9a84c; }
     .login-sub { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #444; text-transform: uppercase; margin-top: -8px; }
     .login-form { width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 10px; }
     .input-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: -6px; }
@@ -53,51 +59,61 @@
       border-radius: 8px; color: #fff; padding: 12px 14px;
       font-size: 16px; font-family: 'Bebas Neue', sans-serif;
       letter-spacing: 3px; outline: none; text-align: center;
+      touch-action: auto;
     }
     .input-field:focus { border-color: #c9a84c; }
     select.input-field { cursor: pointer; }
 
+    /* ── BOTONES GENERALES ── */
     .btn-gold {
       width: 100%; background: #c9a84c; color: #000; border: none;
       padding: 14px; font-family: 'Bebas Neue', sans-serif;
       font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
-    .btn-gold:active { filter: brightness(0.85); }
+    .btn-gold:active { filter: brightness(0.85); transform: scale(0.98); }
+
     .btn-confirmar {
       width: 100%; background: #0ea5e9; color: #fff; border: none;
       padding: 16px; font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 12px;
+      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
-    .btn-confirmar:active { filter: brightness(0.85); }
+    .btn-confirmar:active { filter: brightness(0.85); transform: scale(0.98); }
+
     .btn-enviar {
       width: 100%; background: #16a34a; color: #fff; border: none;
       padding: 16px; font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 12px;
+      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
-    .btn-enviar:active { filter: brightness(0.85); }
+    .btn-enviar:active { filter: brightness(0.85); transform: scale(0.98); }
+
     .btn-siguiente {
-      width: 100%; background: #c9a84c; color: #000; border: none;
+      width: 100%; max-width: 340px;
+      background: #c9a84c; color: #000; border: none;
       padding: 16px; font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 12px;
+      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
     .btn-siguiente:active { filter: brightness(0.85); }
 
-    .hidden { display: none; }
-    #panel-calificacion { display: none; padding-bottom: 30px; }
+    /* ── CONTENT SCROLL ── */
+    #panel-calificacion {
+      display: none; flex: 1; overflow-y: auto;
+      padding: 10px 12px 30px;
+      -webkit-overflow-scrolling: touch;
+    }
     #panel-calificacion.visible { display: block; }
 
-    /* COMP HEADER */
+    /* ── COMP HEADER ── */
     .comp-header {
       background: #141414; border: 1px solid #222;
-      border-radius: 10px; padding: 12px 14px;
-      margin-bottom: 14px; text-align: center;
+      border-radius: 10px; padding: 10px 14px;
+      margin-bottom: 12px; text-align: center;
     }
     .comp-tipo { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 4px; }
-    .comp-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; }
-    .comp-num { font-size: 10px; color: #555; margin-top: 2px; }
+    .comp-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; }
     .paso-label {
       text-align: center; font-size: 9px; font-weight: 700;
-      letter-spacing: 4px; color: #555; text-transform: uppercase; margin-bottom: 12px;
+      letter-spacing: 4px; color: #555; text-transform: uppercase;
+      margin-bottom: 10px;
     }
 
     /* ── PRECISIÓN 1V1 SIMULTÁNEO ── */
@@ -105,8 +121,8 @@
       display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
     }
     .prec-lado {
-      border-radius: 12px; padding: 12px 8px;
-      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      border-radius: 12px; padding: 10px 8px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
     }
     .prec-lado.rojo { background: #1a0000; border: 1px solid #3d0000; }
     .prec-lado.azul { background: #00001a; border: 1px solid #00003d; }
@@ -116,87 +132,96 @@
     .prec-lado.rojo .prec-lado-nombre { color: #ff6666; }
     .prec-lado.azul .prec-lado-nombre { color: #6699ff; }
     .prec-valor {
-      font-family: 'Bebas Neue', sans-serif; font-size: 64px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 72px;
       letter-spacing: 2px; line-height: 1; color: #c9a84c;
-      text-shadow: 0 0 16px rgba(201,168,76,0.3);
+      text-shadow: 0 0 20px rgba(201,168,76,0.4);
     }
-    /* Botones grandes de deducción */
     .prec-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+    /* BOTONES DEDUCCIÓN — MUY GRANDES */
     .btn-ded {
-      width: 100%; border: none; border-radius: 10px;
-      font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;
-      cursor: pointer; transition: all 0.1s;
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; padding: 0;
+      width: 100%; border: none; border-radius: 12px;
+      font-family: 'Bebas Neue', sans-serif;
+      cursor: pointer; transition: transform 0.1s;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
-    .btn-ded.grande { height: 80px; font-size: 28px; }
-    .btn-ded.chico  { height: 64px; font-size: 24px; }
-    .btn-ded.rojo-btn.grande { background: #4a0000; color: #ff8888; border: 1px solid #660000; }
-    .btn-ded.rojo-btn.grande:active { background: #ff4444; color: #fff; transform: scale(0.97); }
-    .btn-ded.rojo-btn.chico  { background: #2a0000; color: #ff9999; border: 1px solid #440000; }
-    .btn-ded.rojo-btn.chico:active  { background: #ff6666; color: #fff; transform: scale(0.97); }
-    .btn-ded.azul-btn.grande { background: #00004a; color: #8888ff; border: 1px solid #000066; }
-    .btn-ded.azul-btn.grande:active { background: #4444ff; color: #fff; transform: scale(0.97); }
-    .btn-ded.azul-btn.chico  { background: #00002a; color: #9999ff; border: 1px solid #000044; }
-    .btn-ded.azul-btn.chico:active  { background: #6666ff; color: #fff; transform: scale(0.97); }
-    .btn-ded-sub { font-size: 10px; letter-spacing: 1px; opacity: 0.6; margin-top: 2px; }
+    .btn-ded:active { transform: scale(0.95); filter: brightness(1.3); }
+    .btn-ded.grande { height: 100px; font-size: 36px; letter-spacing: 2px; }
+    .btn-ded.chico  { height: 80px;  font-size: 30px; letter-spacing: 2px; }
+    .btn-ded-sub { font-size: 10px; letter-spacing: 2px; opacity: 0.65; margin-top: 3px; text-transform: uppercase; }
+
+    .btn-ded.rojo-btn.grande { background: linear-gradient(135deg,#5a0000,#dc2626); color: #fff; border: 1px solid #ef4444; }
+    .btn-ded.rojo-btn.chico  { background: linear-gradient(135deg,#3a0000,#991b1b); color: #ffaaaa; border: 1px solid #b91c1c; }
+    .btn-ded.azul-btn.grande { background: linear-gradient(135deg,#00005a,#3b82f6); color: #fff; border: 1px solid #60a5fa; }
+    .btn-ded.azul-btn.chico  { background: linear-gradient(135deg,#00003a,#1e40af); color: #aabbff; border: 1px solid #2563eb; }
 
     .btn-undo {
       width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a;
-      color: #888; padding: 10px; border-radius: 8px;
-      font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px;
-      cursor: pointer;
+      color: #555; padding: 8px; border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px;
+      cursor: pointer; touch-action: manipulation;
     }
     .btn-undo:active { border-color: #c9a84c; color: #c9a84c; }
 
-    /* ── PRECISIÓN NORMAL ── */
+    /* ── PRECISIÓN NORMAL (cutoff/secuencial) ── */
     .seccion {
       background: #141414; border: 1px solid #222;
       border-radius: 12px; padding: 14px; margin-bottom: 10px;
     }
-    .seccion-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
+    .seccion-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
     .seccion-titulo { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; }
     .seccion-max { font-size: 9px; color: #444; }
-    .precision-display { display: flex; justify-content: center; align-items: baseline; gap: 4px; margin-bottom: 14px; }
-    .precision-valor { font-family: 'Bebas Neue', sans-serif; font-size: 80px; letter-spacing: 2px; color: #c9a84c; line-height: 1; }
-    .precision-max-lbl { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #444; }
-    .deduccion-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .btn-deduccion-normal {
-      background: #1a1a1a; border: 1px solid #2a2a2a; color: #e55;
-      border-radius: 12px; font-family: 'Bebas Neue', sans-serif;
-      font-size: 24px; letter-spacing: 2px; cursor: pointer;
-      height: 80px; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 2px;
+    .precision-display {
+      display: flex; justify-content: center; align-items: baseline;
+      gap: 4px; margin-bottom: 14px;
     }
-    .btn-deduccion-normal:active { background: #3a0000; border-color: #e55; transform: scale(0.97); }
+    .precision-valor { font-family: 'Bebas Neue', sans-serif; font-size: 100px; letter-spacing: 2px; color: #c9a84c; line-height: 1; text-shadow: 0 0 30px rgba(201,168,76,0.4); }
+    .precision-max-lbl { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #444; }
+    .deduccion-btns-normal { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+    .btn-ded-normal {
+      height: 110px; border: 1px solid #550000; border-radius: 14px;
+      background: linear-gradient(135deg,#3a0000,#991b1b); color: #fff;
+      font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px;
+      cursor: pointer; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px;
+      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+    }
+    .btn-ded-normal:active { filter: brightness(1.4); transform: scale(0.96); }
+    .btn-ded-sub-small { font-size: 10px; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; }
     .btn-reset-prec {
-      margin-top: 10px; width: 100%; background: none;
-      border: 1px solid #1a1a1a; color: #444; padding: 10px; border-radius: 8px;
-      font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer;
+      width: 100%; background: none; border: 1px solid #1a1a1a;
+      color: #444; padding: 8px; border-radius: 8px;
+      font-size: 9px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; cursor: pointer; margin-top: 6px;
     }
     .btn-reset-prec:active { border-color: #c9a84c; color: #c9a84c; }
 
     /* ── PRESENTACIÓN ── */
     .pres-simultaneo { display: flex; flex-direction: column; gap: 10px; }
-    .pres-bloque { border-radius: 12px; padding: 14px; }
+    .pres-bloque { border-radius: 12px; padding: 12px; }
     .pres-bloque.rojo { background: #110000; border: 1px solid #2a0000; }
     .pres-bloque.azul { background: #00001a; border: 1px solid #00002a; }
     .pres-bloque-titulo {
       font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px;
-      margin-bottom: 12px; text-align: center;
+      margin-bottom: 10px; text-align: center;
     }
     .pres-bloque.rojo .pres-bloque-titulo { color: #ff6666; }
     .pres-bloque.azul .pres-bloque-titulo { color: #6699ff; }
 
-    .modulo { margin-bottom: 12px; }
+    .modulo { margin-bottom: 10px; }
     .modulo:last-child { margin-bottom: 0; }
-    .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
     .modulo-nombre { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: #666; text-transform: uppercase; }
     .modulo-valor { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: #c9a84c; }
-    .modulo-slider { width: 100%; height: 10px; accent-color: #c9a84c; cursor: pointer; border-radius: 4px; }
+    .modulo-slider {
+      width: 100%; height: 10px; accent-color: #c9a84c;
+      cursor: pointer; border-radius: 4px; touch-action: auto;
+    }
     .modulo-rangos { display: flex; justify-content: space-between; font-size: 8px; color: #444; margin-top: 4px; }
 
-    /* SUBTOTAL PRESENTACIÓN */
     .subtotal-pres {
       background: #0a0a0a; border: 1px solid #333;
       border-radius: 8px; padding: 8px 14px;
@@ -206,13 +231,13 @@
     .subtotal-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; }
     .subtotal-valor { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: #c9a84c; }
 
-    /* RESUMEN ENVIADO */
+    /* ── RESUMEN ── */
     .resumen-card {
       background: #141414; border: 1px solid #222;
       border-radius: 14px; padding: 20px; width: 90%; max-width: 340px;
     }
     .resumen-titulo {
-      font-family: 'Bebas Neue', sans-serif; font-size: 14px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
       letter-spacing: 4px; color: #555; text-align: center; margin-bottom: 14px;
     }
     .resumen-fila {
@@ -221,14 +246,18 @@
     }
     .resumen-fila:last-child { border-bottom: none; }
     .resumen-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; }
-    .resumen-puntaje { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: #c9a84c; }
-    .resumen-sub { font-size: 9px; color: #555; letter-spacing: 1px; }
+    .resumen-puntaje { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 2px; color: #c9a84c; }
+    .resumen-sub { font-size: 9px; color: #555; letter-spacing: 1px; margin-top: 2px; }
+
+    .hidden { display: none; }
+
+    hr.sep { border: none; border-top: 1px solid #1e1e1e; margin: 10px 0; }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="overlay" id="overlay-login">
+<div class="overlay-full" id="overlay-login">
   <div class="login-titulo">POOMSAE</div>
   <div class="login-sub">Sistema de Calificación</div>
   <div class="login-form">
@@ -249,19 +278,17 @@
 
 <!-- ESPERA -->
 <div class="overlay-semi" id="overlay-espera">
-  <div style="font-size:48px">⏸</div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;color:#c9a84c">ESPERANDO TURNO</div>
+  <div style="font-size:44px">⏸</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c">ESPERANDO TURNO</div>
   <div style="font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase">Espera la señal de la mesa</div>
 </div>
 
 <!-- RESUMEN ENVIADO -->
 <div class="overlay-semi hidden" id="overlay-enviado">
-  <div style="font-size:48px" class="pop">✅</div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#22c55e">PUNTAJE ENVIADO</div>
+  <div style="font-size:48px">✅</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#22c55e">PUNTAJE ENVIADO</div>
   <div id="resumen-contenido"></div>
-  <button class="btn-siguiente" style="width:90%;max-width:340px" onclick="esperarSiguiente()">
-    LISTO →
-  </button>
+  <button class="btn-siguiente" onclick="esperarSiguiente()">LISTO →</button>
 </div>
 
 <!-- HEADER -->
@@ -275,12 +302,51 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
+  // ── BLOQUEAR PULL-TO-REFRESH Y GESTOS ──
+  document.addEventListener('touchmove', function(e) {
+    if (!e.target.closest('input[type=range]') && !e.target.closest('.input-field')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
+  document.addEventListener('touchstart', function(e) {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+
+  let lastTap = 0;
+  document.addEventListener('touchend', function(e) {
+    const now = Date.now();
+    if (now - lastTap < 300) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+
+  // ── VIBRACIÓN CON AUDIOCONTEXT ──
+  function vibrar(tipo) {
+    // Vibración nativa (Android)
+    if (navigator.vibrate) {
+      if (tipo === 'suave') navigator.vibrate(60);
+      else navigator.vibrate([100, 30, 100]);
+      return;
+    }
+    // Fallback AudioContext (iOS)
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = tipo === 'suave' ? 80 : 40;
+      gain.gain.setValueAtTime(tipo === 'suave' ? 0.3 : 0.6, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (tipo === 'suave' ? 0.08 : 0.18));
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + (tipo === 'suave' ? 0.08 : 0.18));
+    } catch(e) {}
+  }
+
   const socket = io();
   let salaInfo = {};
   let numJuez = 1;
   let turnoActual = null;
-
-  // Estado
   let precisionVal = { A: 4.0, B: 4.0, C: 4.0 };
   let historialPrec = { A: [], B: [], C: [] };
   let modulosVal = {
@@ -294,13 +360,6 @@
     { id: 'rit', nombre: 'Ritmo y Tiempo' },
     { id: 'exp', nombre: 'Expresión de Energía' }
   ];
-
-  // ── VIBRACIÓN ──
-  function vibrar(tipo) {
-    if (!navigator.vibrate) return;
-    if (tipo === 'suave') navigator.vibrate(60);
-    if (tipo === 'fuerte') navigator.vibrate([80, 40, 80]);
-  }
 
   // ── CONECTAR ──
   function conectarse() {
@@ -325,7 +384,7 @@
     const panel = document.getElementById('panel-calificacion');
 
     if (turno.tipo === '1v1-simultaneo') {
-      panel.innerHTML = headerComp() + '<div id="paso-container"></div>';
+      panel.innerHTML = headerSimultaneo() + '<div id="paso-container"></div>';
       mostrarPasoPrec();
     } else if (turno.tipo === '1v1-secuencial') {
       const comp = turno.fase === 'A' ? turno.competidorA : turno.competidorB;
@@ -338,110 +397,96 @@
     document.getElementById('overlay-espera').classList.add('hidden');
     document.getElementById('overlay-enviado').classList.add('hidden');
     panel.style.display = 'block';
+    panel.classList.add('visible');
   }
 
-  // ── HEADER 1V1 ──
-  function headerComp() {
+  function headerSimultaneo() {
     const t = turnoActual;
-    if (t.tipo === '1v1-simultaneo') {
-      return `<div class="comp-header">
-        <div class="comp-tipo">Simultáneo</div>
-        <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:4px">
-          <span class="comp-nombre" style="color:#ff6666">${t.competidorA?.nombre || '—'}</span>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#333">VS</span>
-          <span class="comp-nombre" style="color:#6699ff">${t.competidorB?.nombre || '—'}</span>
-        </div>
-      </div>`;
-    }
-    return '';
+    return `<div class="comp-header">
+      <div class="comp-tipo">Simultáneo</div>
+      <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:4px">
+        <span class="comp-nombre" style="color:#ff6666">${t.competidorA?.nombre || '—'}</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#333">VS</span>
+        <span class="comp-nombre" style="color:#6699ff">${t.competidorB?.nombre || '—'}</span>
+      </div>
+    </div>`;
   }
 
-  // ── PASO 1: PRECISIÓN SIMULTÁNEO ──
+  // ── PASO 1: PRECISIÓN 1V1 ──
   function mostrarPasoPrec() {
     const nomA = turnoActual.competidorA?.nombre || '—';
     const nomB = turnoActual.competidorB?.nombre || '—';
     document.getElementById('paso-container').innerHTML = `
       <div class="paso-label">PASO 1 · PRECISIÓN TÉCNICA</div>
       <div class="prec-simultaneo">
-
         <div class="prec-lado rojo">
           <div class="prec-lado-nombre">${nomA}</div>
           <div class="prec-valor" id="prec-val-A">4.0</div>
           <div class="prec-btns">
-            <button class="btn-ded grande rojo-btn" onclick="deducir('A',0.3)">
-              − 0.3
-              <span class="btn-ded-sub">MAYOR</span>
+            <button class="btn-ded grande rojo-btn" ontouchstart="deducir('A',0.3)" onclick="deducir('A',0.3)">
+              − 0.3<span class="btn-ded-sub">Mayor</span>
             </button>
-            <button class="btn-ded chico rojo-btn" onclick="deducir('A',0.1)">
-              − 0.1
-              <span class="btn-ded-sub">MENOR</span>
+            <button class="btn-ded chico rojo-btn" ontouchstart="deducir('A',0.1)" onclick="deducir('A',0.1)">
+              − 0.1<span class="btn-ded-sub">Menor</span>
             </button>
             <button class="btn-undo" onclick="undo('A')">↩ UNDO</button>
           </div>
         </div>
-
         <div class="prec-lado azul">
           <div class="prec-lado-nombre">${nomB}</div>
           <div class="prec-valor" id="prec-val-B">4.0</div>
           <div class="prec-btns">
-            <button class="btn-ded grande azul-btn" onclick="deducir('B',0.3)">
-              − 0.3
-              <span class="btn-ded-sub">MAYOR</span>
+            <button class="btn-ded grande azul-btn" ontouchstart="deducir('B',0.3)" onclick="deducir('B',0.3)">
+              − 0.3<span class="btn-ded-sub">Mayor</span>
             </button>
-            <button class="btn-ded chico azul-btn" onclick="deducir('B',0.1)">
-              − 0.1
-              <span class="btn-ded-sub">MENOR</span>
+            <button class="btn-ded chico azul-btn" ontouchstart="deducir('B',0.1)" onclick="deducir('B',0.1)">
+              − 0.1<span class="btn-ded-sub">Menor</span>
             </button>
             <button class="btn-undo" onclick="undo('B')">↩ UNDO</button>
           </div>
         </div>
-
       </div>
       <button class="btn-confirmar" onclick="mostrarPasoPres()">CONFIRMAR PRECISIÓN →</button>
     `;
   }
 
-  // ── PASO 2: PRESENTACIÓN SIMULTÁNEO ──
+  // ── PASO 2: PRESENTACIÓN 1V1 ──
   function mostrarPasoPres() {
     const nomA = turnoActual.competidorA?.nombre || '—';
     const nomB = turnoActual.competidorB?.nombre || '—';
     document.getElementById('paso-container').innerHTML = `
       <div class="paso-label">PASO 2 · PRESENTACIÓN</div>
       <div class="pres-simultaneo">
-
         <div class="pres-bloque azul">
           <div class="pres-bloque-titulo">${nomB}</div>
           ${modulosSliders('B')}
           <div class="subtotal-pres">
-            <span class="subtotal-label">Subtotal Presentación</span>
+            <span class="subtotal-label">Subtotal</span>
             <span class="subtotal-valor" id="subtotal-B">3.0</span>
           </div>
         </div>
-
         <div class="pres-bloque rojo">
           <div class="pres-bloque-titulo">${nomA}</div>
           ${modulosSliders('A')}
           <div class="subtotal-pres">
-            <span class="subtotal-label">Subtotal Presentación</span>
+            <span class="subtotal-label">Subtotal</span>
             <span class="subtotal-valor" id="subtotal-A">3.0</span>
           </div>
         </div>
-
       </div>
-      <button class="btn-enviar" onclick="enviarAmbos()">ENVIAR PUNTAJES</button>
+      <button class="btn-enviar" onclick="enviarAmbos()" style="margin-top:12px">ENVIAR PUNTAJES</button>
     `;
     actualizarSubtotal('A');
     actualizarSubtotal('B');
   }
 
-  // ── RENDER UNO (cutoff / secuencial) ──
+  // ── RENDER UNO ──
   function renderUno(panel, comp, sub, key, fase) {
     panel.innerHTML = `
       <div class="comp-header">
         <div class="comp-tipo">${sub}</div>
         <div class="comp-nombre">${comp?.nombre || '—'}</div>
       </div>
-
       <div class="paso-label">PRECISIÓN TÉCNICA</div>
       <div class="seccion">
         <div class="seccion-header">
@@ -452,19 +497,18 @@
           <span class="precision-valor" id="prec-val-${key}">4.0</span>
           <span class="precision-max-lbl">/ 4.0</span>
         </div>
-        <div class="deduccion-btns">
-          <button class="btn-deduccion-normal" onclick="deducir('${key}',0.3)">
-            − 0.3<span class="btn-ded-sub" style="font-size:10px;opacity:0.6;letter-spacing:1px">MAYOR</span>
+        <div class="deduccion-btns-normal">
+          <button class="btn-ded-normal" ontouchstart="deducir('${key}',0.3)" onclick="deducir('${key}',0.3)">
+            − 0.3<span class="btn-ded-sub-small">Mayor</span>
           </button>
-          <button class="btn-deduccion-normal" onclick="deducir('${key}',0.1)">
-            − 0.1<span class="btn-ded-sub" style="font-size:10px;opacity:0.6;letter-spacing:1px">MENOR</span>
+          <button class="btn-ded-normal" ontouchstart="deducir('${key}',0.1)" onclick="deducir('${key}',0.1)">
+            − 0.1<span class="btn-ded-sub-small">Menor</span>
           </button>
         </div>
-        <button class="btn-undo" onclick="undo('${key}')" style="margin-top:10px">↩ UNDO</button>
+        <button class="btn-undo" onclick="undo('${key}')">↩ UNDO</button>
         <button class="btn-reset-prec" onclick="resetPrecision('${key}')">RESET 4.0</button>
       </div>
-
-      <div class="paso-label" style="margin-top:14px">PRESENTACIÓN</div>
+      <div class="paso-label" style="margin-top:12px">PRESENTACIÓN</div>
       <div class="seccion">
         ${modulosSliders(key)}
         <div class="subtotal-pres" style="margin-top:12px">
@@ -472,7 +516,6 @@
           <span class="subtotal-valor" id="subtotal-${key}">3.0</span>
         </div>
       </div>
-
       <button class="btn-enviar" onclick="enviarUno('${key}','${fase}')">ENVIAR PUNTAJE</button>
     `;
     actualizarSubtotal(key);
@@ -494,11 +537,15 @@
           <span>0.5</span><span>1.0</span><span>1.5</span><span>2.0</span>
         </div>
       </div>
-    `).join('<hr style="border:none;border-top:1px solid #1e1e1e;margin:10px 0">');
+    `).join('<hr class="sep">');
   }
 
   // ── LÓGICA PRECISIÓN ──
+  let ultimaDeduccion = 0;
   function deducir(key, cantidad) {
+    const ahora = Date.now();
+    if (ahora - ultimaDeduccion < 200) return; // debounce
+    ultimaDeduccion = ahora;
     historialPrec[key].push(precisionVal[key]);
     let val = Math.round((precisionVal[key] - cantidad) * 10) / 10;
     val = Math.max(0, val);
@@ -509,7 +556,7 @@
   }
 
   function undo(key) {
-    if (historialPrec[key].length === 0) return;
+    if (!historialPrec[key].length) return;
     const anterior = historialPrec[key].pop();
     precisionVal[key] = anterior;
     const el = document.getElementById(`prec-val-${key}`);
@@ -534,14 +581,14 @@
   }
 
   function actualizarSubtotal(key) {
-    const pres = Math.round(Object.values(modulosVal[key]).reduce((s, v) => s + v, 0) * 100) / 100;
+    const pres = Math.round(Object.values(modulosVal[key]).reduce((s,v) => s+v, 0) * 100) / 100;
     const el = document.getElementById(`subtotal-${key}`);
     if (el) el.textContent = pres.toFixed(1);
   }
 
   function getValores(key) {
     const prec = precisionVal[key] || 0;
-    const pres = Math.round(Object.values(modulosVal[key]).reduce((s, v) => s + v, 0) * 100) / 100;
+    const pres = Math.round(Object.values(modulosVal[key]).reduce((s,v) => s+v, 0) * 100) / 100;
     return { precision: prec, presentacion: pres };
   }
 
@@ -549,14 +596,8 @@
   function enviarAmbos() {
     const vA = getValores('A');
     const vB = getValores('B');
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo, competidorId: turnoActual.competidorA.id,
-      precision: vA.precision, presentacion: vA.presentacion
-    });
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id,
-      precision: vB.precision, presentacion: vB.presentacion
-    });
+    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: turnoActual.competidorA.id, precision: vA.precision, presentacion: vA.presentacion });
+    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id, precision: vB.precision, presentacion: vB.presentacion });
     mostrarResumen([
       { nombre: turnoActual.competidorA?.nombre, ...vA },
       { nombre: turnoActual.competidorB?.nombre, ...vB }
@@ -569,14 +610,10 @@
     else if (fase === 'B') comp = turnoActual.competidorB;
     else comp = turnoActual.competidor;
     const v = getValores(key);
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo, competidorId: comp.id,
-      precision: v.precision, presentacion: v.presentacion
-    });
+    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: comp.id, precision: v.precision, presentacion: v.presentacion });
     mostrarResumen([{ nombre: comp?.nombre, ...v }]);
   }
 
-  // ── RESUMEN ──
   function mostrarResumen(resultados) {
     const html = `
       <div class="resumen-card">
@@ -593,6 +630,7 @@
       </div>`;
     document.getElementById('resumen-contenido').innerHTML = html;
     document.getElementById('panel-calificacion').style.display = 'none';
+    document.getElementById('panel-calificacion').classList.remove('visible');
     document.getElementById('overlay-enviado').classList.remove('hidden');
   }
 
