@@ -223,111 +223,137 @@
       flex-shrink: 0;
     }
 
-    /* Landscape: los botones son aún más anchos */
+       /* Landscape: los botones son aún más anchos */
 @media (orientation: landscape) {
 
-  /* ── Header mínimo ── */
   .header {
-    padding: 1px 8px;
-    min-height: 28px;
-    max-height: 28px;
+    padding: 1px 10px;
+    max-height: 24px;
+    min-height: 0;
   }
-  .header-logo { font-size: 12px; letter-spacing: 3px; }
-  .juez-badge  { font-size: 10px; padding: 1px 8px; }
+  .header-logo { font-size: 11px; letter-spacing: 2px; }
+  .juez-badge  { font-size: 10px; padding: 1px 7px; border-radius: 10px; }
 
-  /* ── El panel no bloquea el scroll del hijo ── */
   #panel-calificacion {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
+    overflow: hidden;
   }
 
-  /* ── paso-prec scrolleable en landscape ── */
   .paso-prec {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 2px 4px;
+    padding: 2px 6px;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: 1fr;
+    gap: 2px;
+    height: 100%;
+    overflow: hidden;
   }
 
-  /* Ocultar label que consume espacio */
-  .paso-label { display: none; }
-
-  /* ── Cabecera de competidores compacta ── */
   .comp-header {
-    padding: 2px 8px;
-    margin-bottom: 2px;
+    padding: 1px 8px;
+    margin-bottom: 0;
+    border-radius: 5px;
   }
-  .comp-tipo   { font-size: 6px; letter-spacing: 3px; }
-  .comp-nombre { font-size: 14px; letter-spacing: 2px; }
+  .comp-tipo   { display: none; }
+  .comp-nombre { font-size: 11px; letter-spacing: 1px; line-height: 1; }
+  .paso-label  { display: none; }
 
-  /* ── Grid simultáneo: ocupa la fila 1fr del medio ── */
   .prec-grid {
     min-height: 0;
+    height: 100%;
+    gap: 5px;
     overflow: hidden;
-    gap: 4px;
   }
 
-  /* ── Botón CONFIRMAR: siempre en su fila al fondo ── */
-  .btn-confirmar {
-    height: 40px !important;
-    margin-top: 0 !important;
-    padding: 0 8px;
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-
-  /* Columnas dentro del grid */
   .prec-col {
     min-height: 0;
     overflow: hidden;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
   }
-  .prec-col-header { padding: 2px; flex-shrink: 0; }
-  .prec-col-nombre { font-size: 11px; }
-  .prec-score      { font-size: 18px; padding: 1px 0; }
 
-  /* Botones de deducción llenan la columna */
+  .prec-col-header {
+    flex-shrink: 0;
+    padding: 1px 4px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .prec-col-nombre { font-size: 10px; letter-spacing: 1px; line-height: 1; }
+  .prec-score {
+    font-size: 14px;
+    padding: 0;
+    line-height: 1;
+    text-shadow: none;
+  }
+
   .prec-btns {
     flex: 1;
     min-height: 0;
-    gap: 4px;
-    padding: 2px;
+    gap: 3px;
+    padding: 2px 3px;
   }
   .btn-ded {
     flex: 1;
     min-height: 0;
-    border-radius: 14px;
+    border-radius: 8px;
   }
-  .btn-ded-val { font-size: clamp(36px, 5vw, 64px); font-weight: 700; }
-  .btn-ded-sub { font-size: clamp(9px, 1vw, 12px); letter-spacing: 3px; }
+  .btn-ded-val { font-size: clamp(24px, 5vh, 48px); line-height: 1; }
+  .btn-ded-sub { font-size: clamp(8px, 1.2vh, 11px); margin-top: 1px; letter-spacing: 1px; }
 
-  /* Undo compacto */
-  .prec-undo-row { padding: 2px 4px; flex-shrink: 0; }
-  .btn-undo      { font-size: 10px; padding: 3px 8px; }
+  .prec-undo-row {
+    flex-shrink: 0;
+    padding: 2px 3px;
+  }
+  .btn-undo { font-size: 9px; padding: 2px 8px; border-radius: 4px; }
 
-  /* ── Modo normal / cutoff / secuencial ── */
+  .btn-confirmar {
+    flex-shrink: 0;
+    padding: 6px;
+    font-size: 13px;
+    letter-spacing: 3px;
+    border-radius: 7px;
+    margin-top: 0;
+  }
+
   .prec-normal {
     flex: 1;
     min-height: 0;
-    gap: 4px;
+    gap: 3px;
   }
   .prec-normal-score {
-    font-size: 22px !important;
+    font-size: 20px !important;
     padding: 0;
+    line-height: 1;
+    text-shadow: none;
   }
+  .prec-normal-max { font-size: 12px; }
+
   .prec-normal-btns {
     flex: 1;
     min-height: 0;
     gap: 4px;
   }
   .btn-ded-normal {
-    flex: 1;
     min-height: 0 !important;
-    border-radius: 14px;
+    flex: 1;
+    border-radius: 10px;
+    gap: 2px;
   }
-  .btn-ded-normal-val { font-size: clamp(28px, 5vw, 52px); }
-  .btn-ded-normal-sub { font-size: clamp(9px, 1.2vw, 12px); }
-  .prec-normal-footer { flex-shrink: 0; }
+  .btn-ded-normal-val { font-size: clamp(24px, 5vh, 48px); line-height: 1; }
+  .btn-ded-normal-sub { font-size: clamp(8px, 1.2vh, 11px); letter-spacing: 1px; }
+
+  .prec-normal-footer {
+    flex-shrink: 0;
+    gap: 6px;
+  }
+  .btn-reset-prec { padding: 5px; font-size: 8px; }
 }
+
 
 
     /* ════════════════════════════════════
