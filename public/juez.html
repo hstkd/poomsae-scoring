@@ -110,9 +110,13 @@
     /* ── CONTENEDOR PASO ── */
     /* PRECISIÓN: llena la pantalla, NO scrollea */
     .paso-prec {
-      flex: 1; display: flex; flex-direction: column;
-      overflow: hidden; padding: 8px 10px;
-    }
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 4px 6px;
+  min-height: 0;
+}
     /* PRESENTACIÓN: scrollea */
     .paso-pres {
       flex: 1; overflow-y: auto; overflow-x: hidden;
@@ -152,16 +156,21 @@
     .prec-col.azul { background: #00001a; border: 1px solid #00003d; }
 
     .prec-col-header {
-      padding: 6px; text-align: center; flex-shrink: 0;
-    }
+  padding: 2px;
+  text-align: center;
+  flex-shrink: 0;
+}
     .prec-col-nombre {
-      font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px;
-    }
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  line-height: 1;
+}
     .prec-col.rojo .prec-col-nombre { color: #ff6666; }
     .prec-col.azul .prec-col-nombre { color: #6699ff; }
 
     .prec-score {
-      font-family: 'Bebas Neue', sans-serif; font-size: 44px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 28px;
       letter-spacing: 2px; line-height: 1; color: #c9a84c;
       text-align: center; padding: 4px 0;
       text-shadow: 0 0 16px rgba(201,168,76,0.3);
@@ -170,9 +179,13 @@
 
     /* Botones deducción: llenan el espacio restante */
     .prec-btns {
-      flex: 1; display: flex; flex-direction: column;
-      gap: 6px; padding: 0 6px 6px; min-height: 0;
-    }
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 2px;
+  min-height: 0;
+}
     .btn-ded {
       flex: 1; width: 100%; border: none; border-radius: 12px;
       font-family: 'Bebas Neue', sans-serif;
@@ -334,6 +347,28 @@
     padding: 10px;
     font-size: 16px;
   }
+  .prec-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+.prec-col {
+  min-height: 0;
+}
+
+.btn-ded {
+  flex: 1;
+  min-height: 0;
+}
+
+.btn-ded-val {
+  font-size: 56px;
+}
+
+.btn-confirmar {
+  flex-shrink: 0;
+  height: 48px;
+}
 }
 
 
@@ -523,6 +558,28 @@
     padding: 10px;
     font-size: 16px;
   }
+  .prec-grid {
+  flex: 1;
+  min-height: 0;
+}
+
+.prec-col {
+  min-height: 0;
+}
+
+.btn-ded {
+  flex: 1;
+  min-height: 0;
+}
+
+.btn-ded-val {
+  font-size: 56px;
+}
+
+.btn-confirmar {
+  flex-shrink: 0;
+  height: 48px;
+}
 }
 
 
