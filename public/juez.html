@@ -14,6 +14,7 @@
       user-select: none; -webkit-user-select: none;
       touch-action: manipulation;
     }
+
     .header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 12px; padding-bottom: 10px;
@@ -30,35 +31,28 @@
       border: 1px solid #c9a84c;
       background: #1a1500; color: #c9a84c;
     }
-    .estado-bar {
-      display: flex; align-items: center; justify-content: center;
-      gap: 6px; margin-bottom: 16px;
-    }
-    .estado-dot { width: 6px; height: 6px; border-radius: 50%; background: #333; }
-    .estado-dot.activo { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-    .estado-txt {
-      font-size: 9px; font-weight: 700; letter-spacing: 3px;
-      color: #444; text-transform: uppercase;
-    }
-    .estado-txt.activo { color: #22c55e; }
 
     /* LOGIN */
-    .overlay-login {
+    .overlay {
       position: fixed; inset: 0; background: #0d0d0d;
       display: flex; flex-direction: column;
       justify-content: center; align-items: center;
       gap: 14px; padding: 30px; z-index: 999;
     }
-    .overlay-login.hidden { display: none; }
+    .overlay.hidden { display: none; }
     .login-titulo {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 28px; letter-spacing: 5px; color: #c9a84c;
+      font-size: 32px; letter-spacing: 6px; color: #c9a84c;
     }
     .login-sub {
       font-size: 9px; font-weight: 700; letter-spacing: 3px;
       color: #444; text-transform: uppercase; margin-top: -8px;
     }
     .login-form { width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 10px; }
+    .input-label {
+      font-size: 8px; font-weight: 700; letter-spacing: 3px;
+      color: #555; text-transform: uppercase; margin-bottom: -6px;
+    }
     .input-field {
       width: 100%; background: #111; border: 1px solid #2a2a2a;
       border-radius: 8px; color: #fff; padding: 12px 14px;
@@ -66,61 +60,40 @@
       letter-spacing: 3px; outline: none; text-align: center;
     }
     .input-field:focus { border-color: #c9a84c; }
-    .input-label {
-      font-size: 8px; font-weight: 700; letter-spacing: 3px;
-      color: #555; text-transform: uppercase; margin-bottom: -6px;
-    }
     select.input-field { cursor: pointer; }
-    .btn-conectar {
-      width: 100%; background: #c9a84c; color: #000;
-      border: none; padding: 14px;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 18px; letter-spacing: 4px;
-      border-radius: 10px; cursor: pointer; margin-top: 4px;
+    .btn-gold {
+      width: 100%; background: #c9a84c; color: #000; border: none;
+      padding: 14px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
-    .btn-conectar:active { filter: brightness(0.85); }
+    .btn-gold:active { filter: brightness(0.85); }
 
-    /* ESPERA */
-    .overlay-espera {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.88);
+    /* OVERLAYS */
+    .overlay-semi {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.92);
       display: flex; flex-direction: column;
-      justify-content: center; align-items: center; gap: 10px;
-      z-index: 90;
+      justify-content: center; align-items: center; gap: 10px; z-index: 90;
     }
-    .overlay-espera.hidden { display: none; }
-    .espera-icon { font-size: 40px; }
-    .espera-titulo {
+    .overlay-semi.hidden { display: none; }
+    .overlay-icon { font-size: 48px; }
+    .overlay-titulo {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px; letter-spacing: 4px; color: #555;
+      font-size: 24px; letter-spacing: 4px; color: #c9a84c;
     }
-    .espera-sub { font-size: 9px; letter-spacing: 3px; color: #333; text-transform: uppercase; }
+    .overlay-sub {
+      font-size: 9px; letter-spacing: 3px; color: #444; text-transform: uppercase;
+    }
+    @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .pop { animation: popIn 0.3s ease-out; }
 
-    /* ENVIADO */
-    .overlay-enviado {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.88);
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center; gap: 10px;
-      z-index: 90;
-    }
-    .overlay-enviado.hidden { display: none; }
-    .enviado-check {
-      font-size: 60px; animation: popIn 0.3s ease-out;
-    }
-    .enviado-titulo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 24px; letter-spacing: 4px; color: #22c55e;
-    }
-    .enviado-sub { font-size: 9px; letter-spacing: 3px; color: #555; text-transform: uppercase; }
-    @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-    /* PANEL CALIFICACION */
-    #panel-calificacion { display: none; }
+    /* PANEL */
+    #panel-calificacion { display: none; padding-bottom: 20px; }
     #panel-calificacion.visible { display: block; }
 
     .comp-header {
       background: #141414; border: 1px solid #222;
       border-radius: 10px; padding: 12px 14px;
-      margin-bottom: 12px; text-align: center;
+      margin-bottom: 14px; text-align: center;
     }
     .comp-tipo {
       font-size: 8px; font-weight: 700; letter-spacing: 3px;
@@ -128,74 +101,135 @@
     }
     .comp-nombre {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 26px; letter-spacing: 3px; color: #fff;
+      font-size: 28px; letter-spacing: 3px;
     }
-    .vs-tag {
-      font-size: 8px; font-weight: 700; letter-spacing: 3px;
-      color: #c9a84c; text-transform: uppercase;
-      background: #1a1500; border: 1px solid #c9a84c;
-      border-radius: 4px; padding: 2px 8px; display: inline-block; margin-top: 4px;
-    }
+    .comp-num { font-size: 10px; color: #555; margin-top: 2px; }
 
-    /* SCORE PANEL */
-    .score-panel {
+    /* SECCION */
+    .seccion {
       background: #141414; border: 1px solid #222;
       border-radius: 12px; padding: 14px; margin-bottom: 10px;
     }
-    .score-titulo {
-      font-size: 8px; font-weight: 700; letter-spacing: 3px;
-      color: #555; text-transform: uppercase; margin-bottom: 12px;
+    .seccion-header {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-bottom: 12px;
     }
-    .score-display {
+    .seccion-titulo {
+      font-size: 8px; font-weight: 700; letter-spacing: 3px;
+      color: #555; text-transform: uppercase;
+    }
+    .seccion-max {
+      font-size: 9px; color: #444; letter-spacing: 1px;
+    }
+
+    /* PRECISION — deducción */
+    .precision-display {
+      display: flex; justify-content: center; align-items: baseline;
+      gap: 4px; margin-bottom: 14px;
+    }
+    .precision-valor {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 64px; letter-spacing: 4px;
-      color: #c9a84c; text-align: center; line-height: 1;
-      margin-bottom: 10px;
+      font-size: 72px; letter-spacing: 2px; color: #c9a84c; line-height: 1;
       text-shadow: 0 0 20px rgba(201,168,76,0.3);
     }
-    .score-slider {
-      width: 100%; height: 6px; margin-bottom: 14px;
-      accent-color: #c9a84c; cursor: pointer;
+    .precision-max {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; color: #444; letter-spacing: 1px;
     }
-    .score-btns {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+    .deduccion-btns {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
     }
-    .btn-score {
+    .btn-deduccion {
       background: #1a1a1a; border: 1px solid #2a2a2a;
-      color: #888; padding: 11px 4px; border-radius: 8px;
-      font-size: 12px; font-weight: 700; cursor: pointer;
-      font-family: 'Inter', sans-serif; transition: all 0.1s;
+      color: #e55; padding: 14px; border-radius: 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 2px; cursor: pointer;
+      transition: all 0.1s; text-align: center;
     }
-    .btn-score:active { background: #c9a84c; color: #000; border-color: #c9a84c; transform: scale(0.95); }
-    .btn-score.reset { grid-column: span 3; color: #444; font-size: 11px; letter-spacing: 2px; }
+    .btn-deduccion:active { background: #3a0000; border-color: #e55; transform: scale(0.97); }
+    .btn-reset-prec {
+      margin-top: 8px; width: 100%;
+      background: none; border: 1px solid #1a1a1a;
+      color: #444; padding: 8px; border-radius: 8px;
+      font-size: 10px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; cursor: pointer;
+    }
+    .btn-reset-prec:active { border-color: #c9a84c; color: #c9a84c; }
 
-    .divider {
-      border: none; border-top: 1px solid #1a1a1a; margin: 12px 0;
+    /* PRESENTACION — módulos con rangos */
+    .modulo { margin-bottom: 12px; }
+    .modulo:last-child { margin-bottom: 0; }
+    .modulo-nombre {
+      font-size: 9px; font-weight: 700; letter-spacing: 2px;
+      color: #777; text-transform: uppercase; margin-bottom: 8px;
+    }
+    .modulo-display {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 40px; letter-spacing: 2px; color: #c9a84c;
+      text-align: center; margin-bottom: 8px; line-height: 1;
+    }
+    .rangos-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px;
+    }
+    .btn-rango {
+      background: #1a1a1a; border: 1px solid #2a2a2a;
+      color: #666; padding: 9px 4px; border-radius: 7px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px; letter-spacing: 1px; cursor: pointer;
+      text-align: center; transition: all 0.1s;
+    }
+    .btn-rango:active { transform: scale(0.95); }
+    .btn-rango.selected {
+      background: #c9a84c; border-color: #c9a84c;
+      color: #000;
+    }
+    .modulo-divider {
+      border: none; border-top: 1px solid #1e1e1e; margin: 12px 0;
+    }
+
+    /* TOTAL PREVIEW */
+    .total-preview {
+      background: #0a0a0a; border: 1px solid #c9a84c;
+      border-radius: 10px; padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 10px;
+    }
+    .total-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 3px;
+      color: #555; text-transform: uppercase;
+    }
+    .total-valor {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px; letter-spacing: 3px; color: #c9a84c;
     }
 
     /* BTN ENVIAR */
     .btn-enviar {
-      width: 100%; background: #16a34a; color: #fff;
-      border: none; padding: 16px;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; letter-spacing: 4px;
-      border-radius: 10px; cursor: pointer; margin-top: 4px;
+      width: 100%; background: #16a34a; color: #fff; border: none;
+      padding: 16px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
     .btn-enviar:active { filter: brightness(0.85); transform: scale(0.99); }
-    .btn-enviar.doble { background: #0ea5e9; }
+    .btn-enviar.azul { background: #0ea5e9; }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
 <!-- LOGIN -->
-<div class="overlay-login" id="overlay-login">
+<div class="overlay" id="overlay-login">
   <div class="login-titulo">POOMSAE</div>
   <div class="login-sub">Sistema de Calificación</div>
   <div class="login-form">
     <div class="input-label">Código de Sala</div>
-    <input class="input-field" id="input-sala" type="text" maxlength="8" placeholder="SALA01" style="text-transform:uppercase">
+    <input class="input-field" id="input-sala" type="text" maxlength="8"
+      placeholder="SALA01" style="text-transform:uppercase">
     <div class="input-label">Tu Nombre</div>
-    <input class="input-field" id="input-nombre" type="text" placeholder="NOMBRE" style="font-size:14px; letter-spacing:2px">
+    <input class="input-field" id="input-nombre" type="text"
+      placeholder="NOMBRE" style="font-size:14px;letter-spacing:2px">
     <div class="input-label">Posición</div>
     <select class="input-field" id="input-numjuez">
       <option value="1">JUEZ 1</option>
@@ -206,32 +240,28 @@
       <option value="6">JUEZ 6</option>
       <option value="7">JUEZ 7</option>
     </select>
-    <button class="btn-conectar" onclick="conectarse()">CONECTAR</button>
+    <button class="btn-gold" onclick="conectarse()">CONECTAR</button>
   </div>
 </div>
 
 <!-- ESPERA -->
-<div class="overlay-espera" id="overlay-espera">
-  <div class="espera-icon">⏸</div>
-  <div class="espera-titulo">ESPERANDO TURNO</div>
-  <div class="espera-sub">Espera la señal de la mesa</div>
+<div class="overlay-semi" id="overlay-espera">
+  <div class="overlay-icon">⏸</div>
+  <div class="overlay-titulo">ESPERANDO TURNO</div>
+  <div class="overlay-sub">Espera la señal de la mesa</div>
 </div>
 
 <!-- ENVIADO -->
-<div class="overlay-enviado hidden" id="overlay-enviado">
-  <div class="enviado-check">✅</div>
-  <div class="enviado-titulo">PUNTAJE ENVIADO</div>
-  <div class="enviado-sub">Esperando siguiente turno</div>
+<div class="overlay-semi hidden" id="overlay-enviado">
+  <div class="overlay-icon pop">✅</div>
+  <div class="overlay-titulo" style="color:#22c55e">PUNTAJE ENVIADO</div>
+  <div class="overlay-sub">Esperando siguiente turno</div>
 </div>
 
 <!-- HEADER -->
 <div class="header">
   <div class="header-logo">POOMSAE</div>
   <div class="juez-badge" id="juez-badge">—</div>
-</div>
-<div class="estado-bar">
-  <div class="estado-dot activo" id="estado-dot"></div>
-  <div class="estado-txt activo" id="estado-txt">Conectado</div>
 </div>
 
 <!-- PANEL CALIFICACION -->
@@ -246,6 +276,19 @@
   let numJuez = 1;
   let turnoActual = null;
 
+  // Estado calificación
+  let precisionVal = {};    // { key: valor }
+  let modulosVal = {};      // { key_modulo: valor }
+
+  // Rangos disponibles para módulos de presentación
+  const RANGOS = [0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2.0];
+  const MODULOS = [
+    { id: 'vel', nombre: 'Velocidad y Fuerza' },
+    { id: 'rit', nombre: 'Ritmo y Tiempo' },
+    { id: 'exp', nombre: 'Expresión de Energía' }
+  ];
+
+  // ── CONECTAR ──
   function conectarse() {
     const codigo = document.getElementById('input-sala').value.trim().toUpperCase();
     const nombre = document.getElementById('input-nombre').value.trim() || 'Juez';
@@ -254,123 +297,267 @@
     socket.emit('juez-unirse', { codigo, nombre, numJuez });
   }
 
+  // ── RENDER FORMULARIO ──
   function renderCalificacion(turno) {
     turnoActual = turno;
     const panel = document.getElementById('panel-calificacion');
     const tipo = salaInfo.tipo;
-    const labels = tipo === 'freestyle' ? ['DIFICULTAD', 'PRESENTACIÓN'] : ['PRECISIÓN', 'PRESENTACIÓN'];
 
     if (turno.tipo === '1v1-simultaneo') {
       panel.innerHTML = `
         <div class="comp-header">
           <div class="comp-tipo">Calificación Simultánea</div>
-          <div style="display:flex; justify-content:center; align-items:center; gap:12px; margin-top:6px;">
+          <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:6px">
             <span class="comp-nombre">${turno.competidorA?.nombre || '—'}</span>
-            <span style="font-family:'Bebas Neue',sans-serif; font-size:18px; color:#333;">VS</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#333">VS</span>
             <span class="comp-nombre">${turno.competidorB?.nombre || '—'}</span>
           </div>
         </div>
-        <div style="font-size:8px; font-weight:700; letter-spacing:3px; color:#555; text-transform:uppercase; margin-bottom:8px;">
-          ${turno.competidorA?.nombre || '—'}
+        <div style="font-size:8px;font-weight:700;letter-spacing:3px;color:#c9a84c;text-transform:uppercase;margin-bottom:8px">
+          ${turno.competidorA?.nombre}
         </div>
-        ${scoreBlock(labels[0], 'precision-A')}
-        ${scoreBlock(labels[1], 'presentacion-A')}
-        <div style="font-size:8px; font-weight:700; letter-spacing:3px; color:#555; text-transform:uppercase; margin: 14px 0 8px;">
-          ${turno.competidorB?.nombre || '—'}
+        ${formComp(tipo, 'A')}
+        <div style="font-size:8px;font-weight:700;letter-spacing:3px;color:#c9a84c;text-transform:uppercase;margin:14px 0 8px">
+          ${turno.competidorB?.nombre}
         </div>
-        ${scoreBlock(labels[0], 'precision-B')}
-        ${scoreBlock(labels[1], 'presentacion-B')}
-        <button class="btn-enviar doble" onclick="enviarAmbos()">ENVIAR AMBOS PUNTAJES</button>
+        ${formComp(tipo, 'B')}
+        ${totalPreview('A')}
+        ${totalPreview('B')}
+        <button class="btn-enviar azul" onclick="enviarAmbos()">ENVIAR AMBOS PUNTAJES</button>
       `;
     } else if (turno.tipo === '1v1-secuencial') {
       const comp = turno.fase === 'A' ? turno.competidorA : turno.competidorB;
-      const faseLabel = turno.fase === 'A' ? 'Primer Competidor' : 'Segundo Competidor';
+      const siguiente = turno.fase === 'A' ? turno.competidorB : turno.competidorA;
       panel.innerHTML = `
         <div class="comp-header">
-          <div class="comp-tipo">${faseLabel}</div>
+          <div class="comp-tipo">${turno.fase === 'A' ? 'Primer Competidor' : 'Segundo Competidor'}</div>
           <div class="comp-nombre">${comp?.nombre || '—'}</div>
-          <div class="vs-tag">luego → ${turno.fase === 'A' ? turno.competidorB?.nombre : turno.competidorA?.nombre}</div>
+          <div class="comp-num">luego → ${siguiente?.nombre || '—'}</div>
         </div>
-        ${scoreBlock(labels[0], 'precision-A')}
-        ${scoreBlock(labels[1], 'presentacion-A')}
+        ${formComp(tipo, 'A')}
+        ${totalPreviewLive('A')}
         <button class="btn-enviar" onclick="enviarUno('${turno.fase}')">ENVIAR PUNTAJE</button>
       `;
     } else {
+      // cutoff / freestyle
       panel.innerHTML = `
         <div class="comp-header">
           <div class="comp-tipo">${turno.numero} de ${turno.total}</div>
           <div class="comp-nombre">${turno.competidor?.nombre || '—'}</div>
         </div>
-        ${scoreBlock(labels[0], 'precision-A')}
-        ${scoreBlock(labels[1], 'presentacion-A')}
+        ${formComp(tipo, 'C')}
+        ${totalPreviewLive('C')}
         <button class="btn-enviar" onclick="enviarUno('C')">ENVIAR PUNTAJE</button>
       `;
     }
+
+    // Inicializar estado
+    inicializarEstado(['A','B','C'], tipo);
 
     document.getElementById('overlay-espera').classList.add('hidden');
     document.getElementById('overlay-enviado').classList.add('hidden');
     panel.classList.add('visible');
   }
 
-  function scoreBlock(label, id) {
+  // ── FORM POR COMPETIDOR ──
+  function formComp(tipo, key) {
+    if (tipo === 'traditional') {
+      return formTradicional(key);
+    } else {
+      return formFreestyle(key);
+    }
+  }
+
+  // ── FORM TRADICIONAL ──
+  function formTradicional(key) {
     return `
-      <div class="score-panel">
-        <div class="score-titulo">${label}</div>
-        <div class="score-display" id="val-${id}">4.0</div>
-        <input type="range" class="score-slider" id="slider-${id}"
-          min="40" max="60" value="40" step="1"
-          oninput="actualizarValor('${id}', this.value)">
-        <div class="score-btns">
-          <button class="btn-score" onclick="ajustar('${id}',-10)">−1.0</button>
-          <button class="btn-score" onclick="ajustar('${id}',-5)">−0.5</button>
-          <button class="btn-score" onclick="ajustar('${id}',-1)">−0.1</button>
-          <button class="btn-score" onclick="ajustar('${id}',+1)">+0.1</button>
-          <button class="btn-score" onclick="ajustar('${id}',+5)">+0.5</button>
-          <button class="btn-score" onclick="ajustar('${id}',+10)">+1.0</button>
-          <button class="btn-score reset" onclick="resetVal('${id}')">RESET 4.0</button>
+      <!-- PRECISIÓN -->
+      <div class="seccion">
+        <div class="seccion-header">
+          <span class="seccion-titulo">Precisión Técnica</span>
+          <span class="seccion-max">Máx 4.0 · Solo deducciones</span>
+        </div>
+        <div class="precision-display">
+          <span class="precision-valor" id="prec-val-${key}">4.0</span>
+          <span class="precision-max">/ 4.0</span>
+        </div>
+        <div class="deduccion-btns">
+          <button class="btn-deduccion" onclick="deducir('${key}', 0.1)">− 0.1</button>
+          <button class="btn-deduccion" onclick="deducir('${key}', 0.3)">− 0.3</button>
+        </div>
+        <button class="btn-reset-prec" onclick="resetPrecision('${key}')">RESET 4.0</button>
+      </div>
+
+      <!-- PRESENTACIÓN -->
+      <div class="seccion">
+        <div class="seccion-header">
+          <span class="seccion-titulo">Presentación</span>
+          <span class="seccion-max">Máx 6.0 · 3 × 2pts</span>
+        </div>
+        ${MODULOS.map(m => moduloHTML(key, m)).join('<hr class="modulo-divider">')}
+      </div>
+    `;
+  }
+
+  // ── FORM FREESTYLE (placeholder) ──
+  function formFreestyle(key) {
+    return `
+      <div class="seccion">
+        <div style="text-align:center;color:#555;padding:20px">
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase">Freestyle</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#444;margin-top:8px">En construcción</div>
         </div>
       </div>
     `;
   }
 
-  function actualizarValor(id, rawVal) {
-    const val = parseInt(rawVal) / 10;
-    document.getElementById('val-' + id).textContent = val.toFixed(1);
-    document.getElementById('slider-' + id).value = rawVal;
+  // ── MÓDULO HTML ──
+  function moduloHTML(key, modulo) {
+    const botonesHTML = RANGOS.map(r => {
+      const label = r.toFixed(1);
+      return `<button class="btn-rango" id="btn-${key}-${modulo.id}-${label}"
+        onclick="seleccionarRango('${key}', '${modulo.id}', ${r})">${label}</button>`;
+    }).join('');
+
+    return `
+      <div class="modulo">
+        <div class="modulo-nombre">${modulo.nombre}</div>
+        <div class="modulo-display" id="mod-val-${key}-${modulo.id}">—</div>
+        <div class="rangos-grid">${botonesHTML}</div>
+      </div>
+    `;
   }
 
-  function ajustar(id, delta) {
-    const slider = document.getElementById('slider-' + id);
-    let val = Math.min(60, Math.max(40, parseInt(slider.value) + delta));
-    actualizarValor(id, val);
+  // ── TOTAL PREVIEW ──
+  function totalPreviewLive(key) {
+    return `
+      <div class="total-preview" id="total-preview-${key}">
+        <span class="total-label">Total</span>
+        <span class="total-valor" id="total-val-${key}">—</span>
+      </div>
+    `;
   }
 
-  function resetVal(id) { actualizarValor(id, 40); }
-
-  function getVal(id) {
-    return parseInt(document.getElementById('slider-' + id).value) / 10;
+  function totalPreview(key) {
+    return totalPreviewLive(key);
   }
 
+  // ── INICIALIZAR ESTADO ──
+  function inicializarEstado(keys, tipo) {
+    keys.forEach(key => {
+      precisionVal[key] = 4.0;
+      modulosVal[key] = { vel: null, rit: null, exp: null };
+    });
+  }
+
+  // ── DEDUCCIÓN PRECISIÓN ──
+  function deducir(key, cantidad) {
+    let val = precisionVal[key] - cantidad;
+    val = Math.max(0, Math.round(val * 10) / 10);
+    precisionVal[key] = val;
+    const el = document.getElementById(`prec-val-${key}`);
+    if (el) el.textContent = val.toFixed(1);
+    actualizarTotal(key);
+  }
+
+  function resetPrecision(key) {
+    precisionVal[key] = 4.0;
+    const el = document.getElementById(`prec-val-${key}`);
+    if (el) el.textContent = '4.0';
+    actualizarTotal(key);
+  }
+
+  // ── SELECCIONAR RANGO MÓDULO ──
+  function seleccionarRango(key, moduloId, valor) {
+    modulosVal[key][moduloId] = valor;
+
+    // Actualizar botones visuales
+    RANGOS.forEach(r => {
+      const btn = document.getElementById(`btn-${key}-${moduloId}-${r.toFixed(1)}`);
+      if (btn) btn.classList.toggle('selected', r === valor);
+    });
+
+    // Actualizar display del módulo
+    const modDisplay = document.getElementById(`mod-val-${key}-${moduloId}`);
+    if (modDisplay) modDisplay.textContent = valor.toFixed(1);
+
+    actualizarTotal(key);
+  }
+
+  // ── CALCULAR Y MOSTRAR TOTAL ──
+  function actualizarTotal(key) {
+    const prec = precisionVal[key] || 0;
+    const mods = modulosVal[key] || {};
+    const todosSeleccionados = MODULOS.every(m => mods[m.id] !== null);
+
+    const totalEl = document.getElementById(`total-val-${key}`);
+    if (!totalEl) return;
+
+    if (todosSeleccionados) {
+      const pres = MODULOS.reduce((sum, m) => sum + (mods[m.id] || 0), 0);
+      const total = Math.round((prec + pres) * 100) / 100;
+      totalEl.textContent = total.toFixed(2);
+    } else {
+      totalEl.textContent = '—';
+    }
+  }
+
+  // ── OBTENER VALORES ──
+  function getValores(key) {
+    const prec = precisionVal[key] || 0;
+    const mods = modulosVal[key] || {};
+    const pres = MODULOS.reduce((sum, m) => sum + (mods[m.id] || 0), 0);
+    return {
+      precision: prec,
+      presentacion: Math.round(pres * 100) / 100
+    };
+  }
+
+  function validar(key) {
+    const mods = modulosVal[key] || {};
+    return MODULOS.every(m => mods[m.id] !== null);
+  }
+
+  // ── ENVIAR ──
   function enviarAmbos() {
+    if (!validar('A') || !validar('B')) {
+      alert('Selecciona todos los módulos de presentación para ambos competidores');
+      return;
+    }
+    const vA = getValores('A');
+    const vB = getValores('B');
     socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo, competidorId: turnoActual.competidorA.id,
-      precision: getVal('precision-A'), presentacion: getVal('presentacion-A')
+      codigo: salaInfo.codigo,
+      competidorId: turnoActual.competidorA.id,
+      precision: vA.precision,
+      presentacion: vA.presentacion
     });
     socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id,
-      precision: getVal('precision-B'), presentacion: getVal('presentacion-B')
+      codigo: salaInfo.codigo,
+      competidorId: turnoActual.competidorB.id,
+      precision: vB.precision,
+      presentacion: vB.presentacion
     });
     mostrarEnviado();
   }
 
   function enviarUno(fase) {
+    const key = (fase === 'C') ? 'C' : 'A';
+    if (!validar(key)) {
+      alert('Selecciona todos los módulos de presentación');
+      return;
+    }
     let comp;
     if (fase === 'A') comp = turnoActual.competidorA;
     else if (fase === 'B') comp = turnoActual.competidorB;
     else comp = turnoActual.competidor;
+
+    const v = getValores(key);
     socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo, competidorId: comp.id,
-      precision: getVal('precision-A'), presentacion: getVal('presentacion-A')
+      codigo: salaInfo.codigo,
+      competidorId: comp.id,
+      precision: v.precision,
+      presentacion: v.presentacion
     });
     mostrarEnviado();
   }
