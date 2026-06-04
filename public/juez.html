@@ -226,183 +226,109 @@
     /* Landscape: los botones son aún más anchos */
 @media (orientation: landscape) {
 
-  /* Header ultra compacto */
+  /* ── Header mínimo ── */
   .header {
-    padding: 2px 8px;
-    min-height: 36px;
+    padding: 1px 8px;
+    min-height: 28px;
+    max-height: 28px;
   }
+  .header-logo { font-size: 12px; letter-spacing: 3px; }
+  .juez-badge  { font-size: 10px; padding: 1px 8px; }
 
-  .header-logo {
-    font-size: 13px;
-    letter-spacing: 3px;
-  }
-
-  .juez-badge {
-    font-size: 11px;
-    padding: 2px 8px;
-  }
-
-  /* Cabecera de competidores */
-  .comp-header {
-    padding: 3px 8px;
-    margin-bottom: 2px;
-    border-radius: 8px;
-  }
-
-  .comp-tipo {
-    font-size: 7px;
-    margin-bottom: 0;
-    letter-spacing: 4px;
-  }
-
-  .comp-nombre {
-    font-size: 16px;
-    letter-spacing: 2px;
-  }
-
-  /* Ocultar el texto PASO 1 · PRECISIÓN TÉCNICA */
-  .paso-label {
-    display: none;
-  }
-
-  /* Menos padding general */
-  .paso-prec {
-    padding: 2px 6px;
-    height: 100%;
-  }
-
+  /* ── El panel llena exactamente lo que queda debajo del header ── */
+  /* NO usar height:100% — solo flex:1 para que respete el header  */
   #panel-calificacion {
-    height: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
   }
 
-  /* Grid principal */
+  /* ── paso-prec: columna flex sin padding extra ── */
+  .paso-prec {
+    padding: 2px 4px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Ocultar label que consume espacio */
+  .paso-label { display: none; }
+
+  /* ── Cabecera de competidores compacta ── */
+  .comp-header {
+    padding: 2px 8px;
+    margin-bottom: 2px;
+  }
+  .comp-tipo   { font-size: 6px; letter-spacing: 3px; }
+  .comp-nombre { font-size: 14px; letter-spacing: 2px; }
+
+  /* ── Grid simultáneo: ocupa todo el espacio disponible ── */
   .prec-grid {
-    flex: 1;
-    gap: 8px;
-    min-height: 0;
-  }
-
-  .prec-col {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Cabecera mínima por competidor */
-  .prec-col-header {
-    padding: 2px;
-    flex-shrink: 0;
-  }
-
-  .prec-col-nombre {
-    font-size: 12px;
-    margin-bottom: 0;
-  }
-
-  .prec-score {
-    font-size: 20px;
-    padding: 0;
-  }
-
-  /* Área de botones ocupa todo el espacio */
-  .prec-btns {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 4px;
-  }
-
-  /* Botones gigantes */
-  .btn-ded {
-    flex: 1;
-    min-height: 0;
-    border-radius: 18px;
-  }
-
-  .btn-ded-val {
-    font-size: clamp(42px, 5vw, 72px);
-    font-weight: 700;
-  }
-
-  .btn-ded-sub {
-    font-size: clamp(10px, 1vw, 14px);
-    letter-spacing: 4px;
-  }
-
-  /* Undo compacto */
-  .prec-undo-row {
-    padding: 4px;
-    flex-shrink: 0;
-  }
-
-  .btn-undo {
-    font-size: 11px;
-    padding: 4px 10px;
-  }
-
-  /* Modo cutoff / secuencial */
-  .prec-normal {
     flex: 1;
     min-height: 0;
     gap: 4px;
   }
 
-  .prec-normal-score {
-    font-size: 24px !important;
-    padding: 0;
-  }
-
-  .prec-normal-btns {
-    flex: 1;
-    min-height: 0;
-    gap: 6px;
-  }
-
-  .btn-ded-normal {
-    flex: 1;
-    min-height: 0 !important;   /* sobreescribe min-height: 120px del base */
-    border-radius: 14px;
-  }
-
-  .btn-ded-normal-val {
-    font-size: clamp(28px, 5vw, 52px);
-  }
-
-  .btn-ded-normal-sub {
-    font-size: clamp(9px, 1.2vw, 13px);
-  }
-
-  .prec-normal-footer {
-    flex-shrink: 0;
-  }
-
-  /* Botón confirmar siempre visible */
-  .btn-confirmar {
-    flex-shrink: 0;
-    margin-top: 4px !important;
-    padding: 8px;
-    font-size: 15px;
-    height: 40px;
-  }
-
-  .prec-grid {
-    flex: 1;
-    min-height: 0;
-  }
-
+  /* Columnas — sin height:100%, el grid ya las estira */
   .prec-col {
     min-height: 0;
+    overflow: hidden;
   }
 
+  .prec-col-header { padding: 2px; flex-shrink: 0; }
+  .prec-col-nombre { font-size: 11px; }
+  .prec-score      { font-size: 18px; padding: 1px 0; }
+
+  /* Botones de deducción llenan el espacio restante de la columna */
+  .prec-btns {
+    flex: 1;
+    min-height: 0;
+    gap: 4px;
+    padding: 2px;
+  }
   .btn-ded {
     flex: 1;
     min-height: 0;
+    border-radius: 14px;
+  }
+  .btn-ded-val { font-size: clamp(36px, 5vw, 64px); font-weight: 700; }
+  .btn-ded-sub { font-size: clamp(9px, 1vw, 12px); letter-spacing: 3px; }
+
+  /* Undo compacto */
+  .prec-undo-row { padding: 2px 4px; flex-shrink: 0; }
+  .btn-undo      { font-size: 10px; padding: 3px 8px; }
+
+  /* ── Botón CONFIRMAR siempre visible, tamaño fijo ── */
+  .btn-confirmar {
+    flex-shrink: 0;
+    height: 38px !important;
+    margin-top: 2px !important;
+    padding: 0 8px;
+    font-size: 14px;
   }
 
-  .btn-ded-val {
-    font-size: clamp(42px, 5vw, 72px);
+  /* ── Modo normal / cutoff / secuencial ── */
+  .prec-normal {
+    flex: 1;
+    min-height: 0;
+    gap: 4px;
   }
+  .prec-normal-score {
+    font-size: 22px !important;
+    padding: 0;
+  }
+  .prec-normal-btns {
+    flex: 1;
+    min-height: 0;
+    gap: 4px;
+  }
+  .btn-ded-normal {
+    flex: 1;
+    min-height: 0 !important;
+    border-radius: 14px;
+  }
+  .btn-ded-normal-val { font-size: clamp(28px, 5vw, 52px); }
+  .btn-ded-normal-sub { font-size: clamp(9px, 1.2vw, 12px); }
+  .prec-normal-footer { flex-shrink: 0; }
 }
 
 
