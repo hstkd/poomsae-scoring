@@ -252,7 +252,8 @@
     gap: 2px;
     flex: 1;
     min-height: 0;
-    overflow: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   /* Ocultar label que consume espacio */
@@ -500,7 +501,8 @@
 <script>
   // ── BLOQUEAR SCROLL / ZOOM ──
   document.addEventListener('touchmove', (e) => {
-    const allowed = e.target.closest('input[type=range]') || e.target.closest('.paso-pres');
+    const isLandscape = window.innerWidth > window.innerHeight;
+    const allowed = e.target.closest('input[type=range]') || e.target.closest('.paso-pres') || e.target.closest('.paso-prec') && isLandscape;
     if (!allowed) e.preventDefault();
   }, { passive: false });
 
