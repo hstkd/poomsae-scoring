@@ -78,7 +78,7 @@
     /* SALA INFO */
     .sala-codigo {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 42px; letter-spacing: 8px; color: #c9a84c;
+      font-size: 36px; letter-spacing: 6px; color: #c9a84c;
       text-align: center; line-height: 1;
       text-shadow: 0 0 20px rgba(201,168,76,0.3);
     }
@@ -86,11 +86,19 @@
       font-size: 9px; font-weight: 700; letter-spacing: 3px;
       color: #555; text-transform: uppercase; text-align: center; margin-top: 4px;
     }
+    .sala-categoria {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 4px; color: #fff;
+      text-align: center; margin-top: 8px; line-height: 1;
+    }
+    .sala-ronda {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px; letter-spacing: 3px; color: #c9a84c;
+      text-align: center; margin-top: 2px;
+    }
 
     /* JUECES */
-    .jueces-grid {
-      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;
-    }
+    .jueces-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .juez-chip {
       display: flex; align-items: center; gap: 6px;
       background: #0a0a0a; border: 1px solid #1a1a1a;
@@ -114,16 +122,14 @@
       font-family: 'Bebas Neue', sans-serif;
       font-size: 16px; color: #555; width: 24px;
     }
-    .comp-nombre {
-      font-size: 13px; font-weight: 700; letter-spacing: 1px; flex: 1;
-    }
+    .comp-nombre { font-size: 13px; font-weight: 700; letter-spacing: 1px; flex: 1; }
     .btn-del {
       background: none; border: none; color: #444;
       font-size: 16px; cursor: pointer; padding: 4px 8px;
     }
     .btn-del:active { color: #dc2626; }
 
-    /* TURNO PANEL */
+    /* TURNO */
     .turno-card {
       background: #0a0a0a; border: 1px solid #c9a84c;
       border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 12px;
@@ -134,9 +140,8 @@
     }
     .turno-nombre {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 32px; letter-spacing: 3px; color: #fff;
+      font-size: 28px; letter-spacing: 3px; color: #fff;
     }
-    .turno-sub { font-size: 10px; color: #555; margin-top: 4px; }
     .vs-row {
       display: flex; align-items: center; justify-content: center;
       gap: 10px; margin-top: 6px;
@@ -146,10 +151,8 @@
       font-size: 18px; color: #333; letter-spacing: 2px;
     }
 
-    /* PUNTAJES RECIBIDOS */
-    .puntajes-bar {
-      display: flex; gap: 6px; justify-content: center; margin-bottom: 12px;
-    }
+    /* PUNTAJES */
+    .puntajes-bar { display: flex; gap: 6px; justify-content: center; margin-bottom: 12px; }
     .pj-chip {
       width: 36px; height: 36px; border-radius: 50%;
       background: #1a1a1a; border: 1px solid #2a2a2a;
@@ -177,23 +180,16 @@
     }
     .rank-item.pasa { border-left: 3px solid #22c55e; }
     .rank-item.fuera { border-left: 3px solid #dc2626; opacity: 0.5; }
-    .linea-corte {
-      border: none; border-top: 1px dashed #c9a84c;
-      margin: 8px 0;
-    }
+    .linea-corte { border: none; border-top: 1px dashed #c9a84c; margin: 8px 0; }
     .corte-label {
       text-align: center; font-size: 8px; font-weight: 700;
-      letter-spacing: 3px; color: #c9a84c; text-transform: uppercase;
-      margin-bottom: 6px;
+      letter-spacing: 3px; color: #c9a84c; text-transform: uppercase; margin-bottom: 6px;
     }
 
-    /* LOG */
     #log {
       font-size: 9px; color: #444; margin-top: 10px;
       max-height: 60px; overflow-y: auto; letter-spacing: 1px;
     }
-
-    /* INPUT ADD */
     .add-row { display: flex; gap: 8px; }
     .add-row .input-field { margin-bottom: 0; flex: 1; }
     .btn-add {
@@ -203,14 +199,12 @@
       cursor: pointer; flex-shrink: 0;
     }
     .btn-add:active { background: #c9a84c; color: #000; }
-
     .corte-row { display: flex; gap: 8px; margin-top: 10px; }
     .corte-row .input-field { margin-bottom: 0; flex: 1; width: auto; }
   </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <div class="header-logo">POOMSAE</div>
   <div class="header-badge" id="header-badge">Mesa Central</div>
@@ -220,25 +214,45 @@
 <div id="seccion-setup">
   <div class="panel">
     <div class="panel-titulo">Crear Sala</div>
+
     <label class="input-label">Código de Sala</label>
-    <input class="input-field" id="input-codigo" type="text" maxlength="8" placeholder="FINAL1" style="text-transform:uppercase">
+    <input class="input-field" id="input-codigo" type="text" maxlength="8"
+      placeholder="FINAL1" style="text-transform:uppercase">
+
+    <label class="input-label">Categoría</label>
+    <input class="input-field" id="input-categoria" type="text"
+      placeholder="ej: CADETE MASCULINO"
+      style="text-transform:uppercase;font-size:13px;letter-spacing:1px">
+
+    <label class="input-label">Ronda</label>
+    <select class="input-field" id="input-ronda">
+      <option value="ELIMINATORIA">Eliminatoria</option>
+      <option value="OCTAVOS DE FINAL">Octavos de Final</option>
+      <option value="CUARTOS DE FINAL">Cuartos de Final</option>
+      <option value="SEMIFINAL">Semifinal</option>
+      <option value="FINAL">Final</option>
+    </select>
+
     <label class="input-label">Tipo</label>
     <select class="input-field" id="input-tipo">
       <option value="traditional">Traditional</option>
       <option value="freestyle">Freestyle</option>
     </select>
+
     <label class="input-label">Modo de Competencia</label>
     <select class="input-field" id="input-modo">
       <option value="1v1-simultaneo">1v1 Simultáneo</option>
       <option value="1v1-secuencial">1v1 Secuencial</option>
       <option value="cutoff">Cut Off / Todos contra todos</option>
     </select>
+
     <label class="input-label">Número de Jueces</label>
     <select class="input-field" id="input-jueces">
       <option value="3">3 Jueces</option>
       <option value="5">5 Jueces</option>
       <option value="7">7 Jueces</option>
     </select>
+
     <button class="btn-gold" onclick="crearSala()">CREAR SALA</button>
   </div>
 </div>
@@ -246,10 +260,12 @@
 <!-- SALA ACTIVA -->
 <div id="seccion-sala" class="hidden">
 
-  <!-- CÓDIGO + JUECES -->
+  <!-- INFO SALA -->
   <div class="panel">
     <div class="sala-codigo" id="display-codigo">—</div>
     <div class="sala-sub" id="display-modo">—</div>
+    <div class="sala-categoria" id="display-categoria">—</div>
+    <div class="sala-ronda" id="display-ronda">—</div>
     <div class="jueces-grid" id="display-jueces"></div>
     <div id="log"></div>
   </div>
@@ -258,7 +274,8 @@
   <div class="panel" id="panel-competidores">
     <div class="panel-titulo">Competidores</div>
     <div class="add-row" style="margin-bottom:10px">
-      <input class="input-field" id="input-competidor" type="text" placeholder="NOMBRE" style="text-transform:uppercase">
+      <input class="input-field" id="input-competidor" type="text"
+        placeholder="NOMBRE" style="text-transform:uppercase">
       <button class="btn-add" onclick="agregarCompetidor()">+</button>
     </div>
     <div id="lista-competidores"></div>
@@ -271,10 +288,7 @@
   <div class="panel hidden" id="panel-control">
     <div class="panel-titulo">Turno Actual</div>
     <div id="display-turno"></div>
-
-    <!-- PUNTAJES RECIBIDOS -->
     <div class="puntajes-bar" id="puntajes-bar"></div>
-
     <button class="btn-gold" id="btn-revelar" onclick="revelarPuntaje()">
       REVELAR PUNTAJE
     </button>
@@ -283,13 +297,13 @@
     </button>
   </div>
 
-  <!-- RANKING (cutoff / freestyle) -->
+  <!-- RANKING -->
   <div class="panel hidden" id="panel-ranking">
     <div class="panel-titulo">Ranking en Vivo</div>
     <div id="display-ranking"></div>
     <div class="corte-row">
       <input class="input-field" id="input-topN" type="number" placeholder="Top N pasan" min="1">
-      <button class="btn-gold" style="width:auto; padding:11px 16px; white-space:nowrap" onclick="definirCorte()">
+      <button class="btn-gold" style="width:auto;padding:11px 16px;white-space:nowrap" onclick="definirCorte()">
         CORTE
       </button>
     </div>
@@ -311,12 +325,15 @@
   // ── CREAR SALA ──
   function crearSala() {
     const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
+    const categoria = document.getElementById('input-categoria').value.trim().toUpperCase();
+    const ronda = document.getElementById('input-ronda').value;
     tipo = document.getElementById('input-tipo').value;
     modo = document.getElementById('input-modo').value;
     numJueces = parseInt(document.getElementById('input-jueces').value);
     if (!codigo) return alert('Ingresa un código de sala');
+    if (!categoria) return alert('Ingresa la categoría');
     salaActual = codigo;
-    socket.emit('mesa-crear-sala', { codigo, tipo, modo, numJueces });
+    socket.emit('mesa-crear-sala', { codigo, tipo, modo, numJueces, categoria, ronda });
   }
 
   // ── COMPETIDORES ──
@@ -371,9 +388,9 @@
         <div class="turno-card">
           <div class="turno-label">${modo === '1v1-simultaneo' ? 'Simultáneo' : 'Secuencial'}</div>
           <div class="vs-row">
-            <span class="turno-nombre">${a.nombre}</span>
+            <span class="turno-nombre" style="color:#ff6666">${a.nombre}</span>
             <span class="vs-sep">VS</span>
-            <span class="turno-nombre">${b.nombre}</span>
+            <span class="turno-nombre" style="color:#6699ff">${b.nombre}</span>
           </div>
         </div>`;
     } else {
@@ -394,7 +411,7 @@
   function finCompetencia() {
     document.getElementById('display-turno').innerHTML = `
       <div class="turno-card" style="border-color:#22c55e">
-        <div class="turno-nombre" style="color:#22c55e; font-size:24px">COMPETENCIA FINALIZADA</div>
+        <div class="turno-nombre" style="color:#22c55e;font-size:20px">COMPETENCIA FINALIZADA</div>
       </div>`;
     document.getElementById('btn-revelar').classList.add('hidden');
     document.getElementById('btn-siguiente').classList.add('hidden');
@@ -471,6 +488,8 @@
     document.getElementById('display-modo').textContent =
       `${data.tipo.toUpperCase()} · ${data.modo} · ${data.numJueces} JUECES`;
     document.getElementById('header-badge').textContent = data.codigo;
+    document.getElementById('display-categoria').textContent = data.categoria;
+    document.getElementById('display-ronda').textContent = data.ronda;
     renderJueces([]);
     log('Sala creada');
   });
