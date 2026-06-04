@@ -235,6 +235,18 @@
     .footer-txt { font-size: 9px; letter-spacing: 2px; color: #2a2a2a; text-transform: uppercase; }
 
     .hidden { display: none !important; }
+    .crono-pantalla-display {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 80px; letter-spacing: 6px; color: #c9a84c; line-height: 1;
+  text-shadow: 0 0 30px rgba(201,168,76,0.5);
+  background: rgba(0,0,0,0.7); border-radius: 12px; padding: 4px 20px;
+}
+.crono-pantalla-display.urgente {
+  color: #dc2626; text-shadow: 0 0 30px rgba(220,38,38,0.6);
+  animation: parpadeo 0.5s infinite;
+}
+@keyframes parpadeo { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
   </style>
 </head>
 <body>
@@ -258,6 +270,19 @@
     <div class="jueces-dots" id="jueces-dots"></div>
   </div>
 </div>
+  
+  <!-- CRONÓMETRO PANTALLA -->
+<div id="crono-wrap" class="hidden" style="
+  position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+  z-index: 50; text-align: center; pointer-events: none;">
+  <div id="crono-label-pantalla" style="
+    font-size: 10px; font-weight: 700; letter-spacing: 4px;
+    color: #555; text-transform: uppercase; margin-bottom: 4px;">
+    Tiempo de Ejecución
+  </div>
+  <div id="crono-pantalla" class="crono-pantalla-display">1:30</div>
+</div>
+
 
 <!-- ESPERA -->
 <div id="estado-espera" class="hidden">
@@ -324,6 +349,33 @@
     if (!codigo) return;
     socket.emit('juez-unirse', { codigo, nombre: 'Pantalla', numJuez: 0 });
   }
+
+  socket.on('cronometro-update', (data) => {
+  const el = document.getElementById('crono-pantalla');
+  const label = document.getElementById('crono-label-pantalla');
+  const wrap = document.getElementById('crono-wrap');
+  if (!el || !wrap) return;
+
+  if (data.accion === 'fin' || (data.accion === 'detener' && data.duracion === 0)) {
+    wrap.classList.add('hidden');
+    return;
+  }
+
+  wrap.classList.remove('hidden');
+  const min = Math.floor(data.duracion / 60);
+  const seg = data.duracion % 60;
+  el.textContent = `${min}:${seg.toString().padStart(2,'0')}`;
+  el.className = 'crono-pantalla-display';
+  if (data.duracion <= 10) el.classList.add('urgente');
+});
+
+socket.on('poomsae-sorteada', (data) => {
+  const el = document.getElementById(`pantalla-p${data.numero}`);
+  if (el) {
+    el.textContent = data.poomsae;
+    el.style.opacity = '1';
+  }
+});
 
   socket.on('juez-ok', (data) => {
     salaInfo = data.sala;
