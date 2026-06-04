@@ -198,11 +198,44 @@
     }
 
     /* Landscape: los botones son aún más anchos */
-    @media (orientation: landscape) {
-      .prec-score { font-size: 32px; }
-      .btn-ded-val { font-size: 28px; }
-      .prec-col-nombre { font-size: 12px; }
-    }
+@media (orientation: landscape) {
+  /* Header más compacto */
+  .header { padding: 4px 14px; }
+
+  /* Comp header más pequeño */
+  .comp-header { padding: 5px 10px; margin-bottom: 5px; }
+  .comp-tipo { font-size: 7px; margin-bottom: 1px; }
+  .comp-nombre { font-size: 14px; }
+
+  /* Paso label más pequeño */
+  .paso-label { font-size: 7px; margin-bottom: 5px; }
+
+  /* Paso precisión: sin padding extra */
+  .paso-prec { padding: 4px 8px; }
+
+  /* Score pequeño — los botones mandan */
+  .prec-score { font-size: 22px; padding: 2px 0; }
+  .prec-col-nombre { font-size: 10px; }
+  .prec-col-header { padding: 3px 6px; }
+
+  /* Botones: texto legible, que llenen el espacio */
+  .btn-ded-val { font-size: 26px; }
+  .btn-ded-sub { font-size: 9px; margin-top: 2px; }
+  .prec-btns { gap: 4px; padding: 0 4px 4px; }
+  .prec-undo-row { padding: 0 4px 4px; }
+  .btn-undo { font-size: 11px; padding: 5px 10px; }
+
+  /* Precisión normal (cutoff/secuencial) */
+  .prec-normal-score { font-size: 32px; }
+  .prec-normal-max { font-size: 14px; }
+  .btn-ded-normal-val { font-size: 28px; }
+  .btn-ded-normal-sub { font-size: 9px; }
+  .btn-ded-normal { min-height: 60px; border-radius: 12px; }
+
+  /* Botón confirmar más compacto */
+  .btn-confirmar { padding: 10px; font-size: 16px; margin-top: 4px; }
+}
+
 
     /* ════════════════════════════════════
        PRECISIÓN — NORMAL (cutoff/secuencial)
@@ -254,10 +287,44 @@
     }
     .btn-reset-prec:active { border-color: #c9a84c; color: #c9a84c; }
 
-    @media (orientation: landscape) {
-      .prec-normal-score { font-size: 48px; }
-      .btn-ded-normal-val { font-size: 32px; }
-    }
+@media (orientation: landscape) {
+  /* Header más compacto */
+  .header { padding: 4px 14px; }
+
+  /* Comp header más pequeño */
+  .comp-header { padding: 5px 10px; margin-bottom: 5px; }
+  .comp-tipo { font-size: 7px; margin-bottom: 1px; }
+  .comp-nombre { font-size: 14px; }
+
+  /* Paso label más pequeño */
+  .paso-label { font-size: 7px; margin-bottom: 5px; }
+
+  /* Paso precisión: sin padding extra */
+  .paso-prec { padding: 4px 8px; }
+
+  /* Score pequeño — los botones mandan */
+  .prec-score { font-size: 22px; padding: 2px 0; }
+  .prec-col-nombre { font-size: 10px; }
+  .prec-col-header { padding: 3px 6px; }
+
+  /* Botones: texto legible, que llenen el espacio */
+  .btn-ded-val { font-size: 26px; }
+  .btn-ded-sub { font-size: 9px; margin-top: 2px; }
+  .prec-btns { gap: 4px; padding: 0 4px 4px; }
+  .prec-undo-row { padding: 0 4px 4px; }
+  .btn-undo { font-size: 11px; padding: 5px 10px; }
+
+  /* Precisión normal (cutoff/secuencial) */
+  .prec-normal-score { font-size: 32px; }
+  .prec-normal-max { font-size: 14px; }
+  .btn-ded-normal-val { font-size: 28px; }
+  .btn-ded-normal-sub { font-size: 9px; }
+  .btn-ded-normal { min-height: 60px; border-radius: 12px; }
+
+  /* Botón confirmar más compacto */
+  .btn-confirmar { padding: 10px; font-size: 16px; margin-top: 4px; }
+}
+
 
     /* ════════════════════════════════════
        PRESENTACIÓN — scrolleable
