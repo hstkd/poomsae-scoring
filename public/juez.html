@@ -268,6 +268,11 @@
   /* Menos padding general */
   .paso-prec {
     padding: 2px 6px;
+    height: 100%;
+  }
+
+  #panel-calificacion {
+    height: 100%;
   }
 
   /* Grid principal */
@@ -344,7 +349,7 @@
   }
 
   .prec-normal-score {
-    font-size: 28px;
+    font-size: 24px !important;
     padding: 0;
   }
 
@@ -356,16 +361,16 @@
 
   .btn-ded-normal {
     flex: 1;
-    min-height: 0;
+    min-height: 0 !important;   /* sobreescribe min-height: 120px del base */
     border-radius: 14px;
   }
 
   .btn-ded-normal-val {
-    font-size: clamp(32px, 6vw, 56px);
+    font-size: clamp(28px, 5vw, 52px);
   }
 
   .btn-ded-normal-sub {
-    font-size: clamp(10px, 1.2vw, 14px);
+    font-size: clamp(9px, 1.2vw, 13px);
   }
 
   .prec-normal-footer {
@@ -376,14 +381,9 @@
   .btn-confirmar {
     flex-shrink: 0;
     margin-top: 4px !important;
-    padding: 10px;
-    font-size: 16px;
-    height: 44px;
-  }
-
-  /* Sin padding lateral */
-  .paso-prec {
-    padding: 2px 0;
+    padding: 8px;
+    font-size: 15px;
+    height: 40px;
   }
 
   .prec-grid {
@@ -428,7 +428,7 @@
       flex: 1; display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px; min-height: 0;
-      height: 0; /* permite que flex: 1 funcione bien en grid dentro de flex */
+      overflow: hidden;
     }
     .btn-ded-normal {
       flex: 1; border-radius: 16px; border: none;
