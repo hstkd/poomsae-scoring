@@ -243,11 +243,16 @@
     overflow: hidden;
   }
 
-  /* ── paso-prec: columna flex sin padding extra ── */
+  /* ── paso-prec: 3 filas explícitas — header / botones / confirmar ── */
+  /* Grid garantiza que confirmar SIEMPRE tenga su espacio al fondo    */
   .paso-prec {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
     padding: 2px 4px;
+    gap: 2px;
     flex: 1;
     min-height: 0;
+    overflow: hidden;
   }
 
   /* Ocultar label que consume espacio */
@@ -261,24 +266,32 @@
   .comp-tipo   { font-size: 6px; letter-spacing: 3px; }
   .comp-nombre { font-size: 14px; letter-spacing: 2px; }
 
-  /* ── Grid simultáneo: ocupa todo el espacio disponible ── */
+  /* ── Grid simultáneo: ocupa la fila 1fr del medio ── */
   .prec-grid {
-    flex: 1;
     min-height: 0;
+    overflow: hidden;
     gap: 4px;
   }
 
-  /* Columnas — sin height:100%, el grid ya las estira */
+  /* ── Botón CONFIRMAR: siempre en su fila al fondo ── */
+  .btn-confirmar {
+    height: 40px !important;
+    margin-top: 0 !important;
+    padding: 0 8px;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  /* Columnas dentro del grid */
   .prec-col {
     min-height: 0;
     overflow: hidden;
   }
-
   .prec-col-header { padding: 2px; flex-shrink: 0; }
   .prec-col-nombre { font-size: 11px; }
   .prec-score      { font-size: 18px; padding: 1px 0; }
 
-  /* Botones de deducción llenan el espacio restante de la columna */
+  /* Botones de deducción llenan la columna */
   .prec-btns {
     flex: 1;
     min-height: 0;
@@ -296,15 +309,6 @@
   /* Undo compacto */
   .prec-undo-row { padding: 2px 4px; flex-shrink: 0; }
   .btn-undo      { font-size: 10px; padding: 3px 8px; }
-
-  /* ── Botón CONFIRMAR siempre visible, tamaño fijo ── */
-  .btn-confirmar {
-    flex-shrink: 0;
-    height: 38px !important;
-    margin-top: 2px !important;
-    padding: 0 8px;
-    font-size: 14px;
-  }
 
   /* ── Modo normal / cutoff / secuencial ── */
   .prec-normal {
