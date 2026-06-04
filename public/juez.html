@@ -14,7 +14,6 @@
       user-select: none; -webkit-user-select: none;
       touch-action: manipulation;
     }
-
     .header {
       display: flex; justify-content: space-between; align-items: center;
       margin-bottom: 12px; padding-bottom: 10px;
@@ -23,8 +22,8 @@
     .header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 4px; color: #c9a84c; }
     .juez-badge {
       font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 3px;
-      padding: 4px 14px; border-radius: 20px; border: 1px solid #c9a84c;
-      background: #1a1500; color: #c9a84c;
+      padding: 4px 14px; border-radius: 20px;
+      border: 1px solid #c9a84c; background: #1a1500; color: #c9a84c;
     }
 
     /* OVERLAYS */
@@ -38,12 +37,9 @@
     .overlay-semi {
       position: fixed; inset: 0; background: rgba(0,0,0,0.93);
       display: flex; flex-direction: column;
-      justify-content: center; align-items: center; gap: 10px; z-index: 90;
+      justify-content: center; align-items: center; gap: 12px; z-index: 90;
     }
     .overlay-semi.hidden { display: none; }
-    .overlay-icon { font-size: 48px; }
-    .overlay-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 4px; color: #c9a84c; }
-    .overlay-sub { font-size: 9px; letter-spacing: 3px; color: #444; text-transform: uppercase; }
     @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .pop { animation: popIn 0.3s ease-out; }
 
@@ -61,30 +57,33 @@
     .input-field:focus { border-color: #c9a84c; }
     select.input-field { cursor: pointer; }
 
-    /* BOTONES */
     .btn-gold {
       width: 100%; background: #c9a84c; color: #000; border: none;
       padding: 14px; font-family: 'Bebas Neue', sans-serif;
       font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
     .btn-gold:active { filter: brightness(0.85); }
+    .btn-confirmar {
+      width: 100%; background: #0ea5e9; color: #fff; border: none;
+      padding: 16px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 12px;
+    }
+    .btn-confirmar:active { filter: brightness(0.85); }
     .btn-enviar {
       width: 100%; background: #16a34a; color: #fff; border: none;
       padding: 16px; font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 10px;
+      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 12px;
     }
     .btn-enviar:active { filter: brightness(0.85); }
-    .btn-confirmar {
-      width: 100%; background: #0ea5e9; color: #fff; border: none;
-      padding: 15px; font-family: 'Bebas Neue', sans-serif;
-      font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 10px;
+    .btn-siguiente {
+      width: 100%; background: #c9a84c; color: #000; border: none;
+      padding: 16px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 12px;
     }
-    .btn-confirmar:active { filter: brightness(0.85); }
+    .btn-siguiente:active { filter: brightness(0.85); }
 
     .hidden { display: none; }
-
-    /* PANEL */
-    #panel-calificacion { display: none; padding-bottom: 24px; }
+    #panel-calificacion { display: none; padding-bottom: 30px; }
     #panel-calificacion.visible { display: block; }
 
     /* COMP HEADER */
@@ -96,131 +95,134 @@
     .comp-tipo { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 4px; }
     .comp-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 3px; }
     .comp-num { font-size: 10px; color: #555; margin-top: 2px; }
-
-    /* PASO LABEL */
     .paso-label {
       text-align: center; font-size: 9px; font-weight: 700;
-      letter-spacing: 4px; color: #555; text-transform: uppercase;
-      margin-bottom: 12px;
+      letter-spacing: 4px; color: #555; text-transform: uppercase; margin-bottom: 12px;
     }
 
-    /* ── 1V1 SIMULTÁNEO PRECISIÓN ── */
+    /* ── PRECISIÓN 1V1 SIMULTÁNEO ── */
     .prec-simultaneo {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
     }
     .prec-lado {
-      border-radius: 10px; padding: 12px 8px; text-align: center;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      border-radius: 12px; padding: 12px 8px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
     .prec-lado.rojo { background: #1a0000; border: 1px solid #3d0000; }
     .prec-lado.azul { background: #00001a; border: 1px solid #00003d; }
     .prec-lado-nombre {
-      font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; text-align: center;
     }
     .prec-lado.rojo .prec-lado-nombre { color: #ff6666; }
     .prec-lado.azul .prec-lado-nombre { color: #6699ff; }
     .prec-valor {
-      font-family: 'Bebas Neue', sans-serif; font-size: 56px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 64px;
       letter-spacing: 2px; line-height: 1; color: #c9a84c;
       text-shadow: 0 0 16px rgba(201,168,76,0.3);
     }
-    .prec-btns { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    /* Botones grandes de deducción */
+    .prec-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
     .btn-ded {
-      width: 100%; border: none; border-radius: 8px; padding: 12px 4px;
-      font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px;
+      width: 100%; border: none; border-radius: 10px;
+      font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px;
       cursor: pointer; transition: all 0.1s;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 0;
     }
-    .btn-ded.grande { background: #3a0000; color: #ff6666; }
-    .btn-ded.grande:active { background: #ff6666; color: #000; transform: scale(0.96); }
-    .btn-ded.chico { background: #1a0a00; color: #ff9966; }
-    .btn-ded.chico:active { background: #ff9966; color: #000; transform: scale(0.96); }
-    .btn-ded.grande.azul-btn { background: #00003a; color: #6699ff; }
-    .btn-ded.grande.azul-btn:active { background: #6699ff; color: #000; }
-    .btn-ded.chico.azul-btn { background: #00001a; color: #99bbff; }
-    .btn-ded.chico.azul-btn:active { background: #99bbff; color: #000; }
-    .btn-reset-mini {
-      background: none; border: 1px solid #1a1a1a; color: #444;
-      width: 100%; padding: 6px; border-radius: 6px;
-      font-size: 9px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; cursor: pointer;
-    }
-    .btn-reset-mini:active { border-color: #c9a84c; color: #c9a84c; }
+    .btn-ded.grande { height: 80px; font-size: 28px; }
+    .btn-ded.chico  { height: 64px; font-size: 24px; }
+    .btn-ded.rojo-btn.grande { background: #4a0000; color: #ff8888; border: 1px solid #660000; }
+    .btn-ded.rojo-btn.grande:active { background: #ff4444; color: #fff; transform: scale(0.97); }
+    .btn-ded.rojo-btn.chico  { background: #2a0000; color: #ff9999; border: 1px solid #440000; }
+    .btn-ded.rojo-btn.chico:active  { background: #ff6666; color: #fff; transform: scale(0.97); }
+    .btn-ded.azul-btn.grande { background: #00004a; color: #8888ff; border: 1px solid #000066; }
+    .btn-ded.azul-btn.grande:active { background: #4444ff; color: #fff; transform: scale(0.97); }
+    .btn-ded.azul-btn.chico  { background: #00002a; color: #9999ff; border: 1px solid #000044; }
+    .btn-ded.azul-btn.chico:active  { background: #6666ff; color: #fff; transform: scale(0.97); }
+    .btn-ded-sub { font-size: 10px; letter-spacing: 1px; opacity: 0.6; margin-top: 2px; }
 
-    /* ── PRECISIÓN NORMAL (cutoff / secuencial) ── */
+    .btn-undo {
+      width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a;
+      color: #888; padding: 10px; border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px;
+      cursor: pointer;
+    }
+    .btn-undo:active { border-color: #c9a84c; color: #c9a84c; }
+
+    /* ── PRECISIÓN NORMAL ── */
     .seccion {
       background: #141414; border: 1px solid #222;
       border-radius: 12px; padding: 14px; margin-bottom: 10px;
     }
-    .seccion-header {
-      display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px;
-    }
+    .seccion-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; }
     .seccion-titulo { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; }
     .seccion-max { font-size: 9px; color: #444; }
-    .precision-display {
-      display: flex; justify-content: center; align-items: baseline;
-      gap: 4px; margin-bottom: 14px;
-    }
-    .precision-valor {
-      font-family: 'Bebas Neue', sans-serif; font-size: 72px;
-      letter-spacing: 2px; color: #c9a84c; line-height: 1;
-      text-shadow: 0 0 20px rgba(201,168,76,0.3);
-    }
-    .precision-max { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #444; }
-    .deduccion-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .btn-deduccion {
+    .precision-display { display: flex; justify-content: center; align-items: baseline; gap: 4px; margin-bottom: 14px; }
+    .precision-valor { font-family: 'Bebas Neue', sans-serif; font-size: 80px; letter-spacing: 2px; color: #c9a84c; line-height: 1; }
+    .precision-max-lbl { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #444; }
+    .deduccion-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-deduccion-normal {
       background: #1a1a1a; border: 1px solid #2a2a2a; color: #e55;
-      padding: 14px; border-radius: 10px;
-      font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; cursor: pointer;
+      border-radius: 12px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 24px; letter-spacing: 2px; cursor: pointer;
+      height: 80px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2px;
     }
-    .btn-deduccion:active { background: #3a0000; border-color: #e55; transform: scale(0.97); }
+    .btn-deduccion-normal:active { background: #3a0000; border-color: #e55; transform: scale(0.97); }
     .btn-reset-prec {
-      margin-top: 8px; width: 100%; background: none;
-      border: 1px solid #1a1a1a; color: #444; padding: 8px; border-radius: 8px;
+      margin-top: 10px; width: 100%; background: none;
+      border: 1px solid #1a1a1a; color: #444; padding: 10px; border-radius: 8px;
       font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer;
     }
     .btn-reset-prec:active { border-color: #c9a84c; color: #c9a84c; }
 
-    /* ── PRESENTACIÓN SLIDERS ── */
+    /* ── PRESENTACIÓN ── */
     .pres-simultaneo { display: flex; flex-direction: column; gap: 10px; }
-    .pres-bloque {
-      border-radius: 12px; padding: 12px;
-    }
+    .pres-bloque { border-radius: 12px; padding: 14px; }
     .pres-bloque.rojo { background: #110000; border: 1px solid #2a0000; }
     .pres-bloque.azul { background: #00001a; border: 1px solid #00002a; }
     .pres-bloque-titulo {
       font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px;
-      margin-bottom: 10px; text-align: center;
+      margin-bottom: 12px; text-align: center;
     }
     .pres-bloque.rojo .pres-bloque-titulo { color: #ff6666; }
     .pres-bloque.azul .pres-bloque-titulo { color: #6699ff; }
 
-    .modulo { margin-bottom: 10px; }
+    .modulo { margin-bottom: 12px; }
     .modulo:last-child { margin-bottom: 0; }
-    .modulo-header {
-      display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;
-    }
+    .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .modulo-nombre { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: #666; text-transform: uppercase; }
-    .modulo-valor {
-      font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: #c9a84c;
-    }
-    .modulo-slider {
-      width: 100%; height: 8px; accent-color: #c9a84c;
-      cursor: pointer; border-radius: 4px;
-    }
-    .modulo-rangos {
-      display: flex; justify-content: space-between;
-      font-size: 8px; color: #444; margin-top: 3px; letter-spacing: 1px;
-    }
+    .modulo-valor { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: #c9a84c; }
+    .modulo-slider { width: 100%; height: 10px; accent-color: #c9a84c; cursor: pointer; border-radius: 4px; }
+    .modulo-rangos { display: flex; justify-content: space-between; font-size: 8px; color: #444; margin-top: 4px; }
 
-    /* TOTAL */
-    .total-preview {
-      background: #0a0a0a; border: 1px solid #c9a84c;
-      border-radius: 10px; padding: 12px 16px;
+    /* SUBTOTAL PRESENTACIÓN */
+    .subtotal-pres {
+      background: #0a0a0a; border: 1px solid #333;
+      border-radius: 8px; padding: 8px 14px;
       display: flex; justify-content: space-between; align-items: center;
       margin-top: 10px;
     }
-    .total-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; }
-    .total-valor { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 3px; color: #c9a84c; }
+    .subtotal-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; }
+    .subtotal-valor { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: #c9a84c; }
+
+    /* RESUMEN ENVIADO */
+    .resumen-card {
+      background: #141414; border: 1px solid #222;
+      border-radius: 14px; padding: 20px; width: 90%; max-width: 340px;
+    }
+    .resumen-titulo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 14px;
+      letter-spacing: 4px; color: #555; text-align: center; margin-bottom: 14px;
+    }
+    .resumen-fila {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #1a1a1a;
+    }
+    .resumen-fila:last-child { border-bottom: none; }
+    .resumen-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 2px; }
+    .resumen-puntaje { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: #c9a84c; }
+    .resumen-sub { font-size: 9px; color: #555; letter-spacing: 1px; }
   </style>
 </head>
 <body>
@@ -247,16 +249,19 @@
 
 <!-- ESPERA -->
 <div class="overlay-semi" id="overlay-espera">
-  <div class="overlay-icon">⏸</div>
-  <div class="overlay-titulo">ESPERANDO TURNO</div>
-  <div class="overlay-sub">Espera la señal de la mesa</div>
+  <div style="font-size:48px">⏸</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:4px;color:#c9a84c">ESPERANDO TURNO</div>
+  <div style="font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase">Espera la señal de la mesa</div>
 </div>
 
-<!-- ENVIADO -->
+<!-- RESUMEN ENVIADO -->
 <div class="overlay-semi hidden" id="overlay-enviado">
-  <div class="overlay-icon pop">✅</div>
-  <div class="overlay-titulo" style="color:#22c55e">PUNTAJE ENVIADO</div>
-  <div class="overlay-sub">Esperando siguiente turno</div>
+  <div style="font-size:48px" class="pop">✅</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#22c55e">PUNTAJE ENVIADO</div>
+  <div id="resumen-contenido"></div>
+  <button class="btn-siguiente" style="width:90%;max-width:340px" onclick="esperarSiguiente()">
+    LISTO →
+  </button>
 </div>
 
 <!-- HEADER -->
@@ -274,10 +279,10 @@
   let salaInfo = {};
   let numJuez = 1;
   let turnoActual = null;
-  let fase1v1 = 'prec'; // 'prec' | 'pres'
 
   // Estado
   let precisionVal = { A: 4.0, B: 4.0, C: 4.0 };
+  let historialPrec = { A: [], B: [], C: [] };
   let modulosVal = {
     A: { vel: 1.0, rit: 1.0, exp: 1.0 },
     B: { vel: 1.0, rit: 1.0, exp: 1.0 },
@@ -289,6 +294,13 @@
     { id: 'rit', nombre: 'Ritmo y Tiempo' },
     { id: 'exp', nombre: 'Expresión de Energía' }
   ];
+
+  // ── VIBRACIÓN ──
+  function vibrar(tipo) {
+    if (!navigator.vibrate) return;
+    if (tipo === 'suave') navigator.vibrate(60);
+    if (tipo === 'fuerte') navigator.vibrate([80, 40, 80]);
+  }
 
   // ── CONECTAR ──
   function conectarse() {
@@ -303,23 +315,24 @@
   function renderCalificacion(turno) {
     turnoActual = turno;
     precisionVal = { A: 4.0, B: 4.0, C: 4.0 };
+    historialPrec = { A: [], B: [], C: [] };
     modulosVal = {
       A: { vel: 1.0, rit: 1.0, exp: 1.0 },
       B: { vel: 1.0, rit: 1.0, exp: 1.0 },
       C: { vel: 1.0, rit: 1.0, exp: 1.0 }
     };
-    fase1v1 = 'prec';
 
     const panel = document.getElementById('panel-calificacion');
 
     if (turno.tipo === '1v1-simultaneo') {
-      renderSimultaneo(panel);
+      panel.innerHTML = headerComp() + '<div id="paso-container"></div>';
+      mostrarPasoPrec();
     } else if (turno.tipo === '1v1-secuencial') {
       const comp = turno.fase === 'A' ? turno.competidorA : turno.competidorB;
       const sig = turno.fase === 'A' ? turno.competidorB : turno.competidorA;
-      renderUno(panel, comp, sig ? `luego → ${sig.nombre}` : '', 'A');
+      renderUno(panel, comp, sig ? `luego → ${sig.nombre}` : '', 'A', turno.fase);
     } else {
-      renderUno(panel, turno.competidor, `${turno.numero} de ${turno.total}`, 'C');
+      renderUno(panel, turno.competidor, `${turno.numero} de ${turno.total}`, 'C', 'C');
     }
 
     document.getElementById('overlay-espera').classList.add('hidden');
@@ -327,84 +340,108 @@
     panel.style.display = 'block';
   }
 
-  // ── 1V1 SIMULTÁNEO ──
-  function renderSimultaneo(panel) {
-    panel.innerHTML = headerSimultaneo() + '<div id="paso-container"></div>';
-    mostrarPasoPrec();
-  }
-
-  function headerSimultaneo() {
-    return `
-      <div class="comp-header">
+  // ── HEADER 1V1 ──
+  function headerComp() {
+    const t = turnoActual;
+    if (t.tipo === '1v1-simultaneo') {
+      return `<div class="comp-header">
         <div class="comp-tipo">Simultáneo</div>
         <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:4px">
-          <span class="comp-nombre" style="color:#ff6666">${turnoActual.competidorA?.nombre || '—'}</span>
+          <span class="comp-nombre" style="color:#ff6666">${t.competidorA?.nombre || '—'}</span>
           <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#333">VS</span>
-          <span class="comp-nombre" style="color:#6699ff">${turnoActual.competidorB?.nombre || '—'}</span>
+          <span class="comp-nombre" style="color:#6699ff">${t.competidorB?.nombre || '—'}</span>
         </div>
       </div>`;
+    }
+    return '';
   }
 
+  // ── PASO 1: PRECISIÓN SIMULTÁNEO ──
   function mostrarPasoPrec() {
-    fase1v1 = 'prec';
     const nomA = turnoActual.competidorA?.nombre || '—';
     const nomB = turnoActual.competidorB?.nombre || '—';
     document.getElementById('paso-container').innerHTML = `
       <div class="paso-label">PASO 1 · PRECISIÓN TÉCNICA</div>
       <div class="prec-simultaneo">
+
         <div class="prec-lado rojo">
           <div class="prec-lado-nombre">${nomA}</div>
           <div class="prec-valor" id="prec-val-A">4.0</div>
           <div class="prec-btns">
-            <button class="btn-ded grande" onclick="deducir('A',0.3)">− 0.3</button>
-            <button class="btn-ded chico" onclick="deducir('A',0.1)">− 0.1</button>
-            <button class="btn-reset-mini" onclick="resetPrecision('A')">RESET</button>
+            <button class="btn-ded grande rojo-btn" onclick="deducir('A',0.3)">
+              − 0.3
+              <span class="btn-ded-sub">MAYOR</span>
+            </button>
+            <button class="btn-ded chico rojo-btn" onclick="deducir('A',0.1)">
+              − 0.1
+              <span class="btn-ded-sub">MENOR</span>
+            </button>
+            <button class="btn-undo" onclick="undo('A')">↩ UNDO</button>
           </div>
         </div>
+
         <div class="prec-lado azul">
           <div class="prec-lado-nombre">${nomB}</div>
           <div class="prec-valor" id="prec-val-B">4.0</div>
           <div class="prec-btns">
-            <button class="btn-ded grande azul-btn" onclick="deducir('B',0.3)">− 0.3</button>
-            <button class="btn-ded chico azul-btn" onclick="deducir('B',0.1)">− 0.1</button>
-            <button class="btn-reset-mini" onclick="resetPrecision('B')">RESET</button>
+            <button class="btn-ded grande azul-btn" onclick="deducir('B',0.3)">
+              − 0.3
+              <span class="btn-ded-sub">MAYOR</span>
+            </button>
+            <button class="btn-ded chico azul-btn" onclick="deducir('B',0.1)">
+              − 0.1
+              <span class="btn-ded-sub">MENOR</span>
+            </button>
+            <button class="btn-undo" onclick="undo('B')">↩ UNDO</button>
           </div>
         </div>
+
       </div>
       <button class="btn-confirmar" onclick="mostrarPasoPres()">CONFIRMAR PRECISIÓN →</button>
     `;
   }
 
+  // ── PASO 2: PRESENTACIÓN SIMULTÁNEO ──
   function mostrarPasoPres() {
-    fase1v1 = 'pres';
     const nomA = turnoActual.competidorA?.nombre || '—';
     const nomB = turnoActual.competidorB?.nombre || '—';
     document.getElementById('paso-container').innerHTML = `
       <div class="paso-label">PASO 2 · PRESENTACIÓN</div>
       <div class="pres-simultaneo">
+
         <div class="pres-bloque azul">
           <div class="pres-bloque-titulo">${nomB}</div>
           ${modulosSliders('B')}
+          <div class="subtotal-pres">
+            <span class="subtotal-label">Subtotal Presentación</span>
+            <span class="subtotal-valor" id="subtotal-B">3.0</span>
+          </div>
         </div>
+
         <div class="pres-bloque rojo">
           <div class="pres-bloque-titulo">${nomA}</div>
           ${modulosSliders('A')}
+          <div class="subtotal-pres">
+            <span class="subtotal-label">Subtotal Presentación</span>
+            <span class="subtotal-valor" id="subtotal-A">3.0</span>
+          </div>
         </div>
+
       </div>
-      ${totalDoble()}
       <button class="btn-enviar" onclick="enviarAmbos()">ENVIAR PUNTAJES</button>
     `;
-    actualizarTotal('A');
-    actualizarTotal('B');
+    actualizarSubtotal('A');
+    actualizarSubtotal('B');
   }
 
   // ── RENDER UNO (cutoff / secuencial) ──
-  function renderUno(panel, comp, sub, key) {
+  function renderUno(panel, comp, sub, key, fase) {
     panel.innerHTML = `
       <div class="comp-header">
         <div class="comp-tipo">${sub}</div>
         <div class="comp-nombre">${comp?.nombre || '—'}</div>
       </div>
+
       <div class="paso-label">PRECISIÓN TÉCNICA</div>
       <div class="seccion">
         <div class="seccion-header">
@@ -413,24 +450,32 @@
         </div>
         <div class="precision-display">
           <span class="precision-valor" id="prec-val-${key}">4.0</span>
-          <span class="precision-max">/ 4.0</span>
+          <span class="precision-max-lbl">/ 4.0</span>
         </div>
         <div class="deduccion-btns">
-          <button class="btn-deduccion" onclick="deducir('${key}',0.3)">− 0.3</button>
-          <button class="btn-deduccion" onclick="deducir('${key}',0.1)">− 0.1</button>
+          <button class="btn-deduccion-normal" onclick="deducir('${key}',0.3)">
+            − 0.3<span class="btn-ded-sub" style="font-size:10px;opacity:0.6;letter-spacing:1px">MAYOR</span>
+          </button>
+          <button class="btn-deduccion-normal" onclick="deducir('${key}',0.1)">
+            − 0.1<span class="btn-ded-sub" style="font-size:10px;opacity:0.6;letter-spacing:1px">MENOR</span>
+          </button>
         </div>
+        <button class="btn-undo" onclick="undo('${key}')" style="margin-top:10px">↩ UNDO</button>
         <button class="btn-reset-prec" onclick="resetPrecision('${key}')">RESET 4.0</button>
       </div>
+
       <div class="paso-label" style="margin-top:14px">PRESENTACIÓN</div>
       <div class="seccion">
         ${modulosSliders(key)}
+        <div class="subtotal-pres" style="margin-top:12px">
+          <span class="subtotal-label">Subtotal Presentación</span>
+          <span class="subtotal-valor" id="subtotal-${key}">3.0</span>
+        </div>
       </div>
-      ${totalPreviewHTML(key)}
-      <button class="btn-enviar" onclick="enviarUno('${key}', '${turnoActual.tipo === '1v1-secuencial' ? turnoActual.fase : 'C'}')">
-        ENVIAR PUNTAJE
-      </button>
+
+      <button class="btn-enviar" onclick="enviarUno('${key}','${fase}')">ENVIAR PUNTAJE</button>
     `;
-    actualizarTotal(key);
+    actualizarSubtotal(key);
   }
 
   // ── MÓDULOS SLIDERS ──
@@ -445,68 +490,53 @@
           id="slider-${key}-${m.id}"
           min="5" max="20" value="10" step="1"
           oninput="actualizarModulo('${key}','${m.id}',this.value)">
-        <div class="modulo-rangos"><span>0.5</span><span>1.0</span><span>1.5</span><span>2.0</span></div>
+        <div class="modulo-rangos">
+          <span>0.5</span><span>1.0</span><span>1.5</span><span>2.0</span>
+        </div>
       </div>
-    `).join('<hr style="border:none;border-top:1px solid #1e1e1e;margin:8px 0">');
+    `).join('<hr style="border:none;border-top:1px solid #1e1e1e;margin:10px 0">');
   }
 
-  // ── TOTAL PREVIEW ──
-  function totalPreviewHTML(key) {
-    return `
-      <div class="total-preview" id="total-preview-${key}" style="margin-top:10px">
-        <span class="total-label">Total</span>
-        <span class="total-valor" id="total-val-${key}">—</span>
-      </div>`;
-  }
-
-  function totalDoble() {
-    const nomA = turnoActual.competidorA?.nombre || 'A';
-    const nomB = turnoActual.competidorB?.nombre || 'B';
-    return `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
-        <div class="total-preview" style="flex-direction:column;align-items:center;gap:2px">
-          <span class="total-label" style="color:#ff6666">${nomA}</span>
-          <span class="total-valor" id="total-val-A">—</span>
-        </div>
-        <div class="total-preview" style="flex-direction:column;align-items:center;gap:2px">
-          <span class="total-label" style="color:#6699ff">${nomB}</span>
-          <span class="total-valor" id="total-val-B">—</span>
-        </div>
-      </div>`;
-  }
-
-  // ── LÓGICA ──
+  // ── LÓGICA PRECISIÓN ──
   function deducir(key, cantidad) {
+    historialPrec[key].push(precisionVal[key]);
     let val = Math.round((precisionVal[key] - cantidad) * 10) / 10;
     val = Math.max(0, val);
     precisionVal[key] = val;
     const el = document.getElementById(`prec-val-${key}`);
     if (el) el.textContent = val.toFixed(1);
-    actualizarTotal(key);
+    vibrar(cantidad === 0.1 ? 'suave' : 'fuerte');
+  }
+
+  function undo(key) {
+    if (historialPrec[key].length === 0) return;
+    const anterior = historialPrec[key].pop();
+    precisionVal[key] = anterior;
+    const el = document.getElementById(`prec-val-${key}`);
+    if (el) el.textContent = anterior.toFixed(1);
+    vibrar('suave');
   }
 
   function resetPrecision(key) {
+    historialPrec[key] = [];
     precisionVal[key] = 4.0;
     const el = document.getElementById(`prec-val-${key}`);
     if (el) el.textContent = '4.0';
-    actualizarTotal(key);
   }
 
+  // ── LÓGICA MÓDULOS ──
   function actualizarModulo(key, moduloId, rawVal) {
     const val = parseInt(rawVal) / 10;
     modulosVal[key][moduloId] = val;
     const el = document.getElementById(`mod-val-${key}-${moduloId}`);
     if (el) el.textContent = val.toFixed(1);
-    actualizarTotal(key);
+    actualizarSubtotal(key);
   }
 
-  function actualizarTotal(key) {
-    const prec = precisionVal[key] || 0;
-    const mods = modulosVal[key];
-    const pres = Object.values(mods).reduce((s, v) => s + v, 0);
-    const total = Math.round((prec + pres) * 100) / 100;
-    const el = document.getElementById(`total-val-${key}`);
-    if (el) el.textContent = total.toFixed(2);
+  function actualizarSubtotal(key) {
+    const pres = Math.round(Object.values(modulosVal[key]).reduce((s, v) => s + v, 0) * 100) / 100;
+    const el = document.getElementById(`subtotal-${key}`);
+    if (el) el.textContent = pres.toFixed(1);
   }
 
   function getValores(key) {
@@ -515,6 +545,7 @@
     return { precision: prec, presentacion: pres };
   }
 
+  // ── ENVIAR ──
   function enviarAmbos() {
     const vA = getValores('A');
     const vB = getValores('B');
@@ -526,7 +557,10 @@
       codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id,
       precision: vB.precision, presentacion: vB.presentacion
     });
-    mostrarEnviado();
+    mostrarResumen([
+      { nombre: turnoActual.competidorA?.nombre, ...vA },
+      { nombre: turnoActual.competidorB?.nombre, ...vB }
+    ]);
   }
 
   function enviarUno(key, fase) {
@@ -539,12 +573,32 @@
       codigo: salaInfo.codigo, competidorId: comp.id,
       precision: v.precision, presentacion: v.presentacion
     });
-    mostrarEnviado();
+    mostrarResumen([{ nombre: comp?.nombre, ...v }]);
   }
 
-  function mostrarEnviado() {
+  // ── RESUMEN ──
+  function mostrarResumen(resultados) {
+    const html = `
+      <div class="resumen-card">
+        <div class="resumen-titulo">TUS CALIFICACIONES</div>
+        ${resultados.map(r => `
+          <div class="resumen-fila">
+            <div>
+              <div class="resumen-nombre">${r.nombre}</div>
+              <div class="resumen-sub">Prec ${r.precision.toFixed(1)} · Pres ${r.presentacion.toFixed(1)}</div>
+            </div>
+            <div class="resumen-puntaje">${(r.precision + r.presentacion).toFixed(2)}</div>
+          </div>
+        `).join('')}
+      </div>`;
+    document.getElementById('resumen-contenido').innerHTML = html;
     document.getElementById('panel-calificacion').style.display = 'none';
     document.getElementById('overlay-enviado').classList.remove('hidden');
+  }
+
+  function esperarSiguiente() {
+    document.getElementById('overlay-enviado').classList.add('hidden');
+    document.getElementById('overlay-espera').classList.remove('hidden');
   }
 
   // ── SOCKET ──
