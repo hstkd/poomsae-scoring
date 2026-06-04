@@ -228,18 +228,18 @@
 
   /* Header ultra compacto */
   .header {
-    padding: 2px 12px;
-    min-height: 44px;
+    padding: 2px 8px;
+    min-height: 36px;
   }
 
   .header-logo {
-    font-size: 16px;
-    letter-spacing: 4px;
+    font-size: 13px;
+    letter-spacing: 3px;
   }
 
   .juez-badge {
     font-size: 11px;
-    padding: 2px 10px;
+    padding: 2px 8px;
   }
 
   /* Cabecera de competidores */
@@ -337,51 +337,72 @@
   }
 
   /* Modo cutoff / secuencial */
+  .prec-normal {
+    flex: 1;
+    min-height: 0;
+    gap: 4px;
+  }
+
   .prec-normal-score {
-    font-size: 32px;
+    font-size: 28px;
+    padding: 0;
+  }
+
+  .prec-normal-btns {
+    flex: 1;
+    min-height: 0;
+    gap: 6px;
   }
 
   .btn-ded-normal {
-    min-height: 80px;
+    flex: 1;
+    min-height: 0;
     border-radius: 14px;
   }
 
   .btn-ded-normal-val {
-    font-size: 36px;
+    font-size: clamp(32px, 6vw, 56px);
   }
 
   .btn-ded-normal-sub {
-    font-size: 10px;
+    font-size: clamp(10px, 1.2vw, 14px);
   }
 
-  /* Botón confirmar */
+  .prec-normal-footer {
+    flex-shrink: 0;
+  }
+
+  /* Botón confirmar siempre visible */
   .btn-confirmar {
-    margin-top: 4px;
+    flex-shrink: 0;
+    margin-top: 4px !important;
     padding: 10px;
     font-size: 16px;
+    height: 44px;
   }
+
+  /* Sin padding lateral */
+  .paso-prec {
+    padding: 2px 0;
+  }
+
   .prec-grid {
-  flex: 1;
-  min-height: 0;
-}
+    flex: 1;
+    min-height: 0;
+  }
 
-.prec-col {
-  min-height: 0;
-}
+  .prec-col {
+    min-height: 0;
+  }
 
-.btn-ded {
-  flex: 1;
-  min-height: 0;
-}
+  .btn-ded {
+    flex: 1;
+    min-height: 0;
+  }
 
-.btn-ded-val {
-  font-size: 56px;
-}
-
-.btn-confirmar {
-  flex-shrink: 0;
-  height: 48px;
-}
+  .btn-ded-val {
+    font-size: clamp(42px, 5vw, 72px);
+  }
 }
 
 
@@ -407,6 +428,7 @@
       flex: 1; display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px; min-height: 0;
+      height: 0; /* permite que flex: 1 funcione bien en grid dentro de flex */
     }
     .btn-ded-normal {
       flex: 1; border-radius: 16px; border: none;
@@ -435,165 +457,7 @@
     }
     .btn-reset-prec:active { border-color: #c9a84c; color: #c9a84c; }
 
-@media (orientation: landscape) {
-
-  /* Header ultra compacto */
-  .header {
-    padding: 2px 12px;
-    min-height: 44px;
-  }
-
-  .header-logo {
-    font-size: 16px;
-    letter-spacing: 4px;
-  }
-
-  .juez-badge {
-    font-size: 11px;
-    padding: 2px 10px;
-  }
-
-  /* Cabecera de competidores */
-  .comp-header {
-    padding: 3px 8px;
-    margin-bottom: 2px;
-    border-radius: 8px;
-  }
-
-  .comp-tipo {
-    font-size: 7px;
-    margin-bottom: 0;
-    letter-spacing: 4px;
-  }
-
-  .comp-nombre {
-    font-size: 16px;
-    letter-spacing: 2px;
-  }
-
-  /* Ocultar el texto PASO 1 · PRECISIÓN TÉCNICA */
-  .paso-label {
-    display: none;
-  }
-
-  /* Menos padding general */
-  .paso-prec {
-    padding: 2px 6px;
-  }
-
-  /* Grid principal */
-  .prec-grid {
-    flex: 1;
-    gap: 8px;
-    min-height: 0;
-  }
-
-  .prec-col {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  /* Cabecera mínima por competidor */
-  .prec-col-header {
-    padding: 2px;
-    flex-shrink: 0;
-  }
-
-  .prec-col-nombre {
-    font-size: 12px;
-    margin-bottom: 0;
-  }
-
-  .prec-score {
-    font-size: 20px;
-    padding: 0;
-  }
-
-  /* Área de botones ocupa todo el espacio */
-  .prec-btns {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding: 4px;
-  }
-
-  /* Botones gigantes */
-  .btn-ded {
-    flex: 1;
-    min-height: 0;
-    border-radius: 18px;
-  }
-
-  .btn-ded-val {
-    font-size: clamp(42px, 5vw, 72px);
-    font-weight: 700;
-  }
-
-  .btn-ded-sub {
-    font-size: clamp(10px, 1vw, 14px);
-    letter-spacing: 4px;
-  }
-
-  /* Undo compacto */
-  .prec-undo-row {
-    padding: 4px;
-    flex-shrink: 0;
-  }
-
-  .btn-undo {
-    font-size: 11px;
-    padding: 4px 10px;
-  }
-
-  /* Modo cutoff / secuencial */
-  .prec-normal-score {
-    font-size: 32px;
-  }
-
-  .btn-ded-normal {
-    min-height: 80px;
-    border-radius: 14px;
-  }
-
-  .btn-ded-normal-val {
-    font-size: 36px;
-  }
-
-  .btn-ded-normal-sub {
-    font-size: 10px;
-  }
-
-  /* Botón confirmar */
-  .btn-confirmar {
-    margin-top: 4px;
-    padding: 10px;
-    font-size: 16px;
-  }
-  .prec-grid {
-  flex: 1;
-  min-height: 0;
-}
-
-.prec-col {
-  min-height: 0;
-}
-
-.btn-ded {
-  flex: 1;
-  min-height: 0;
-}
-
-.btn-ded-val {
-  font-size: 56px;
-}
-
-.btn-confirmar {
-  flex-shrink: 0;
-  height: 48px;
-}
-}
+/* second landscape block merged above */
 
 
     /* ════════════════════════════════════
