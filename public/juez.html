@@ -40,7 +40,6 @@
       overflow-y: auto;
     }
     .overlay-full.hidden { display: none; }
-
     .overlay-semi {
       position: fixed; inset: 0; background: rgba(0,0,0,0.94);
       display: flex; flex-direction: column;
@@ -70,166 +69,234 @@
       padding: 14px; font-family: 'Bebas Neue', sans-serif;
       font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
-    .btn-gold:active { filter: brightness(0.85); transform: scale(0.98); }
-
+    .btn-gold:active { filter: brightness(0.85); }
     .btn-confirmar {
       width: 100%; background: #0ea5e9; color: #fff; border: none;
       padding: 16px; font-family: 'Bebas Neue', sans-serif;
       font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
+      flex-shrink: 0;
     }
-    .btn-confirmar:active { filter: brightness(0.85); transform: scale(0.98); }
-
+    .btn-confirmar:active { filter: brightness(0.85); }
     .btn-enviar {
       width: 100%; background: #16a34a; color: #fff; border: none;
       padding: 16px; font-family: 'Bebas Neue', sans-serif;
       font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
+      flex-shrink: 0;
     }
-    .btn-enviar:active { filter: brightness(0.85); transform: scale(0.98); }
-
+    .btn-enviar:active { filter: brightness(0.85); }
     .btn-siguiente {
-      width: 100%; max-width: 340px;
+      width: 90%; max-width: 340px;
       background: #c9a84c; color: #000; border: none;
       padding: 16px; font-family: 'Bebas Neue', sans-serif;
       font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
     .btn-siguiente:active { filter: brightness(0.85); }
-
-    /* ── CONTENT SCROLL ── */
-    #panel-calificacion {
-      display: none; flex: 1; overflow-y: auto;
-      padding: 10px 12px 30px;
-      -webkit-overflow-scrolling: touch;
+    .btn-undo {
+      background: #1a1a1a; border: 1px solid #2a2a2a;
+      color: #555; padding: 7px 14px; border-radius: 8px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px;
+      cursor: pointer; touch-action: manipulation; flex-shrink: 0;
     }
-    #panel-calificacion.visible { display: block; }
+    .btn-undo:active { border-color: #c9a84c; color: #c9a84c; }
+
+    /* ── PANEL PRINCIPAL ── */
+    #panel-calificacion {
+      display: none; flex: 1;
+      overflow: hidden; /* el scroll lo maneja el hijo */
+      flex-direction: column;
+    }
+    #panel-calificacion.visible { display: flex; }
+
+    /* ── CONTENEDOR PASO ── */
+    /* PRECISIÓN: llena la pantalla, NO scrollea */
+    .paso-prec {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; padding: 8px 10px;
+    }
+    /* PRESENTACIÓN: scrollea */
+    .paso-pres {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding: 8px 10px 30px;
+    }
 
     /* ── COMP HEADER ── */
     .comp-header {
       background: #141414; border: 1px solid #222;
-      border-radius: 10px; padding: 10px 14px;
-      margin-bottom: 12px; text-align: center;
+      border-radius: 10px; padding: 8px 14px;
+      margin-bottom: 8px; text-align: center; flex-shrink: 0;
     }
-    .comp-tipo { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 4px; }
-    .comp-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 3px; }
+    .comp-tipo { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 3px; }
+    .comp-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; }
     .paso-label {
       text-align: center; font-size: 9px; font-weight: 700;
       letter-spacing: 4px; color: #555; text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 8px; flex-shrink: 0;
     }
 
-    /* ── PRECISIÓN 1V1 SIMULTÁNEO ── */
-    .prec-simultaneo {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+    /* ════════════════════════════════════
+       PRECISIÓN — 1V1 SIMULTÁNEO
+       Vertical: 2 columnas
+       Horizontal: 2 columnas con más espacio
+    ════════════════════════════════════ */
+    .prec-grid {
+      flex: 1; display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px; min-height: 0;
     }
-    .prec-lado {
-      border-radius: 12px; padding: 10px 8px;
-      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    .prec-col {
+      display: flex; flex-direction: column;
+      border-radius: 14px; overflow: hidden; min-height: 0;
     }
-    .prec-lado.rojo { background: #1a0000; border: 1px solid #3d0000; }
-    .prec-lado.azul { background: #00001a; border: 1px solid #00003d; }
-    .prec-lado-nombre {
-      font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; text-align: center;
+    .prec-col.rojo { background: #180000; border: 1px solid #3d0000; }
+    .prec-col.azul { background: #00001a; border: 1px solid #00003d; }
+
+    .prec-col-header {
+      padding: 6px; text-align: center; flex-shrink: 0;
     }
-    .prec-lado.rojo .prec-lado-nombre { color: #ff6666; }
-    .prec-lado.azul .prec-lado-nombre { color: #6699ff; }
-    .prec-valor {
-      font-family: 'Bebas Neue', sans-serif; font-size: 72px;
+    .prec-col-nombre {
+      font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px;
+    }
+    .prec-col.rojo .prec-col-nombre { color: #ff6666; }
+    .prec-col.azul .prec-col-nombre { color: #6699ff; }
+
+    .prec-score {
+      font-family: 'Bebas Neue', sans-serif; font-size: 44px;
       letter-spacing: 2px; line-height: 1; color: #c9a84c;
-      text-shadow: 0 0 20px rgba(201,168,76,0.4);
+      text-align: center; padding: 4px 0;
+      text-shadow: 0 0 16px rgba(201,168,76,0.3);
+      flex-shrink: 0;
     }
-    .prec-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
 
-    /* BOTONES DEDUCCIÓN — MUY GRANDES */
+    /* Botones deducción: llenan el espacio restante */
+    .prec-btns {
+      flex: 1; display: flex; flex-direction: column;
+      gap: 6px; padding: 0 6px 6px; min-height: 0;
+    }
     .btn-ded {
-      width: 100%; border: none; border-radius: 12px;
+      flex: 1; width: 100%; border: none; border-radius: 12px;
       font-family: 'Bebas Neue', sans-serif;
-      cursor: pointer; transition: transform 0.1s;
+      cursor: pointer; min-height: 0;
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       -webkit-tap-highlight-color: transparent;
       touch-action: manipulation;
+      transition: transform 0.08s, filter 0.08s;
     }
-    .btn-ded:active { transform: scale(0.95); filter: brightness(1.3); }
-    .btn-ded.grande { height: 100px; font-size: 36px; letter-spacing: 2px; }
-    .btn-ded.chico  { height: 80px;  font-size: 30px; letter-spacing: 2px; }
+    .btn-ded:active { transform: scale(0.95); filter: brightness(1.4); }
+    .btn-ded-val { font-size: 32px; letter-spacing: 2px; line-height: 1; }
     .btn-ded-sub { font-size: 10px; letter-spacing: 2px; opacity: 0.65; margin-top: 3px; text-transform: uppercase; }
 
-    .btn-ded.rojo-btn.grande { background: linear-gradient(135deg,#5a0000,#dc2626); color: #fff; border: 1px solid #ef4444; }
-    .btn-ded.rojo-btn.chico  { background: linear-gradient(135deg,#3a0000,#991b1b); color: #ffaaaa; border: 1px solid #b91c1c; }
-    .btn-ded.azul-btn.grande { background: linear-gradient(135deg,#00005a,#3b82f6); color: #fff; border: 1px solid #60a5fa; }
-    .btn-ded.azul-btn.chico  { background: linear-gradient(135deg,#00003a,#1e40af); color: #aabbff; border: 1px solid #2563eb; }
+    .btn-ded.rojo-grande { background: linear-gradient(135deg,#6b0000,#dc2626); color: #fff; border: 1px solid #ef4444; }
+    .btn-ded.rojo-chico  { background: linear-gradient(135deg,#420000,#991b1b); color: #ffbbbb; border: 1px solid #7f1d1d; }
+    .btn-ded.azul-grande { background: linear-gradient(135deg,#00006b,#3b82f6); color: #fff; border: 1px solid #60a5fa; }
+    .btn-ded.azul-chico  { background: linear-gradient(135deg,#000042,#1e40af); color: #bbccff; border: 1px solid #1d4ed8; }
 
-    .btn-undo {
-      width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a;
-      color: #555; padding: 8px; border-radius: 8px;
-      font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px;
-      cursor: pointer; touch-action: manipulation;
+    .prec-undo-row {
+      display: flex; justify-content: center; padding: 0 6px 6px;
+      flex-shrink: 0;
     }
-    .btn-undo:active { border-color: #c9a84c; color: #c9a84c; }
 
-    /* ── PRECISIÓN NORMAL (cutoff/secuencial) ── */
-    .seccion {
-      background: #141414; border: 1px solid #222;
-      border-radius: 12px; padding: 14px; margin-bottom: 10px;
+    /* Landscape: los botones son aún más anchos */
+    @media (orientation: landscape) {
+      .prec-score { font-size: 32px; }
+      .btn-ded-val { font-size: 28px; }
+      .prec-col-nombre { font-size: 12px; }
     }
-    .seccion-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-    .seccion-titulo { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; }
-    .seccion-max { font-size: 9px; color: #444; }
-    .precision-display {
-      display: flex; justify-content: center; align-items: baseline;
-      gap: 4px; margin-bottom: 14px;
+
+    /* ════════════════════════════════════
+       PRECISIÓN — NORMAL (cutoff/secuencial)
+       Botones que llenan toda la pantalla
+    ════════════════════════════════════ */
+    .prec-normal {
+      flex: 1; display: flex; flex-direction: column;
+      gap: 8px; min-height: 0;
     }
-    .precision-valor { font-family: 'Bebas Neue', sans-serif; font-size: 100px; letter-spacing: 2px; color: #c9a84c; line-height: 1; text-shadow: 0 0 30px rgba(201,168,76,0.4); }
-    .precision-max-lbl { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #444; }
-    .deduccion-btns-normal { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+    .prec-normal-score {
+      text-align: center; flex-shrink: 0;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 72px; letter-spacing: 4px; color: #c9a84c; line-height: 1;
+      text-shadow: 0 0 30px rgba(201,168,76,0.4);
+      padding: 4px 0;
+    }
+    .prec-normal-max {
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #444;
+    }
+    .prec-normal-btns {
+      flex: 1; display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px; min-height: 0;
+    }
     .btn-ded-normal {
-      height: 110px; border: 1px solid #550000; border-radius: 14px;
-      background: linear-gradient(135deg,#3a0000,#991b1b); color: #fff;
-      font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px;
+      flex: 1; border-radius: 16px; border: none;
+      font-family: 'Bebas Neue', sans-serif;
       cursor: pointer; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 4px;
-      -webkit-tap-highlight-color: transparent; touch-action: manipulation;
+      align-items: center; justify-content: center; gap: 6px;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      transition: transform 0.08s, filter 0.08s;
+      min-height: 120px;
     }
-    .btn-ded-normal:active { filter: brightness(1.4); transform: scale(0.96); }
-    .btn-ded-sub-small { font-size: 10px; opacity: 0.6; letter-spacing: 2px; text-transform: uppercase; }
+    .btn-ded-normal:active { transform: scale(0.95); filter: brightness(1.4); }
+    .btn-ded-normal.grande { background: linear-gradient(135deg,#6b0000,#dc2626); color: #fff; border: 1px solid #ef4444; }
+    .btn-ded-normal.chico  { background: linear-gradient(135deg,#420000,#991b1b); color: #ffbbbb; border: 1px solid #7f1d1d; }
+    .btn-ded-normal-val { font-size: 40px; letter-spacing: 2px; line-height: 1; }
+    .btn-ded-normal-sub { font-size: 11px; letter-spacing: 2px; opacity: 0.65; text-transform: uppercase; }
+
+    .prec-normal-footer {
+      display: flex; gap: 8px; flex-shrink: 0;
+    }
     .btn-reset-prec {
-      width: 100%; background: none; border: 1px solid #1a1a1a;
-      color: #444; padding: 8px; border-radius: 8px;
+      flex: 1; background: none; border: 1px solid #1a1a1a;
+      color: #444; padding: 10px; border-radius: 8px;
       font-size: 9px; font-weight: 700; letter-spacing: 3px;
-      text-transform: uppercase; cursor: pointer; margin-top: 6px;
+      text-transform: uppercase; cursor: pointer;
     }
     .btn-reset-prec:active { border-color: #c9a84c; color: #c9a84c; }
 
-    /* ── PRESENTACIÓN ── */
-    .pres-simultaneo { display: flex; flex-direction: column; gap: 10px; }
-    .pres-bloque { border-radius: 12px; padding: 12px; }
+    @media (orientation: landscape) {
+      .prec-normal-score { font-size: 48px; }
+      .btn-ded-normal-val { font-size: 32px; }
+    }
+
+    /* ════════════════════════════════════
+       PRESENTACIÓN — scrolleable
+    ════════════════════════════════════ */
+    .pres-bloque {
+      border-radius: 12px; padding: 12px; margin-bottom: 10px;
+    }
     .pres-bloque.rojo { background: #110000; border: 1px solid #2a0000; }
     .pres-bloque.azul { background: #00001a; border: 1px solid #00002a; }
+    .pres-bloque.neutro { background: #141414; border: 1px solid #222; }
     .pres-bloque-titulo {
       font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px;
       margin-bottom: 10px; text-align: center;
     }
     .pres-bloque.rojo .pres-bloque-titulo { color: #ff6666; }
     .pres-bloque.azul .pres-bloque-titulo { color: #6699ff; }
+    .pres-bloque.neutro .pres-bloque-titulo { color: #c9a84c; }
 
-    .modulo { margin-bottom: 10px; }
+    .modulo { margin-bottom: 12px; }
     .modulo:last-child { margin-bottom: 0; }
-    .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .modulo-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .modulo-nombre { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: #666; text-transform: uppercase; }
-    .modulo-valor { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; color: #c9a84c; }
+    .modulo-valor { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: #c9a84c; }
     .modulo-slider {
-      width: 100%; height: 10px; accent-color: #c9a84c;
-      cursor: pointer; border-radius: 4px; touch-action: auto;
+      width: 100%; height: 12px; accent-color: #c9a84c;
+      cursor: pointer; border-radius: 4px;
+      touch-action: auto; /* permitir deslizar */
     }
     .modulo-rangos { display: flex; justify-content: space-between; font-size: 8px; color: #444; margin-top: 4px; }
+    hr.sep { border: none; border-top: 1px solid #1e1e1e; margin: 10px 0; }
 
     .subtotal-pres {
       background: #0a0a0a; border: 1px solid #333;
-      border-radius: 8px; padding: 8px 14px;
+      border-radius: 8px; padding: 10px 14px;
       display: flex; justify-content: space-between; align-items: center;
-      margin-top: 10px;
+      margin-top: 12px;
     }
     .subtotal-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; }
-    .subtotal-valor { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 2px; color: #c9a84c; }
+    .subtotal-valor { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: #c9a84c; }
 
     /* ── RESUMEN ── */
     .resumen-card {
@@ -250,8 +317,6 @@
     .resumen-sub { font-size: 9px; color: #555; letter-spacing: 1px; margin-top: 2px; }
 
     .hidden { display: none; }
-
-    hr.sep { border: none; border-top: 1px solid #1e1e1e; margin: 10px 0; }
   </style>
 </head>
 <body>
@@ -286,7 +351,7 @@
 <!-- RESUMEN ENVIADO -->
 <div class="overlay-semi hidden" id="overlay-enviado">
   <div style="font-size:48px">✅</div>
-  <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#22c55e">PUNTAJE ENVIADO</div>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#22c55e;margin-bottom:8px">PUNTAJE ENVIADO</div>
   <div id="resumen-contenido"></div>
   <button class="btn-siguiente" onclick="esperarSiguiente()">LISTO →</button>
 </div>
@@ -297,56 +362,49 @@
   <div class="juez-badge" id="juez-badge">—</div>
 </div>
 
-<!-- PANEL -->
+<!-- PANEL CALIFICACION -->
 <div id="panel-calificacion"></div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  // ── BLOQUEAR PULL-TO-REFRESH Y GESTOS ──
-  document.addEventListener('touchmove', function(e) {
-    if (!e.target.closest('input[type=range]') && !e.target.closest('.input-field')) {
-      e.preventDefault();
-    }
+  // ── BLOQUEAR SCROLL / ZOOM ──
+  document.addEventListener('touchmove', (e) => {
+    const allowed = e.target.closest('input[type=range]') || e.target.closest('.paso-pres');
+    if (!allowed) e.preventDefault();
   }, { passive: false });
 
-  document.addEventListener('touchstart', function(e) {
+  document.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) e.preventDefault();
   }, { passive: false });
 
   let lastTap = 0;
-  document.addEventListener('touchend', function(e) {
+  document.addEventListener('touchend', (e) => {
     const now = Date.now();
     if (now - lastTap < 300) e.preventDefault();
     lastTap = now;
   }, { passive: false });
 
-  // ── VIBRACIÓN CON AUDIOCONTEXT ──
+  // ── VIBRACIÓN ──
   function vibrar(tipo) {
-    // Vibración nativa (Android)
     if (navigator.vibrate) {
-      if (tipo === 'suave') navigator.vibrate(60);
-      else navigator.vibrate([100, 30, 100]);
+      navigator.vibrate(tipo === 'suave' ? 60 : [100, 30, 100]);
       return;
     }
-    // Fallback AudioContext (iOS)
     try {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
+      osc.connect(gain); gain.connect(ctx.destination);
+      const dur = tipo === 'suave' ? 0.08 : 0.18;
       osc.frequency.value = tipo === 'suave' ? 80 : 40;
       gain.gain.setValueAtTime(tipo === 'suave' ? 0.3 : 0.6, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (tipo === 'suave' ? 0.08 : 0.18));
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + (tipo === 'suave' ? 0.08 : 0.18));
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+      osc.start(); osc.stop(ctx.currentTime + dur);
     } catch(e) {}
   }
 
   const socket = io();
-  let salaInfo = {};
-  let numJuez = 1;
-  let turnoActual = null;
+  let salaInfo = {}, numJuez = 1, turnoActual = null;
   let precisionVal = { A: 4.0, B: 4.0, C: 4.0 };
   let historialPrec = { A: [], B: [], C: [] };
   let modulosVal = {
@@ -354,14 +412,12 @@
     B: { vel: 1.0, rit: 1.0, exp: 1.0 },
     C: { vel: 1.0, rit: 1.0, exp: 1.0 }
   };
-
   const MODULOS = [
     { id: 'vel', nombre: 'Velocidad y Fuerza' },
     { id: 'rit', nombre: 'Ritmo y Tiempo' },
     { id: 'exp', nombre: 'Expresión de Energía' }
   ];
 
-  // ── CONECTAR ──
   function conectarse() {
     const codigo = document.getElementById('input-sala').value.trim().toUpperCase();
     const nombre = document.getElementById('input-nombre').value.trim() || 'Juez';
@@ -370,9 +426,7 @@
     socket.emit('juez-unirse', { codigo, nombre, numJuez });
   }
 
-  // ── RENDER PRINCIPAL ──
-  function renderCalificacion(turno) {
-    turnoActual = turno;
+  function resetEstado() {
     precisionVal = { A: 4.0, B: 4.0, C: 4.0 };
     historialPrec = { A: [], B: [], C: [] };
     modulosVal = {
@@ -380,15 +434,20 @@
       B: { vel: 1.0, rit: 1.0, exp: 1.0 },
       C: { vel: 1.0, rit: 1.0, exp: 1.0 }
     };
+  }
 
+  // ── RENDER PRINCIPAL ──
+  function renderCalificacion(turno) {
+    turnoActual = turno;
+    resetEstado();
     const panel = document.getElementById('panel-calificacion');
+    panel.innerHTML = '';
 
     if (turno.tipo === '1v1-simultaneo') {
-      panel.innerHTML = headerSimultaneo() + '<div id="paso-container"></div>';
-      mostrarPasoPrec();
+      renderSimultaneo(panel);
     } else if (turno.tipo === '1v1-secuencial') {
       const comp = turno.fase === 'A' ? turno.competidorA : turno.competidorB;
-      const sig = turno.fase === 'A' ? turno.competidorB : turno.competidorA;
+      const sig  = turno.fase === 'A' ? turno.competidorB : turno.competidorA;
       renderUno(panel, comp, sig ? `luego → ${sig.nombre}` : '', 'A', turno.fase);
     } else {
       renderUno(panel, turno.competidor, `${turno.numero} de ${turno.total}`, 'C', 'C');
@@ -396,67 +455,60 @@
 
     document.getElementById('overlay-espera').classList.add('hidden');
     document.getElementById('overlay-enviado').classList.add('hidden');
-    panel.style.display = 'block';
     panel.classList.add('visible');
+    panel.style.display = 'flex';
   }
 
-  function headerSimultaneo() {
-    const t = turnoActual;
-    return `<div class="comp-header">
-      <div class="comp-tipo">Simultáneo</div>
-      <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-top:4px">
-        <span class="comp-nombre" style="color:#ff6666">${t.competidorA?.nombre || '—'}</span>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#333">VS</span>
-        <span class="comp-nombre" style="color:#6699ff">${t.competidorB?.nombre || '—'}</span>
-      </div>
-    </div>`;
-  }
-
-  // ── PASO 1: PRECISIÓN 1V1 ──
-  function mostrarPasoPrec() {
-    const nomA = turnoActual.competidorA?.nombre || '—';
-    const nomB = turnoActual.competidorB?.nombre || '—';
-    document.getElementById('paso-container').innerHTML = `
-      <div class="paso-label">PASO 1 · PRECISIÓN TÉCNICA</div>
-      <div class="prec-simultaneo">
-        <div class="prec-lado rojo">
-          <div class="prec-lado-nombre">${nomA}</div>
-          <div class="prec-valor" id="prec-val-A">4.0</div>
-          <div class="prec-btns">
-            <button class="btn-ded grande rojo-btn" ontouchstart="deducir('A',0.3)" onclick="deducir('A',0.3)">
-              − 0.3<span class="btn-ded-sub">Mayor</span>
-            </button>
-            <button class="btn-ded chico rojo-btn" ontouchstart="deducir('A',0.1)" onclick="deducir('A',0.1)">
-              − 0.1<span class="btn-ded-sub">Menor</span>
-            </button>
-            <button class="btn-undo" onclick="undo('A')">↩ UNDO</button>
-          </div>
+  // ── 1V1 SIMULTÁNEO ──
+  function renderSimultaneo(panel) {
+    // Paso contenedor: inicia en precisión
+    panel.innerHTML = `
+      <div class="paso-prec" id="paso-prec">
+        ${headerHTML('Simultáneo', null, null, true)}
+        <div class="paso-label">PASO 1 · PRECISIÓN TÉCNICA</div>
+        <div class="prec-grid" id="prec-grid">
+          ${precColHTML('A', turnoActual.competidorA?.nombre, 'rojo')}
+          ${precColHTML('B', turnoActual.competidorB?.nombre, 'azul')}
         </div>
-        <div class="prec-lado azul">
-          <div class="prec-lado-nombre">${nomB}</div>
-          <div class="prec-valor" id="prec-val-B">4.0</div>
-          <div class="prec-btns">
-            <button class="btn-ded grande azul-btn" ontouchstart="deducir('B',0.3)" onclick="deducir('B',0.3)">
-              − 0.3<span class="btn-ded-sub">Mayor</span>
-            </button>
-            <button class="btn-ded chico azul-btn" ontouchstart="deducir('B',0.1)" onclick="deducir('B',0.1)">
-              − 0.1<span class="btn-ded-sub">Menor</span>
-            </button>
-            <button class="btn-undo" onclick="undo('B')">↩ UNDO</button>
-          </div>
-        </div>
+        <button class="btn-confirmar" style="margin-top:8px" onclick="irPresentacion()">CONFIRMAR PRECISIÓN →</button>
       </div>
-      <button class="btn-confirmar" onclick="mostrarPasoPres()">CONFIRMAR PRECISIÓN →</button>
     `;
   }
 
-  // ── PASO 2: PRESENTACIÓN 1V1 ──
-  function mostrarPasoPres() {
+  function precColHTML(key, nombre, color) {
+    const esRojo = color === 'rojo';
+    return `
+      <div class="prec-col ${color}">
+        <div class="prec-col-header">
+          <div class="prec-col-nombre">${nombre || '—'}</div>
+          <div class="prec-score" id="prec-val-${key}">4.0</div>
+        </div>
+        <div class="prec-btns">
+          <button class="btn-ded ${esRojo ? 'rojo-grande' : 'azul-grande'}"
+            ontouchstart="dedClick('${key}',0.3,event)" onclick="dedClick('${key}',0.3,event)">
+            <span class="btn-ded-val">− 0.3</span>
+            <span class="btn-ded-sub">Mayor</span>
+          </button>
+          <button class="btn-ded ${esRojo ? 'rojo-chico' : 'azul-chico'}"
+            ontouchstart="dedClick('${key}',0.1,event)" onclick="dedClick('${key}',0.1,event)">
+            <span class="btn-ded-val">− 0.1</span>
+            <span class="btn-ded-sub">Menor</span>
+          </button>
+        </div>
+        <div class="prec-undo-row">
+          <button class="btn-undo" onclick="undo('${key}')">↩ UNDO</button>
+        </div>
+      </div>`;
+  }
+
+  function irPresentacion() {
+    const panel = document.getElementById('panel-calificacion');
     const nomA = turnoActual.competidorA?.nombre || '—';
     const nomB = turnoActual.competidorB?.nombre || '—';
-    document.getElementById('paso-container').innerHTML = `
-      <div class="paso-label">PASO 2 · PRESENTACIÓN</div>
-      <div class="pres-simultaneo">
+    panel.innerHTML = `
+      <div class="paso-pres" id="paso-pres">
+        ${headerHTML('Simultáneo', null, null, true)}
+        <div class="paso-label">PASO 2 · PRESENTACIÓN</div>
         <div class="pres-bloque azul">
           <div class="pres-bloque-titulo">${nomB}</div>
           ${modulosSliders('B')}
@@ -465,7 +517,7 @@
             <span class="subtotal-valor" id="subtotal-B">3.0</span>
           </div>
         </div>
-        <div class="pres-bloque rojo">
+        <div class="pres-bloque rojo" style="margin-top:10px">
           <div class="pres-bloque-titulo">${nomA}</div>
           ${modulosSliders('A')}
           <div class="subtotal-pres">
@@ -473,52 +525,89 @@
             <span class="subtotal-valor" id="subtotal-A">3.0</span>
           </div>
         </div>
+        <button class="btn-enviar" style="margin-top:12px" onclick="enviarAmbos()">ENVIAR PUNTAJES</button>
       </div>
-      <button class="btn-enviar" onclick="enviarAmbos()" style="margin-top:12px">ENVIAR PUNTAJES</button>
     `;
     actualizarSubtotal('A');
     actualizarSubtotal('B');
   }
 
-  // ── RENDER UNO ──
+  // ── RENDER UNO (cutoff / secuencial) ──
   function renderUno(panel, comp, sub, key, fase) {
     panel.innerHTML = `
-      <div class="comp-header">
-        <div class="comp-tipo">${sub}</div>
-        <div class="comp-nombre">${comp?.nombre || '—'}</div>
+      <div class="paso-prec" id="paso-prec">
+        ${headerHTML(sub, comp?.nombre, null, false)}
+        <div class="paso-label">PRECISIÓN TÉCNICA</div>
+        <div class="prec-normal">
+          <div style="text-align:center;flex-shrink:0">
+            <span class="prec-normal-score" id="prec-val-${key}">4.0</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#444">/ 4.0</span>
+          </div>
+          <div class="prec-normal-btns">
+            <button class="btn-ded-normal grande"
+              ontouchstart="dedClick('${key}',0.3,event)" onclick="dedClick('${key}',0.3,event)">
+              <span class="btn-ded-normal-val">− 0.3</span>
+              <span class="btn-ded-normal-sub">Mayor</span>
+            </button>
+            <button class="btn-ded-normal chico"
+              ontouchstart="dedClick('${key}',0.1,event)" onclick="dedClick('${key}',0.1,event)">
+              <span class="btn-ded-normal-val">− 0.1</span>
+              <span class="btn-ded-normal-sub">Menor</span>
+            </button>
+          </div>
+          <div class="prec-normal-footer">
+            <button class="btn-undo" onclick="undo('${key}')">↩ UNDO</button>
+            <button class="btn-reset-prec" onclick="resetPrecision('${key}')">RESET 4.0</button>
+          </div>
+        </div>
+        <button class="btn-confirmar" style="margin-top:8px" onclick="irPresentacionUno('${key}','${fase}','${comp?.nombre}')">
+          CONFIRMAR PRECISIÓN →
+        </button>
       </div>
-      <div class="paso-label">PRECISIÓN TÉCNICA</div>
-      <div class="seccion">
-        <div class="seccion-header">
-          <span class="seccion-titulo">Solo deducciones</span>
-          <span class="seccion-max">Máx 4.0</span>
+    `;
+  }
+
+  function irPresentacionUno(key, fase, nombre) {
+    const panel = document.getElementById('panel-calificacion');
+    panel.innerHTML = `
+      <div class="paso-pres">
+        <div class="comp-header" style="margin-bottom:8px">
+          <div class="comp-tipo">${turnoActual.tipo === '1v1-secuencial' ? 'Secuencial' : `${turnoActual.numero} de ${turnoActual.total}`}</div>
+          <div class="comp-nombre">${nombre || '—'}</div>
         </div>
-        <div class="precision-display">
-          <span class="precision-valor" id="prec-val-${key}">4.0</span>
-          <span class="precision-max-lbl">/ 4.0</span>
+        <div class="paso-label">PRESENTACIÓN</div>
+        <div class="pres-bloque neutro">
+          <div class="pres-bloque-titulo">${nombre || '—'}</div>
+          ${modulosSliders(key)}
+          <div class="subtotal-pres">
+            <span class="subtotal-label">Subtotal Presentación</span>
+            <span class="subtotal-valor" id="subtotal-${key}">3.0</span>
+          </div>
         </div>
-        <div class="deduccion-btns-normal">
-          <button class="btn-ded-normal" ontouchstart="deducir('${key}',0.3)" onclick="deducir('${key}',0.3)">
-            − 0.3<span class="btn-ded-sub-small">Mayor</span>
-          </button>
-          <button class="btn-ded-normal" ontouchstart="deducir('${key}',0.1)" onclick="deducir('${key}',0.1)">
-            − 0.1<span class="btn-ded-sub-small">Menor</span>
-          </button>
-        </div>
-        <button class="btn-undo" onclick="undo('${key}')">↩ UNDO</button>
-        <button class="btn-reset-prec" onclick="resetPrecision('${key}')">RESET 4.0</button>
+        <button class="btn-enviar" style="margin-top:12px" onclick="enviarUno('${key}','${fase}')">ENVIAR PUNTAJE</button>
       </div>
-      <div class="paso-label" style="margin-top:12px">PRESENTACIÓN</div>
-      <div class="seccion">
-        ${modulosSliders(key)}
-        <div class="subtotal-pres" style="margin-top:12px">
-          <span class="subtotal-label">Subtotal Presentación</span>
-          <span class="subtotal-valor" id="subtotal-${key}">3.0</span>
-        </div>
-      </div>
-      <button class="btn-enviar" onclick="enviarUno('${key}','${fase}')">ENVIAR PUNTAJE</button>
     `;
     actualizarSubtotal(key);
+  }
+
+  // ── HEADER HTML ──
+  function headerHTML(tipo, nombre, sub, esSimultaneo) {
+    if (esSimultaneo) {
+      const t = turnoActual;
+      return `<div class="comp-header">
+        <div class="comp-tipo">Simultáneo</div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:3px">
+          <span class="comp-nombre" style="color:#ff6666">${t.competidorA?.nombre || '—'}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:12px;color:#333">VS</span>
+          <span class="comp-nombre" style="color:#6699ff">${t.competidorB?.nombre || '—'}</span>
+        </div>
+      </div>`;
+    }
+    return `<div class="comp-header">
+      <div class="comp-tipo">${tipo}</div>
+      <div class="comp-nombre">${nombre || '—'}</div>
+      ${sub ? `<div style="font-size:10px;color:#555;margin-top:2px">${sub}</div>` : ''}
+    </div>`;
   }
 
   // ── MÓDULOS SLIDERS ──
@@ -540,27 +629,28 @@
     `).join('<hr class="sep">');
   }
 
-  // ── LÓGICA PRECISIÓN ──
-  let ultimaDeduccion = 0;
+  // ── LÓGICA ──
+  let ultimaDed = 0;
+  function dedClick(key, cantidad, e) {
+    if (e && e.type === 'click' && e.isTrusted && (Date.now() - ultimaDed) < 300) return;
+    ultimaDed = Date.now();
+    deducir(key, cantidad);
+  }
+
   function deducir(key, cantidad) {
-    const ahora = Date.now();
-    if (ahora - ultimaDeduccion < 200) return; // debounce
-    ultimaDeduccion = ahora;
     historialPrec[key].push(precisionVal[key]);
     let val = Math.round((precisionVal[key] - cantidad) * 10) / 10;
-    val = Math.max(0, val);
-    precisionVal[key] = val;
+    precisionVal[key] = Math.max(0, val);
     const el = document.getElementById(`prec-val-${key}`);
-    if (el) el.textContent = val.toFixed(1);
+    if (el) el.textContent = precisionVal[key].toFixed(1);
     vibrar(cantidad === 0.1 ? 'suave' : 'fuerte');
   }
 
   function undo(key) {
     if (!historialPrec[key].length) return;
-    const anterior = historialPrec[key].pop();
-    precisionVal[key] = anterior;
+    precisionVal[key] = historialPrec[key].pop();
     const el = document.getElementById(`prec-val-${key}`);
-    if (el) el.textContent = anterior.toFixed(1);
+    if (el) el.textContent = precisionVal[key].toFixed(1);
     vibrar('suave');
   }
 
@@ -571,11 +661,10 @@
     if (el) el.textContent = '4.0';
   }
 
-  // ── LÓGICA MÓDULOS ──
-  function actualizarModulo(key, moduloId, rawVal) {
-    const val = parseInt(rawVal) / 10;
-    modulosVal[key][moduloId] = val;
-    const el = document.getElementById(`mod-val-${key}-${moduloId}`);
+  function actualizarModulo(key, modId, raw) {
+    const val = parseInt(raw) / 10;
+    modulosVal[key][modId] = val;
+    const el = document.getElementById(`mod-val-${key}-${modId}`);
     if (el) el.textContent = val.toFixed(1);
     actualizarSubtotal(key);
   }
@@ -587,17 +676,16 @@
   }
 
   function getValores(key) {
-    const prec = precisionVal[key] || 0;
-    const pres = Math.round(Object.values(modulosVal[key]).reduce((s,v) => s+v, 0) * 100) / 100;
-    return { precision: prec, presentacion: pres };
+    return {
+      precision: precisionVal[key] || 0,
+      presentacion: Math.round(Object.values(modulosVal[key]).reduce((s,v) => s+v, 0) * 100) / 100
+    };
   }
 
-  // ── ENVIAR ──
   function enviarAmbos() {
-    const vA = getValores('A');
-    const vB = getValores('B');
-    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: turnoActual.competidorA.id, precision: vA.precision, presentacion: vA.presentacion });
-    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id, precision: vB.precision, presentacion: vB.presentacion });
+    const vA = getValores('A'), vB = getValores('B');
+    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: turnoActual.competidorA.id, ...vA });
+    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id, ...vB });
     mostrarResumen([
       { nombre: turnoActual.competidorA?.nombre, ...vA },
       { nombre: turnoActual.competidorB?.nombre, ...vB }
@@ -605,17 +693,16 @@
   }
 
   function enviarUno(key, fase) {
-    let comp;
-    if (fase === 'A') comp = turnoActual.competidorA;
-    else if (fase === 'B') comp = turnoActual.competidorB;
-    else comp = turnoActual.competidor;
+    let comp = fase === 'A' ? turnoActual.competidorA : fase === 'B' ? turnoActual.competidorB : turnoActual.competidor;
     const v = getValores(key);
-    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: comp.id, precision: v.precision, presentacion: v.presentacion });
+    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: comp.id, ...v });
     mostrarResumen([{ nombre: comp?.nombre, ...v }]);
   }
 
   function mostrarResumen(resultados) {
-    const html = `
+    document.getElementById('panel-calificacion').style.display = 'none';
+    document.getElementById('panel-calificacion').classList.remove('visible');
+    document.getElementById('resumen-contenido').innerHTML = `
       <div class="resumen-card">
         <div class="resumen-titulo">TUS CALIFICACIONES</div>
         ${resultados.map(r => `
@@ -625,12 +712,8 @@
               <div class="resumen-sub">Prec ${r.precision.toFixed(1)} · Pres ${r.presentacion.toFixed(1)}</div>
             </div>
             <div class="resumen-puntaje">${(r.precision + r.presentacion).toFixed(2)}</div>
-          </div>
-        `).join('')}
+          </div>`).join('')}
       </div>`;
-    document.getElementById('resumen-contenido').innerHTML = html;
-    document.getElementById('panel-calificacion').style.display = 'none';
-    document.getElementById('panel-calificacion').classList.remove('visible');
     document.getElementById('overlay-enviado').classList.remove('hidden');
   }
 
@@ -646,18 +729,9 @@
     document.getElementById('juez-badge').textContent = 'JUEZ ' + numJuez;
     document.getElementById('overlay-espera').classList.remove('hidden');
   });
-
-  socket.on('error-sala', (data) => { alert(data.msg); });
-
-  socket.on('competencia-iniciada', (data) => {
-    salaInfo.tipo = data.tipo;
-    salaInfo.modo = data.modo;
-    salaInfo.competidores = data.competidores;
-  });
-
-  socket.on('turno-actualizado', (data) => {
-    renderCalificacion(data.turno);
-  });
+  socket.on('error-sala', (d) => alert(d.msg));
+  socket.on('competencia-iniciada', (d) => { salaInfo.tipo = d.tipo; salaInfo.modo = d.modo; });
+  socket.on('turno-actualizado', (d) => renderCalificacion(d.turno));
 </script>
 </body>
 </html>
