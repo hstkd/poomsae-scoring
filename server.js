@@ -226,36 +226,14 @@ io.on('connection', (socket) => {
     io.to(codigo).emit('corte-aplicado', { ranking, topN });
   });
   // ── MESA: SORTEAR POOMSAE ──
-  socket.on('mesa-sortear-poomsae', ({ codigo, numero }) => {
-    const sala = salas[codigo];
-    if (!sala) return;
+ socket.on('mesa-sortear-poomsae', ({ codigo, numero, poomsae }) => {
+  const sala = salas[codigo];
+  if (!sala) return;
+  if (numero === 1) sala.poomsae1 = poomsae;
+  else sala.poomsae2 = poomsae;
+  io.to(codigo).emit('poomsae-sorteada', { numero, poomsae });
+});
 
-    const POOMSAES = [
-      'Koryo','Keumgang','Taebaek','Pyongwon',
-      'Sipjin','Jitae','Cheonkwon','Hansu','Ilyeo'
-    ];
-
-    let disponibles;
-    if (numero === 1) {
-      disponibles = POOMSAES;
-    } else {
-      // Excluir la primera poomsae sorteada
-      disponibles = POOMSAES.filter(p => p !== sala.poomsae1);
-    }
-
-    const sorteada = disponibles[Math.floor(Math.random() * disponibles.length)];
-
-    if (numero === 1) {
-      sala.poomsae1 = sorteada;
-    } else {
-      sala.poomsae2 = sorteada;
-    }
-
-    io.to(codigo).emit('poomsae-sorteada', {
-      numero,
-      poomsae: sorteada
-    });
-  });
 
   // ── MESA: CRONÓMETRO ──
   socket.on('mesa-cronometro', ({ codigo, accion, duracion }) => {
