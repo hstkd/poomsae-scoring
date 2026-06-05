@@ -875,11 +875,78 @@
     document.getElementById('overlay-espera').classList.remove('hidden');
   }
 
+  // ── ENVIAR con desglose ──
+  function enviarAmbos() {
+    const vA = getValores('A');
+    const vB = getValores('B');
+    const modA = modulosVal['A'];
+    const modB = modulosVal['B'];
+
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo,
+      competidorId: turnoActual.competidorA.id,
+      precision: vA.precision,
+      presentacion: vA.presentacion,
+      desglose: { precision: vA.precision, vel: modA.vel, rit: modA.rit, exp: modA.exp }
+    });
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo,
+      competidorId: turnoActual.competidorB.id,
+      precision: vB.precision,
+      presentacion: vB.presentacion,
+      desglose: { precision: vB.precision, vel: modB.vel, rit: modB.rit, exp: modB.exp }
+    });
+    mostrarResumen([
+      { nombre: turnoActual.competidorA?.nombre, ...vA },
+      { nombre: turnoActual.competidorB?.nombre, ...vB }
+    ]);
+  }
+
+  function enviarUno(key, fase) {
+    let comp = fase === 'A' ? turnoActual.competidorA : fase === 'B' ? turnoActual.competidorB : turnoActual.competidor;
+    const v = getValores(key);
+    const mods = modulosVal[key];
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo,
+      competidorId: comp.id,
+      precision: v.precision,
+      presentacion: v.presentacion,
+      desglose: { precision: v.precision, vel: mods.vel, rit: mods.rit, exp: mods.exp }
+    });
+    mostrarResumen([{ nombre: comp?.nombre, ...v }]);
+  }
+
   // ── SOCKET ──
-    // Reconexión automática
+  socket.on('juez-ok', (data) => {
+    salaInfo = data.sala;
+    document.getElementById('overlay-login').classList.add('hidden');
+    document.getElementById('juez-badge').textContent = 'JUEZ ' + numJuez;
+    document.getElementById('overlay-espera').classList.remove('hidden');
+  });
+
+  socket.on('error-sala', (d) => alert(d.msg));
+
+  socket.on('competencia-iniciada', (d) => {
+    salaInfo.tipo = d.tipo;
+    salaInfo.modo = d.modo;
+  });
+
+  socket.on('turno-actualizado', (d) => renderCalificacion(d.turno));
+
+  // Habilitar calificación cuando mesa inicia cronómetro
+  socket.on('fase-actualizada', (data) => {
+    salaInfo.faseActual = data.fase;
+    // Si hay turno activo y se habilita nueva fase, reactivar panel
+    if (turnoActual && ['ejecucion1','ejecucion2'].includes(data.fase)) {
+      // Reactivar para segunda poomsae sin recargar
+      if (data.fase === 'ejecucion2') {
+        renderCalificacion(turnoActual);
+      }
+    }
+  });
+
   socket.on('disconnect', () => {
-    document.getElementById('estado-dot')?.classList.remove('activo');
-    document.getElementById('estado-txt')?.classList.remove('activo');
+    console.log('Desconectado del servidor');
   });
 
   socket.on('reconnect', () => {
@@ -893,18 +960,9 @@
   });
 
   socket.on('puntaje-confirmado', (data) => {
-    console.log(`Puntaje confirmado: comp ${data.competidorId}`);
+    console.log(`✓ Puntaje confirmado comp ${data.competidorId}`);
   });
 
-  socket.on('juez-ok', (data) => {
-    salaInfo = data.sala;
-    document.getElementById('overlay-login').classList.add('hidden');
-    document.getElementById('juez-badge').textContent = 'JUEZ ' + numJuez;
-    document.getElementById('overlay-espera').classList.remove('hidden');
-  });
-  socket.on('error-sala', (d) => alert(d.msg));
-  socket.on('competencia-iniciada', (d) => { salaInfo.tipo = d.tipo; salaInfo.modo = d.modo; });
-  socket.on('turno-actualizado', (d) => renderCalificacion(d.turno));
 </script>
 </body>
 </html>
