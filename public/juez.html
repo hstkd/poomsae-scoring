@@ -876,6 +876,26 @@
   }
 
   // ── SOCKET ──
+    // Reconexión automática
+  socket.on('disconnect', () => {
+    document.getElementById('estado-dot')?.classList.remove('activo');
+    document.getElementById('estado-txt')?.classList.remove('activo');
+  });
+
+  socket.on('reconnect', () => {
+    if (salaInfo.codigo) {
+      socket.emit('juez-unirse', {
+        codigo: salaInfo.codigo,
+        nombre: document.getElementById('juez-badge')?.textContent?.replace('JUEZ ','') || 'Juez',
+        numJuez
+      });
+    }
+  });
+
+  socket.on('puntaje-confirmado', (data) => {
+    console.log(`Puntaje confirmado: comp ${data.competidorId}`);
+  });
+
   socket.on('juez-ok', (data) => {
     salaInfo = data.sala;
     document.getElementById('overlay-login').classList.add('hidden');
