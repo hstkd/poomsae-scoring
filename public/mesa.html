@@ -433,13 +433,15 @@
     const btnRevelar = document.getElementById('btn-revelar');
     const btnSig = document.getElementById('btn-siguiente');
 
-    // Reset todo
     bloqueSorteo1.classList.add('hidden');
     bloqueSorteo2.classList.add('hidden');
     bloqueAcciones.classList.add('hidden');
     bloqueCreno.classList.add('hidden');
     btnRevelar.classList.add('hidden');
     btnSig.classList.add('hidden');
+
+    // Actualizar banner en cada cambio de fase
+    mostrarTurnoSimultaneo();
 
     if (faseActual === 'sorteo1') {
       badge.className = 'fase-badge sorteo';
@@ -478,14 +480,32 @@
     }
   }
 
+
   function siguienteFase() {
     const flujo = ['sorteo1','ejecucion1','calificacion1','ejecucion2','calificacion2','resultado'];
     const idx = flujo.indexOf(faseActual);
-    if (idx < flujo.length - 1) faseActual = flujo[idx + 1];
+
+    if (faseActual === 'resultado') {
+      // Siguiente enfrentamiento
+      turnoIndex += 2;
+      poomsae1 = null;
+      poomsae2 = null;
+      faseActual = 'sorteo1';
+      // Limpiar displays
+      const el1 = document.getElementById('display-p1');
+      const el2 = document.getElementById('display-p2');
+      if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
+      if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
+    } else if (idx < flujo.length - 1) {
+      faseActual = flujo[idx + 1];
+    }
+
     puntajesRecibidos = {};
     renderPuntajesBar({}, 'puntajes-bar');
+    mostrarTurnoSimultaneo();
     actualizarFaseUI();
   }
+
 
 
   // ── REVELAR ──
@@ -493,16 +513,44 @@
     socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
     document.getElementById('btn-revelar').classList.add('hidden');
     const btnSig = document.getElementById('btn-siguiente');
-    btnSig.classList.remove('hidden');
+
     if (faseActual === 'calificacion1') {
+      btnSig.classList.remove('hidden');
       btnSig.textContent = 'IR A 2DA POOMSAE →';
+
     } else if (faseActual === 'calificacion2') {
-      btnSig.textContent = 'VER RESULTADO →';
+      btnSig.classList.remove('hidden');
+      btnSig.textContent = 'VER RESULTADO FINAL →';
+
     } else if (faseActual === 'resultado') {
-      turnoIndex += 2;
+      // Calcular ganador
+      const a = competidores[turnoIndex];
+      const b = competidores[turnoIndex + 1];
+      if (a && b && a.total !== null && b.total !== null) {
+        const ganador = a.total > b.total ? a.nombre : b.total > a.total ? b.nombre : 'EMPATE';
+        const color = a.total > b.total ? '#ff6666' : b.total > a.total ? '#6699ff' : '#c9a84c';
+        const div = document.getElementById('display-turno-sim');
+        div.innerHTML += `
+          <div style="
+            background:#0a0a0a; border:2px solid #c9a84c;
+            border-radius:10px; padding:14px; text-align:center; margin-top:10px;
+          ">
+            <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:6px">
+              Resultado Final
+            </div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:#555;margin-bottom:4px">
+              ${a.nombre}: ${a.total.toFixed(2)} &nbsp;·&nbsp; ${b.nombre}: ${b.total.toFixed(2)}
+            </div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:${color}">
+              🏆 ${ganador}
+            </div>
+          </div>`;
+      }
+      btnSig.classList.remove('hidden');
       btnSig.textContent = 'SIGUIENTE ENFRENTAMIENTO →';
     }
   }
+
 
   function revelarPuntajeGen() {
     socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
@@ -522,19 +570,27 @@
       return;
     }
 
-    const p1txt = poomsae1 ? poomsae1 : '';
-    const p2txt = poomsae2 ? poomsae2 : '';
-    const poomsaeLine = (p1txt || p2txt) ? `
+    // Mostrar solo la poomsae de la fase actual
+    let poomsaeActual = '';
+    let labelPoomsae = '';
+    if (faseActual === 'sorteo1') {
+      // Ambas al sortear
+      if (poomsae1 && poomsae2) {
+        poomsaeActual = `1ra: ${poomsae1} &nbsp;·&nbsp; 2da: ${poomsae2}`;
+      }
+    } else if (['ejecucion1','calificacion1'].includes(faseActual)) {
+      poomsaeActual = poomsae1 ? `1ra: ${poomsae1}` : '';
+    } else if (['ejecucion2','calificacion2','resultado'].includes(faseActual)) {
+      poomsaeActual = poomsae2 ? `2da: ${poomsae2}` : '';
+    }
+
+    const poomsaeLine = poomsaeActual ? `
       <div style="
         font-family:'Bebas Neue',sans-serif;
         font-size:22px; letter-spacing:4px;
-        color:#c9a84c; margin-bottom:6px;
+        color:#c9a84c; margin-bottom:8px;
         border-bottom:1px solid #2a2a2a; padding-bottom:8px;
-      ">
-        ${p1txt ? '1ra: ' + p1txt : ''}
-        ${p1txt && p2txt ? '&nbsp;·&nbsp;' : ''}
-        ${p2txt ? '2da: ' + p2txt : ''}
-      </div>` : '';
+      ">${poomsaeActual}</div>` : '';
 
     document.getElementById('display-turno-sim').innerHTML = `
       <div class="turno-card">
@@ -597,16 +653,19 @@
 
   // ── RENDER HELPERS ──
   function renderJueces(jueces) {
+    const el = document.getElementById('display-jueces');
+    if (!el) return;
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
       const c = jueces.find(j => j.num === i);
-      html += `<div class="juez-chip ${c?'activo':''}">
-        <div class="juez-dot ${c?'activo':''}"></div>
-        <span class="juez-txt">J${i}${c?.nombre?' · '+c.nombre:''}</span>
+      html += `<div class="juez-chip ${c ? 'activo' : ''}">
+        <div class="juez-dot ${c ? 'activo' : ''}"></div>
+        <span class="juez-txt">J${i}${c?.nombre ? ' · ' + c.nombre : ''}</span>
       </div>`;
     }
-    document.getElementById('display-jueces').innerHTML = html;
+    el.innerHTML = html;
   }
+
 
   function renderPuntajesBar(recibidos, elId) {
     const el = document.getElementById(elId);
@@ -653,8 +712,16 @@
     log('Sala creada');
   });
 
-  socket.on('juez-conectado', (data) => { renderJueces(data.jueces); log('Juez conectado: '+(data.nombre||'')); });
-  socket.on('juez-desconectado', (data) => { renderJueces(data.jueces); log('Juez desconectado'); });
+    socket.on('juez-conectado', (data) => {
+    renderJueces(data.jueces);
+    log('Juez conectado: ' + (data.nombre || ''));
+  });
+
+  socket.on('juez-desconectado', (data) => {
+    renderJueces(data.jueces);
+    log('Juez desconectado');
+  });
+
 
   socket.on('puntaje-recibido', (data) => {
     if (!puntajesRecibidos[data.juezNum]) puntajesRecibidos[data.juezNum] = 0;
