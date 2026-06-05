@@ -27,6 +27,8 @@
     .btn-blue:active { filter: brightness(0.85); }
     .btn-red { width: 100%; background: #dc2626; color: #fff; border: none; padding: 13px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
     .btn-red:active { filter: brightness(0.85); }
+    .btn-next { width: 100%; background: #7c3aed; color: #fff; border: none; padding: 14px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-bottom: 6px; }
+    .btn-next:active { filter: brightness(0.85); }
     .hidden { display: none; }
     .sala-codigo { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 6px; color: #c9a84c; text-align: center; line-height: 1; }
     .sala-sub { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; text-align: center; margin-top: 4px; }
@@ -46,7 +48,7 @@
     .cronometro-card { background: #0a0a0a; border: 1px solid #333; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 10px; }
     .cronometro-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 6px; }
     .cronometro-display { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 4px; color: #c9a84c; line-height: 1; text-shadow: 0 0 20px rgba(201,168,76,0.4); }
-    .cronometro-display.rojo { color: #dc2626; text-shadow: 0 0 20px rgba(220,38,38,0.4); }
+    .cronometro-display.rojo { color: #dc2626; }
     .crono-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
     .poomsae-card { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 14px; margin-bottom: 10px; text-align: center; }
     .poomsae-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 8px; }
@@ -57,22 +59,26 @@
     .turno-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: #fff; }
     .vs-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
     .vs-sep { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #333; }
-    .puntajes-bar { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
-    .pj-chip { min-width: 42px; padding: 0 8px; height: 42px; border-radius: 10px; background: #1a1a1a; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #444; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; }
-    .pj-chip.recibido { background: #16a34a; border-color: #22c55e; color: #fff; }
-    .rank-item { display: flex; align-items: center; gap: 10px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
-    .rank-pos { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; width: 28px; }
-    .rank-nombre { flex: 1; font-size: 13px; font-weight: 700; }
-    .rank-total { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; }
     .fase-badge { display: inline-block; padding: 5px 16px; border-radius: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; margin-bottom: 10px; }
     .fase-badge.ejecucion { background: #16a34a; color: #fff; }
     .fase-badge.sorteo { background: #c9a84c; color: #000; }
-    .fase-badge.calificacion { background: #7c3aed; color: #fff; }
-    .notas-juez { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
-    .notas-juez-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .notas-juez-num { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px; color: #c9a84c; }
-    .notas-juez-total { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #fff; }
-    .notas-juez-detalle { font-size: 9px; color: #555; letter-spacing: 1px; }
+    .fase-badge.detenido { background: #dc2626; color: #fff; }
+    .fase-badge.resultado { background: #7c3aed; color: #fff; }
+    .notas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+    .notas-comp { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 10px; padding: 10px; }
+    .notas-comp-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; margin-bottom: 8px; text-align: center; }
+    .notas-comp-titulo.rojo { color: #ff6666; }
+    .notas-comp-titulo.azul { color: #6699ff; }
+    .nota-juez-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #1a1a1a; font-size: 10px; }
+    .nota-juez-row:last-child { border-bottom: none; }
+    .nota-juez-num { color: #555; letter-spacing: 1px; }
+    .nota-juez-val { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: #c9a84c; }
+    .nota-juez-detalle { color: #444; font-size: 9px; }
+    .total-comp { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 6px; border-top: 1px solid #2a2a2a; }
+    .total-comp-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: #555; text-transform: uppercase; }
+    .total-comp-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #fff; }
+    .resultado-final { background: #0a0a0a; border: 2px solid #c9a84c; border-radius: 12px; padding: 16px; text-align: center; margin-top: 12px; }
+    .resultado-ganador { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 4px; }
     #log { font-size: 9px; color: #444; margin-top: 10px; max-height: 60px; overflow-y: auto; }
     .add-row { display: flex; gap: 8px; }
     .add-row .input-field { margin-bottom: 0; flex: 1; }
@@ -80,9 +86,6 @@
     .btn-add:active { background: #c9a84c; color: #000; }
     .corte-row { display: flex; gap: 8px; margin-top: 10px; }
     .corte-row .input-field { margin-bottom: 0; flex: 1; width: auto; }
-    .resultado-final { background: #0a0a0a; border: 2px solid #c9a84c; border-radius: 12px; padding: 16px; text-align: center; margin-top: 12px; }
-    .resultado-ganador { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 4px; color: #c9a84c; }
-    .resultado-detalle { font-size: 11px; color: #555; letter-spacing: 2px; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -173,7 +176,7 @@
     </div>
 
     <!-- SORTEO -->
-    <div id="bloque-sorteo-1">
+    <div id="bloque-sorteo">
       <div class="poomsae-card">
         <div class="poomsae-label">1ra Poomsae</div>
         <div class="poomsae-nombre vacio" id="display-p1">— Sin sortear —</div>
@@ -184,30 +187,50 @@
       </div>
       <button class="btn-blue" onclick="sortear()">🎲 SORTEAR AMBAS POOMSAES</button>
     </div>
-    <div id="bloque-sorteo-2" class="hidden"></div>
 
     <!-- CRONÓMETRO -->
     <div class="cronometro-card hidden" id="bloque-crono">
       <div class="cronometro-label" id="crono-label">—</div>
-      <div class="cronometro-display" id="crono-display">—</div>
+      <div class="cronometro-display" id="crono-display">1:30</div>
       <div class="crono-btns">
-        <button class="btn-green" onclick="iniciarCrono()">▶ INICIAR</button>
-        <button class="btn-red" onclick="detenerCrono()">⏹ DETENER</button>
+        <button class="btn-green" id="btn-iniciar-crono" onclick="iniciarCrono()">▶ INICIAR</button>
+        <button class="btn-red" id="btn-detener-crono" onclick="detenerCrono()">⏹ DETENER</button>
       </div>
-      <button class="btn-dark" onclick="restablecerCrono()" style="margin-top:6px">↺ RESTABLECER TIEMPO</button>
+      <button class="btn-dark" onclick="restablecerCrono()" style="margin-top:6px">↺ RESTABLECER</button>
     </div>
 
-    <!-- NOTAS RECIBIDAS -->
+    <!-- BOTÓN NEXT -->
+    <button class="btn-next hidden" id="btn-next" onclick="presionarNext()" style="margin-top:8px">
+      NEXT ›
+    </button>
+
+    <!-- NOTAS -->
     <div id="bloque-notas" class="hidden" style="margin-top:8px">
       <div class="panel-titulo">Notas Recibidas</div>
-      <div class="puntajes-bar" id="puntajes-bar"></div>
-      <div id="detalle-notas"></div>
+      <div class="notas-grid">
+        <div class="notas-comp" id="notas-comp-A">
+          <div class="notas-comp-titulo rojo" id="nombre-comp-A">—</div>
+          <div id="notas-rows-A"></div>
+          <div class="total-comp">
+            <span class="total-comp-label">Total P<span id="poomsae-num-label">1</span></span>
+            <span class="total-comp-val" id="total-A">—</span>
+          </div>
+        </div>
+        <div class="notas-comp" id="notas-comp-B">
+          <div class="notas-comp-titulo azul" id="nombre-comp-B">—</div>
+          <div id="notas-rows-B"></div>
+          <div class="total-comp">
+            <span class="total-comp-label">Total P<span class="poomsae-num-label">1</span></span>
+            <span class="total-comp-val" id="total-B">—</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- RESULTADO FINAL -->
     <div id="bloque-resultado" class="hidden"></div>
 
-    <!-- SIGUIENTE -->
+    <!-- SIGUIENTE ENFRENTAMIENTO -->
     <button class="btn-gold hidden" id="btn-siguiente-enfrentamiento" onclick="siguienteEnfrentamiento()" style="margin-top:8px">
       SIGUIENTE ENFRENTAMIENTO →
     </button>
@@ -218,7 +241,7 @@
   <div class="panel hidden" id="panel-control">
     <div class="panel-titulo">Turno Actual</div>
     <div id="display-turno"></div>
-    <div class="puntajes-bar" id="puntajes-bar-gen"></div>
+    <div id="puntajes-bar-gen" style="display:flex;gap:6px;justify-content:center;margin-bottom:10px;flex-wrap:wrap"></div>
     <button class="btn-gold" id="btn-revelar-gen" onclick="revelarPuntajeGen()">REVELAR PUNTAJE</button>
     <button class="btn-dark hidden" id="btn-siguiente-gen" onclick="siguienteTurno()" style="margin-top:6px">SIGUIENTE →</button>
   </div>
@@ -246,8 +269,6 @@
   let tipo = '';
   let numJueces = 3;
   let grupoCategoria = 'cadetes';
-  let puntajesRecibidos = {};
-  let notasDetalle = {}; // { juezNum: { precision, vel, rit, exp, total } }
 
   const POOMSAES_GRUPO = {
     cadetes: ['Taegeuk 4','Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek'],
@@ -256,17 +277,18 @@
     under40: ['Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek','Pyongwon','Sipjin','Jitae']
   };
 
-  let poomsae1 = null;
-  let poomsae2 = null;
+  let poomsae1 = null, poomsae2 = null;
   let cronoInterval = null;
-  let cronoSegundos = 90;
-  let cronoOriginal = 90;
-  let cronoTipoActual = 'ejecucion';
-  let faseActual = 'sorteo1';
+  let cronoSegundos = 90, cronoOriginal = 90;
+  let cronoActivo = false;
 
-  // Notas acumuladas por competidor para calcular resultado
-  let notasPoomsae1 = {}; // { compId: total }
-  let notasPoomsae2 = {}; // { compId: total }
+  // fases: sorteo → p1_corriendo → p1_detenido → p2_corriendo → p2_detenido → resultado
+  let faseActual = 'sorteo';
+
+  // Notas recibidas { compId: { jueces: {juezNum: {prec, vel, rit, exp}}, total } }
+  let notasP1 = {};
+  let notasP2 = {};
+  let notasActuales = {}; // referencia a la poomsae activa
 
   // ── CREAR SALA ──
   function crearSala() {
@@ -302,7 +324,7 @@
   }
   function eliminarCompetidor(i) { competidores.splice(i,1); renderCompetidores(); }
 
-  // ── INICIAR ──
+  // ── INICIAR COMPETENCIA ──
   function iniciarCompetencia() {
     if (competidores.length < 2) return alert('Agrega al menos 2 competidores');
     turnoIndex = 0;
@@ -310,16 +332,30 @@
     document.getElementById('panel-competidores').classList.add('hidden');
     if (modo === '1v1-simultaneo') {
       document.getElementById('panel-control-simultaneo').classList.remove('hidden');
-      faseActual = 'sorteo1';
-      poomsae1 = null; poomsae2 = null;
-      notasPoomsae1 = {}; notasPoomsae2 = {};
-      mostrarTurnoSimultaneo();
-      actualizarFaseUI();
+      resetSimultaneo();
     } else {
       document.getElementById('panel-control').classList.remove('hidden');
       if (modo === 'cutoff' || tipo === 'freestyle') document.getElementById('panel-ranking').classList.remove('hidden');
       mostrarTurnoActual();
     }
+  }
+
+  function resetSimultaneo() {
+    faseActual = 'sorteo';
+    poomsae1 = null; poomsae2 = null;
+    notasP1 = {}; notasP2 = {}; notasActuales = {};
+    const el1 = document.getElementById('display-p1');
+    const el2 = document.getElementById('display-p2');
+    if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
+    if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
+    document.getElementById('bloque-resultado').innerHTML = '';
+    document.getElementById('bloque-resultado').classList.add('hidden');
+    document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
+    document.getElementById('btn-next').classList.add('hidden');
+    document.getElementById('bloque-notas').classList.add('hidden');
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    mostrarTurnoSimultaneo();
+    actualizarFaseUI();
   }
 
   // ── SORTEO ──
@@ -330,59 +366,81 @@
     poomsae1 = lista[idx1];
     const restantes = lista.filter(p => p !== poomsae1);
     poomsae2 = restantes[Math.floor(Math.random() * restantes.length)];
-
     socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 1, poomsae: poomsae1 });
     socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 2, poomsae: poomsae2 });
-
     const el1 = document.getElementById('display-p1');
     const el2 = document.getElementById('display-p2');
     if (el1) { el1.textContent = poomsae1; el1.classList.remove('vacio'); }
     if (el2) { el2.textContent = poomsae2; el2.classList.remove('vacio'); }
-
-    faseActual = 'ejecucion1';
-    notasDetalle = {};
-    puntajesRecibidos = {};
+    faseActual = 'p1_listo';
+    inicializarNotasComp();
     mostrarTurnoSimultaneo();
     actualizarFaseUI();
     log(`Sorteadas: ${poomsae1} / ${poomsae2}`);
   }
 
+  function inicializarNotasComp() {
+    const a = competidores[turnoIndex];
+    const b = competidores[turnoIndex + 1];
+    if (!a || !b) return;
+    document.getElementById('nombre-comp-A').textContent = a.nombre;
+    document.getElementById('nombre-comp-B').textContent = b.nombre;
+    notasP1 = { [a.id]: { jueces: {}, total: null }, [b.id]: { jueces: {}, total: null } };
+    notasP2 = { [a.id]: { jueces: {}, total: null }, [b.id]: { jueces: {}, total: null } };
+  }
+
   // ── CRONÓMETRO ──
-  function setCrono(segundos, tipoC, label) {
-    detenerCrono();
+  function setCrono(segundos, label) {
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     cronoSegundos = segundos;
     cronoOriginal = segundos;
-    cronoTipoActual = tipoC;
     document.getElementById('crono-label').textContent = label;
     actualizarDisplayCrono();
   }
 
   function iniciarCrono() {
     if (cronoInterval) return;
-    // Notificar a jueces que pueden calificar
-    socket.emit('mesa-fase', { codigo: salaActual, fase: faseActual });
-    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundos, tipo: cronoTipoActual });
+    cronoActivo = true;
+    // Notificar jueces: habilitar precisión
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'iniciar', fase: faseActual });
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundos });
+    // Ocultar NEXT mientras corre
+    document.getElementById('btn-next').classList.add('hidden');
     cronoInterval = setInterval(() => {
       cronoSegundos--;
       actualizarDisplayCrono();
-      socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'tick', duracion: cronoSegundos, tipo: cronoTipoActual });
+      socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'tick', duracion: cronoSegundos });
       if (cronoSegundos <= 0) {
         detenerCrono();
-        socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'fin', duracion: 0, tipo: cronoTipoActual });
       }
     }, 1000);
   }
 
   function detenerCrono() {
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
-    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundos, tipo: cronoTipoActual });
+    cronoActivo = false;
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundos });
+    // Notificar jueces: bloquear precisión, habilitar presentación
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'detener', fase: faseActual });
+    // Mostrar NEXT
+    document.getElementById('btn-next').classList.remove('hidden');
+    // Actualizar badge
+    const badge = document.getElementById('fase-badge');
+    badge.className = 'fase-badge detenido';
+    badge.textContent = '⏹ Detenido — Jueces califican';
   }
 
   function restablecerCrono() {
-    detenerCrono();
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    cronoActivo = false;
     cronoSegundos = cronoOriginal;
     actualizarDisplayCrono();
-    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginal, tipo: cronoTipoActual });
+    document.getElementById('btn-next').classList.add('hidden');
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginal });
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'restablecer', fase: faseActual });
+    const badge = document.getElementById('fase-badge');
+    badge.className = 'fase-badge ejecucion';
+    badge.textContent = faseActual === 'p1_corriendo' ? '▶ Poomsae 1 · Ejecución' : '▶ Poomsae 2 · Ejecución';
   }
 
   function actualizarDisplayCrono() {
@@ -394,10 +452,38 @@
     if (cronoSegundos <= 10 && cronoSegundos > 0) el.classList.add('rojo');
   }
 
+  // ── NEXT ──
+  function presionarNext() {
+    document.getElementById('btn-next').classList.add('hidden');
+    if (faseActual === 'p1_detenido') {
+      // Ir a Poomsae 2
+      faseActual = 'p2_listo';
+      // Limpiar notas de la vista
+      limpiarNotasVista();
+      // Notificar jueces: nueva poomsae disponible
+      socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-poomsae', fase: 'p2', poomsae: poomsae2 });
+      mostrarTurnoSimultaneo();
+      actualizarFaseUI();
+    } else if (faseActual === 'p2_detenido') {
+      // Calcular resultado final
+      calcularResultadoFinal();
+    }
+  }
+
+  function limpiarNotasVista() {
+    document.getElementById('notas-rows-A').innerHTML = '';
+    document.getElementById('notas-rows-B').innerHTML = '';
+    document.getElementById('total-A').textContent = '—';
+    document.getElementById('total-B').textContent = '—';
+    // Actualizar label de poomsae
+    document.querySelectorAll('.poomsae-num-label').forEach(el => el.textContent = '2');
+    document.getElementById('poomsae-num-label').textContent = '2';
+  }
+
   // ── FASE UI ──
   function actualizarFaseUI() {
     const badge = document.getElementById('fase-badge');
-    const bloqueSorteo = document.getElementById('bloque-sorteo-1');
+    const bloqueSorteo = document.getElementById('bloque-sorteo');
     const bloqueCreno = document.getElementById('bloque-crono');
     const bloqueNotas = document.getElementById('bloque-notas');
 
@@ -406,57 +492,67 @@
 
     mostrarTurnoSimultaneo();
 
-    if (faseActual === 'sorteo1') {
+    if (faseActual === 'sorteo') {
       badge.className = 'fase-badge sorteo';
       badge.textContent = '🎲 Sortear Poomsaes';
       bloqueSorteo.classList.remove('hidden');
       bloqueNotas.classList.add('hidden');
 
-    } else if (faseActual === 'ejecucion1') {
+    } else if (faseActual === 'p1_listo') {
       badge.className = 'fase-badge ejecucion';
-      badge.textContent = '▶ Poomsae 1 · Ejecución';
+      badge.textContent = '▶ Poomsae 1 · Listo para iniciar';
       bloqueCreno.classList.remove('hidden');
       bloqueNotas.classList.remove('hidden');
-      setCrono(90, 'ejecucion', '1ra Poomsae · Tiempo de Ejecución');
-      notasDetalle = {};
-      puntajesRecibidos = {};
-      renderPuntajesBar({}, 'puntajes-bar');
-      renderDetalleNotas();
+      setCrono(90, '1ra Poomsae · Tiempo de Ejecución');
 
-    } else if (faseActual === 'ejecucion2') {
+    } else if (faseActual === 'p1_corriendo') {
       badge.className = 'fase-badge ejecucion';
-      badge.textContent = '▶ Poomsae 2 · Ejecución';
+      badge.textContent = '▶ Poomsae 1 · En ejecución';
       bloqueCreno.classList.remove('hidden');
       bloqueNotas.classList.remove('hidden');
-      setCrono(90, 'ejecucion', '2da Poomsae · Tiempo de Ejecución');
-      notasDetalle = {};
-      puntajesRecibidos = {};
-      renderPuntajesBar({}, 'puntajes-bar');
-      renderDetalleNotas();
+
+    } else if (faseActual === 'p1_detenido') {
+      badge.className = 'fase-badge detenido';
+      badge.textContent = '⏹ Poomsae 1 · Jueces califican';
+      bloqueCreno.classList.remove('hidden');
+      bloqueNotas.classList.remove('hidden');
+
+    } else if (faseActual === 'p2_listo') {
+      badge.className = 'fase-badge ejecucion';
+      badge.textContent = '▶ Poomsae 2 · Listo para iniciar';
+      bloqueCreno.classList.remove('hidden');
+      bloqueNotas.classList.remove('hidden');
+      setCrono(90, '2da Poomsae · Tiempo de Ejecución');
+
+    } else if (faseActual === 'p2_corriendo') {
+      badge.className = 'fase-badge ejecucion';
+      badge.textContent = '▶ Poomsae 2 · En ejecución';
+      bloqueCreno.classList.remove('hidden');
+      bloqueNotas.classList.remove('hidden');
+
+    } else if (faseActual === 'p2_detenido') {
+      badge.className = 'fase-badge detenido';
+      badge.textContent = '⏹ Poomsae 2 · Jueces califican';
+      bloqueCreno.classList.remove('hidden');
+      bloqueNotas.classList.remove('hidden');
     }
   }
 
-  // ── MOSTRAR TURNO ──
+  // ── TURNO SIMULTÁNEO ──
   function mostrarTurnoSimultaneo() {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
-    if (!a || !b) {
-      document.getElementById('display-turno-sim').innerHTML = `
-        <div class="turno-card" style="border-color:#22c55e">
-          <div class="turno-nombre" style="color:#22c55e;font-size:20px">COMPETENCIA FINALIZADA</div>
-        </div>`;
-      return;
-    }
+    if (!a || !b) return;
 
     let poomsaeLine = '';
-    if (faseActual === 'sorteo1' && poomsae1 && poomsae2) {
-      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:8px">
+    if (faseActual === 'sorteo' && poomsae1 && poomsae2) {
+      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:#c9a84c;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #2a2a2a">
         1ra: ${poomsae1} &nbsp;·&nbsp; 2da: ${poomsae2}</div>`;
-    } else if (['ejecucion1','calificacion1'].includes(faseActual) && poomsae1) {
-      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:8px">
+    } else if (['p1_listo','p1_corriendo','p1_detenido'].includes(faseActual) && poomsae1) {
+      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #2a2a2a">
         1ra: ${poomsae1}</div>`;
-    } else if (['ejecucion2','resultado'].includes(faseActual) && poomsae2) {
-      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:8px">
+    } else if (['p2_listo','p2_corriendo','p2_detenido','resultado'].includes(faseActual) && poomsae2) {
+      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #2a2a2a">
         2da: ${poomsae2}</div>`;
     }
 
@@ -473,100 +569,136 @@
     socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
   }
 
-  // ── NOTAS DETALLE ──
-  function renderDetalleNotas() {
-    const div = document.getElementById('detalle-notas');
-    if (!div) return;
-    if (Object.keys(notasDetalle).length === 0) {
-      div.innerHTML = `<div style="font-size:10px;color:#444;text-align:center;padding:8px">Esperando notas de jueces...</div>`;
-      return;
+  // ── NOTAS ──
+  function actualizarNotasVista(compId, juezNum, datos, esA) {
+    const suffix = esA ? 'A' : 'B';
+    const notasObj = faseActual.startsWith('p1') ? notasP1 : notasP2;
+    if (!notasObj[compId]) notasObj[compId] = { jueces: {}, total: null };
+    notasObj[compId].jueces[juezNum] = datos;
+
+    // Calcular total del comp
+    const vals = Object.values(notasObj[compId].jueces).map(d => d.prec + d.vel + d.rit + d.exp);
+    let total = null;
+    if (vals.length === numJueces) {
+      if (numJueces >= 5) {
+        const sorted = [...vals].sort((a,b) => a-b);
+        total = sorted.slice(1,-1).reduce((a,b) => a+b, 0) / (numJueces - 2);
+      } else {
+        total = vals.reduce((a,b) => a+b, 0) / vals.length;
+      }
+      notasObj[compId].total = total;
+      document.getElementById(`total-${suffix}`).textContent = total.toFixed(2);
     }
+
+    // Render filas de jueces
+    const div = document.getElementById(`notas-rows-${suffix}`);
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
-      const n = notasDetalle[i];
-      if (!n) continue;
-      html += `<div class="notas-juez">
-        <div class="notas-juez-header">
-          <span class="notas-juez-num">Juez ${i}</span>
-          <span class="notas-juez-total">${(n.precision + n.vel + n.rit + n.exp).toFixed(2)}</span>
-        </div>
-        <div class="notas-juez-detalle">
-          Prec: ${n.precision.toFixed(1)} &nbsp;·&nbsp;
-          Vel: ${n.vel.toFixed(1)} &nbsp;·&nbsp;
-          Rit: ${n.rit.toFixed(1)} &nbsp;·&nbsp;
-          Exp: ${n.exp.toFixed(1)}
-        </div>
-      </div>`;
+      const d = notasObj[compId].jueces[i];
+      if (!d) {
+        html += `<div class="nota-juez-row"><span class="nota-juez-num">J${i}</span><span class="nota-juez-detalle">—</span></div>`;
+      } else {
+        const tot = (d.prec + d.vel + d.rit + d.exp).toFixed(2);
+        html += `<div class="nota-juez-row">
+          <span class="nota-juez-num">J${i}</span>
+          <span class="nota-juez-detalle">${d.prec.toFixed(1)} / ${d.vel.toFixed(1)} ${d.rit.toFixed(1)} ${d.exp.toFixed(1)}</span>
+          <span class="nota-juez-val">${tot}</span>
+        </div>`;
+      }
     }
     div.innerHTML = html;
+
+    // Verificar si todos calificaron ambos comps
+    verificarCompletitud();
   }
 
-  // ── CALCULAR RESULTADO FINAL ──
+  function verificarCompletitud() {
+    const a = competidores[turnoIndex];
+    const b = competidores[turnoIndex + 1];
+    if (!a || !b) return;
+    const notasObj = faseActual.startsWith('p1') ? notasP1 : notasP2;
+    const totA = notasObj[a.id]?.total;
+    const totB = notasObj[b.id]?.total;
+    if (totA !== null && totA !== undefined && totB !== null && totB !== undefined) {
+      // Todos calificaron esta poomsae
+      if (faseActual === 'p1_detenido') {
+        log(`✅ Poomsae 1 completa: ${a.nombre} ${totA.toFixed(2)} · ${b.nombre} ${totB.toFixed(2)}`);
+      } else if (faseActual === 'p2_detenido') {
+        log(`✅ Poomsae 2 completa: ${a.nombre} ${totA.toFixed(2)} · ${b.nombre} ${totB.toFixed(2)}`);
+        calcularResultadoFinal();
+      }
+    }
+  }
+
+  // ── RESULTADO FINAL ──
   function calcularResultadoFinal() {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
     if (!a || !b) return;
 
-    const totalA = (notasPoomsae1[a.id] || 0) + (notasPoomsae2[a.id] || 0);
-    const totalB = (notasPoomsae1[b.id] || 0) + (notasPoomsae2[b.id] || 0);
+    const totA1 = notasP1[a.id]?.total || 0;
+    const totB1 = notasP1[b.id]?.total || 0;
+    const totA2 = notasP2[a.id]?.total || 0;
+    const totB2 = notasP2[b.id]?.total || 0;
+    const totalA = totA1 + totA2;
+    const totalB = totB1 + totB2;
 
     const ganador = totalA > totalB ? a.nombre : totalB > totalA ? b.nombre : 'EMPATE';
     const colorGanador = totalA > totalB ? '#ff6666' : totalB > totalA ? '#6699ff' : '#c9a84c';
 
+    faseActual = 'resultado';
+    mostrarTurnoSimultaneo();
+
     document.getElementById('bloque-resultado').classList.remove('hidden');
     document.getElementById('bloque-resultado').innerHTML = `
       <div class="resultado-final">
-        <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:10px">Resultado Final</div>
-        <div style="display:flex;justify-content:space-around;margin-bottom:12px">
+        <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:12px">Resultado Final</div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:14px">
           <div style="text-align:center">
             <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#ff6666">${a.nombre}</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff">${totalA.toFixed(2)}</div>
-            <div style="font-size:9px;color:#555">P1: ${(notasPoomsae1[a.id]||0).toFixed(2)} · P2: ${(notasPoomsae2[a.id]||0).toFixed(2)}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff">${totalA.toFixed(2)}</div>
+            <div style="font-size:9px;color:#555">P1: ${totA1.toFixed(2)} · P2: ${totA2.toFixed(2)}</div>
           </div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#333;align-self:center">VS</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#333">VS</div>
           <div style="text-align:center">
             <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#6699ff">${b.nombre}</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff">${totalB.toFixed(2)}</div>
-            <div style="font-size:9px;color:#555">P1: ${(notasPoomsae1[b.id]||0).toFixed(2)} · P2: ${(notasPoomsae2[b.id]||0).toFixed(2)}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff">${totalB.toFixed(2)}</div>
+            <div style="font-size:9px;color:#555">P1: ${totB1.toFixed(2)} · P2: ${totB2.toFixed(2)}</div>
           </div>
         </div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:#555;margin-bottom:4px">GANADOR</div>
+        <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:4px">Ganador</div>
         <div class="resultado-ganador" style="color:${colorGanador}">🏆 ${ganador}</div>
       </div>`;
 
-    document.getElementById('btn-siguiente-enfrentamiento').classList.remove('hidden');
-    faseActual = 'resultado';
-    mostrarTurnoSimultaneo();
-    log(`Resultado: ${a.nombre} ${totalA.toFixed(2)} vs ${b.nombre} ${totalB.toFixed(2)} → ${ganador}`);
+    // Ver si hay siguiente enfrentamiento
+    const haySiguiente = competidores[turnoIndex + 2] && competidores[turnoIndex + 3];
+    if (haySiguiente) {
+      document.getElementById('btn-siguiente-enfrentamiento').classList.remove('hidden');
+    } else {
+      // Fin de todos los enfrentamientos
+      setTimeout(() => finDeSala(), 2000);
+    }
+    log(`🏆 Ganador: ${ganador} | ${a.nombre} ${totalA.toFixed(2)} vs ${b.nombre} ${totalB.toFixed(2)}`);
   }
 
   function siguienteEnfrentamiento() {
     turnoIndex += 2;
-    poomsae1 = null; poomsae2 = null;
-    notasPoomsae1 = {}; notasPoomsae2 = {};
-    notasDetalle = {}; puntajesRecibidos = {};
-    faseActual = 'sorteo1';
-    const el1 = document.getElementById('display-p1');
-    const el2 = document.getElementById('display-p2');
-    if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
-    if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
-    document.getElementById('bloque-resultado').classList.add('hidden');
-    document.getElementById('bloque-resultado').innerHTML = '';
+    // Notificar jueces nueva competencia
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-competencia', fase: 'sorteo' });
     document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
-    renderPuntajesBar({}, 'puntajes-bar');
-    renderDetalleNotas();
+    resetSimultaneo();
     mostrarTurnoSimultaneo();
-    actualizarFaseUI();
+  }
+
+  function finDeSala() {
+    socket.emit('mesa-fin-sala', { codigo: salaActual });
   }
 
   // ── TURNO GENERAL ──
   function mostrarTurnoActual() {
-    puntajesRecibidos = {};
-    renderPuntajesBar({}, 'puntajes-bar-gen');
     const div = document.getElementById('display-turno');
     if (modo === '1v1-secuencial') {
-      const a = competidores[turnoIndex];
-      const b = competidores[turnoIndex + 1];
+      const a = competidores[turnoIndex], b = competidores[turnoIndex + 1];
       if (!a || !b) { finGen(); return; }
       div.innerHTML = `<div class="turno-card"><div class="turno-label">Secuencial</div>
         <div class="vs-row">
@@ -613,12 +745,11 @@
 
   // ── RESTAURAR ──
   function restaurarSistema() {
-    const ok = confirm('¿Restaurar el sistema? Se borrará la competencia actual.');
-    if (!ok) return;
+    if (!confirm('¿Restaurar el sistema? Se borrará la competencia actual.')) return;
     socket.emit('mesa-restaurar', { codigo: salaActual });
   }
 
-  // ── RENDER HELPERS ──
+  // ── RENDER ──
   function renderJueces(jueces) {
     const el = document.getElementById('display-jueces');
     if (!el) return;
@@ -633,22 +764,12 @@
     el.innerHTML = html;
   }
 
-  function renderPuntajesBar(recibidos, elId) {
-    const el = document.getElementById(elId);
-    if (!el) return;
-    let html = '';
-    for (let i = 1; i <= numJueces; i++) {
-      html += `<div class="pj-chip ${recibidos[i]?'recibido':''}">J${i}</div>`;
-    }
-    el.innerHTML = html;
-  }
-
   function renderRanking(ranking, topN) {
     const div = document.getElementById('display-ranking');
     if (!div) return;
     let html = '';
-    ranking.forEach((c, i) => {
-      let clase = topN ? (i < topN ? 'pasa' : 'fuera') : '';
+    ranking.forEach((c,i) => {
+      const clase = topN ? (i < topN ? 'pasa' : 'fuera') : '';
       if (topN && i === topN) html += `<hr style="border-color:#c9a84c;margin:6px 0">`;
       html += `<div class="rank-item ${clase}">
         <span class="rank-pos">${i+1}</span>
@@ -678,95 +799,47 @@
     log('Sala creada');
   });
 
-  socket.on('juez-conectado', (data) => {
-    renderJueces(data.jueces);
-    log(`Juez ${data.numJuez} conectado: ${data.nombre||''}`);
-  });
-
-  socket.on('juez-desconectado', (data) => {
-    renderJueces(data.jueces);
-    log(`Juez ${data.numJuez} desconectado`);
-  });
+  socket.on('juez-conectado', (data) => { renderJueces(data.jueces); log(`Juez ${data.numJuez} conectado`); });
+  socket.on('juez-desconectado', (data) => { renderJueces(data.jueces); log(`Juez ${data.numJuez} desconectado`); });
 
   socket.on('puntaje-recibido', (data) => {
-    // Actualizar barra
-    puntajesRecibidos[data.juezNum] = true;
-    const barId = modo === '1v1-simultaneo' ? 'puntajes-bar' : 'puntajes-bar-gen';
-    renderPuntajesBar(puntajesRecibidos, barId);
-
-    // Guardar desglose
-    if (data.desglose) {
-      notasDetalle[data.juezNum] = {
-        precision: data.desglose.precision,
-        vel: data.desglose.vel,
-        rit: data.desglose.rit,
-        exp: data.desglose.exp
-      };
-      renderDetalleNotas();
-
-      // Acumular por poomsae
-      if (faseActual === 'ejecucion1') {
-        if (!notasPoomsae1[data.competidorId]) notasPoomsae1[data.competidorId] = 0;
-      } else if (faseActual === 'ejecucion2') {
-        if (!notasPoomsae2[data.competidorId]) notasPoomsae2[data.competidorId] = 0;
-      }
-    }
-
-    // Verificar si todos enviaron para ambos competidores
-    if (modo === '1v1-simultaneo') {
-      const a = competidores[turnoIndex];
-      const b = competidores[turnoIndex + 1];
-      if (a && b) {
-        const todosListos = Object.keys(puntajesRecibidos).length >= numJueces * 2 ||
-          (data.totalPuntajesA >= numJueces && data.totalPuntajesB >= numJueces);
-        if (data.todosCompletos) {
-          // Guardar totales
-          if (faseActual === 'ejecucion1') {
-            notasPoomsae1[a.id] = data.totalA || 0;
-            notasPoomsae1[b.id] = data.totalB || 0;
-            // Pasar a poomsae 2
-            faseActual = 'ejecucion2';
-            actualizarFaseUI();
-          } else if (faseActual === 'ejecucion2') {
-            notasPoomsae2[a.id] = data.totalA || 0;
-            notasPoomsae2[b.id] = data.totalB || 0;
-            calcularResultadoFinal();
-          }
-        }
-      }
-    }
-
-    log(`✓ J${data.juezNum} (${data.totalPuntajes}/${data.numJueces})`);
-  });
-
-  socket.on('poomsae-sorteada', (data) => {
-    log(`Poomsae ${data.numero}: ${data.poomsae}`);
+    if (!data.desglose) return;
+    const a = competidores[turnoIndex];
+    const b = competidores[turnoIndex + 1];
+    if (!a || !b) return;
+    const esA = data.competidorId === a.id;
+    actualizarNotasVista(data.competidorId, data.juezNum, data.desglose, esA);
+    log(`J${data.juezNum} → ${esA ? a.nombre : b.nombre}: ${(data.desglose.prec + data.desglose.vel + data.desglose.rit + data.desglose.exp).toFixed(2)}`);
   });
 
   socket.on('ranking-actualizado', (data) => { renderRanking(data.ranking, null); });
   socket.on('corte-aplicado', (data) => { renderRanking(data.ranking, data.topN); });
+  socket.on('poomsae-sorteada', () => {});
 
   socket.on('sistema-restaurado', () => {
-    competidores = [];
-    turnoIndex = 0;
-    poomsae1 = null; poomsae2 = null;
-    faseActual = 'sorteo1';
-    puntajesRecibidos = {};
-    notasDetalle = {};
-    notasPoomsae1 = {}; notasPoomsae2 = {};
-    const el1 = document.getElementById('display-p1');
-    const el2 = document.getElementById('display-p2');
-    if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
-    if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
+    competidores = []; turnoIndex = 0;
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     document.getElementById('panel-control-simultaneo').classList.add('hidden');
     document.getElementById('panel-control').classList.add('hidden');
     document.getElementById('panel-ranking').classList.add('hidden');
     document.getElementById('panel-competidores').classList.remove('hidden');
     document.getElementById('lista-competidores').innerHTML = '';
-    document.getElementById('bloque-resultado').classList.add('hidden');
-    document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
-    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    resetSimultaneo();
     log('Sistema restaurado');
+  });
+
+  socket.on('sala-finalizada', () => {
+    // Regresar a inicio
+    document.getElementById('seccion-sala').classList.add('hidden');
+    document.getElementById('seccion-setup').classList.remove('hidden');
+    document.getElementById('panel-control-simultaneo').classList.add('hidden');
+    document.getElementById('panel-control').classList.add('hidden');
+    document.getElementById('panel-ranking').classList.add('hidden');
+    document.getElementById('panel-competidores').classList.remove('hidden');
+    document.getElementById('lista-competidores').innerHTML = '';
+    competidores = []; turnoIndex = 0; salaActual = null;
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    log('Sala finalizada');
   });
 </script>
 </body>
