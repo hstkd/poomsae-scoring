@@ -850,21 +850,75 @@
     };
   }
 
-  function enviarAmbos() {
+    function enviarAmbos() {
     const vA = getValores('A'), vB = getValores('B');
-    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: turnoActual.competidorA.id, ...vA });
-    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id, ...vB });
+    const mA = modulosVal['A'], mB = modulosVal['B'];
+
+    const compA = turnoActual.competidorA;
+    const compB = turnoActual.competidorB;
+
+    if (!compA || compA.id === undefined) {
+      console.error('CompA inválido:', compA);
+      return;
+    }
+    if (!compB || compB.id === undefined) {
+      console.error('CompB inválido:', compB);
+      return;
+    }
+
+    console.log(`Enviando A id=${compA.id} prec=${vA.precision} pres=${vA.presentacion}`);
+    console.log(`Enviando B id=${compB.id} prec=${vB.precision} pres=${vB.presentacion}`);
+
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo,
+      competidorId: compA.id,
+      precision: vA.precision,
+      presentacion: vA.presentacion,
+      desglose: { prec: vA.precision, vel: mA.vel, rit: mA.rit, exp: mA.exp },
+      poomsae: poomsaeActiva
+    });
+
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo,
+      competidorId: compB.id,
+      precision: vB.precision,
+      presentacion: vB.presentacion,
+      desglose: { prec: vB.precision, vel: mB.vel, rit: mB.rit, exp: mB.exp },
+      poomsae: poomsaeActiva
+    });
+
     mostrarResumen([
-      { nombre: turnoActual.competidorA?.nombre, ...vA },
-      { nombre: turnoActual.competidorB?.nombre, ...vB }
+      { nombre: compA.nombre, ...vA },
+      { nombre: compB.nombre, ...vB }
     ]);
   }
 
   function enviarUno(key, fase) {
-    let comp = fase === 'A' ? turnoActual.competidorA : fase === 'B' ? turnoActual.competidorB : turnoActual.competidor;
+    let comp;
+    if (fase === 'A') comp = turnoActual.competidorA;
+    else if (fase === 'B') comp = turnoActual.competidorB;
+    else comp = turnoActual.competidor;
+
+    if (!comp || comp.id === undefined) {
+      console.error('Comp inválido:', comp);
+      return;
+    }
+
     const v = getValores(key);
-    socket.emit('juez-puntaje', { codigo: salaInfo.codigo, competidorId: comp.id, ...v });
-    mostrarResumen([{ nombre: comp?.nombre, ...v }]);
+    const m = modulosVal[key];
+
+    console.log(`Enviando ${comp.nombre} id=${comp.id} prec=${v.precision} pres=${v.presentacion}`);
+
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo,
+      competidorId: comp.id,
+      precision: v.precision,
+      presentacion: v.presentacion,
+      desglose: { prec: v.precision, vel: m.vel, rit: m.rit, exp: m.exp },
+      poomsae: poomsaeActiva
+    });
+
+    mostrarResumen([{ nombre: comp.nombre, ...v }]);
   }
 
   function mostrarResumen(resultados) {
