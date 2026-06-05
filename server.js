@@ -162,6 +162,14 @@ io.on('connection', (socket) => {
     console.log(`Juez ${numJuez} (${nombre}) en sala ${codigo}`);
   });
 
+    // ── MESA: FASE ──
+  socket.on('mesa-fase', ({ codigo, fase }) => {
+    const sala = salas[codigo];
+    if (!sala) return;
+    sala.faseActual = fase;
+    io.to(codigo).emit('fase-actualizada', { fase });
+  });
+
   // ── JUEZ: PUNTAJE ──
   socket.on('juez-puntaje', ({ codigo, competidorId, precision, presentacion }) => {
     const sala = salas[codigo];
