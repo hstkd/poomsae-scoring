@@ -917,6 +917,83 @@
   }
 
   // ── SOCKET ──
+  // ── ESTADO DE CALIFICACIÓN ──
+  let precisonBloqueada = true;
+  let poomsaeActiva = 1; // 1 o 2
+  let precisionConfirmada = { A: false, B: false, C: false };
+
+  // ── ENVIAR PRECISIÓN (al confirmar) ──
+  function enviarPrecision(key, comp) {
+    if (precisonBloqueada) return;
+    const prec = precisionVal[key] || 0;
+    socket.emit('juez-precision', {
+      codigo: salaInfo.codigo,
+      competidorId: comp.id,
+      precision: prec,
+      poomsae: poomsaeActiva
+    });
+    precisionConfirmada[key] = true;
+    log(`Precisión enviada: ${prec.toFixed(1)}`);
+  }
+
+  // Modificar irPresentacion para enviar precisión primero
+  const _irPresentacionOrig = irPresentacion;
+  function irPresentacion() {
+    // Enviar precisión de ambos al confirmar
+    if (turnoActual?.tipo === '1v1-simultaneo') {
+      enviarPrecision('A', turnoActual.competidorA);
+      enviarPrecision('B', turnoActual.competidorB);
+    }
+    _irPresentacionOrig?.();
+  }
+
+  const _irPresentacionUnoOrig = irPresentacionUno;
+  function irPresentacionUno(key, fase, nombre) {
+    if (turnoActual?.tipo === '1v1-secuencial') {
+      const comp = fase === 'A' ? turnoActual.competidorA : turnoActual.competidorB;
+      enviarPrecision(key, comp);
+    } else {
+      enviarPrecision(key, turnoActual?.competidor);
+    }
+    _irPresentacionUnoOrig?.(key, fase, nombre);
+  }
+
+  // ── ENVIAR PRESENTACIÓN con desglose ──
+  function enviarAmbos() {
+    const vA = getValores('A'), vB = getValores('B');
+    const mA = modulosVal['A'], mB = modulosVal['B'];
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo, competidorId: turnoActual.competidorA.id,
+      precision: vA.precision, presentacion: vA.presentacion,
+      desglose: { prec: vA.precision, vel: mA.vel, rit: mA.rit, exp: mA.exp },
+      poomsae: poomsaeActiva
+    });
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id,
+      precision: vB.precision, presentacion: vB.presentacion,
+      desglose: { prec: vB.precision, vel: mB.vel, rit: mB.rit, exp: mB.exp },
+      poomsae: poomsaeActiva
+    });
+    mostrarResumen([
+      { nombre: turnoActual.competidorA?.nombre, ...vA },
+      { nombre: turnoActual.competidorB?.nombre, ...vB }
+    ]);
+  }
+
+  function enviarUno(key, fase) {
+    const comp = fase === 'A' ? turnoActual.competidorA : fase === 'B' ? turnoActual.competidorB : turnoActual.competidor;
+    const v = getValores(key);
+    const m = modulosVal[key];
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo, competidorId: comp.id,
+      precision: v.precision, presentacion: v.presentacion,
+      desglose: { prec: v.precision, vel: m.vel, rit: m.rit, exp: m.exp },
+      poomsae: poomsaeActiva
+    });
+    mostrarResumen([{ nombre: comp?.nombre, ...v }]);
+  }
+
+  // ── SOCKET ──
   socket.on('juez-ok', (data) => {
     salaInfo = data.sala;
     document.getElementById('overlay-login').classList.add('hidden');
@@ -925,43 +1002,89 @@
   });
 
   socket.on('error-sala', (d) => alert(d.msg));
-
-  socket.on('competencia-iniciada', (d) => {
-    salaInfo.tipo = d.tipo;
-    salaInfo.modo = d.modo;
-  });
-
+  socket.on('competencia-iniciada', (d) => { salaInfo.tipo = d.tipo; salaInfo.modo = d.modo; });
   socket.on('turno-actualizado', (d) => renderCalificacion(d.turno));
 
-  // Habilitar calificación cuando mesa inicia cronómetro
-  socket.on('fase-actualizada', (data) => {
-    salaInfo.faseActual = data.fase;
-    // Si hay turno activo y se habilita nueva fase, reactivar panel
-    if (turnoActual && ['ejecucion1','ejecucion2'].includes(data.fase)) {
-      // Reactivar para segunda poomsae sin recargar
-      if (data.fase === 'ejecucion2') {
-        renderCalificacion(turnoActual);
-      }
-    }
-  });
+  socket.on('control-actualizado', (data) => {
+    if (data.accion === 'iniciar') {
+      // Habilitar precisión
+      precisonBloqueada = false;
+      precisionConfirmada = { A: false, B: false, C: false };
+      // Si hay panel visible, habilitar botones de deducción visualmente
+      document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+      });
 
-  socket.on('disconnect', () => {
-    console.log('Desconectado del servidor');
-  });
+    } else if (data.accion === 'detener') {
+      // Bloquear precisión
+      precisonBloqueada = true;
+      document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
+        btn.style.opacity = '0.3';
+        btn.style.pointerEvents = 'none';
+      });
 
-  socket.on('reconnect', () => {
-    if (salaInfo.codigo) {
-      socket.emit('juez-unirse', {
-        codigo: salaInfo.codigo,
-        nombre: document.getElementById('juez-badge')?.textContent?.replace('JUEZ ','') || 'Juez',
-        numJuez
+    } else if (data.accion === 'nueva-poomsae') {
+      // Poomsae 2: reactivar sin recargar
+      poomsaeActiva = 2;
+      precisonBloqueada = true;
+      precisionConfirmada = { A: false, B: false, C: false };
+      // Mostrar overlay de espera con info de nueva poomsae
+      document.getElementById('overlay-enviado').classList.add('hidden');
+      document.getElementById('panel-calificacion').style.display = 'none';
+      document.getElementById('panel-calificacion').classList.remove('visible');
+      const espera = document.getElementById('overlay-espera');
+      espera.innerHTML = `
+        <div style="font-size:44px">⏸</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#c9a84c">2DA POOMSAE</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:#fff">${data.poomsae || ''}</div>
+        <div style="font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase;margin-top:4px">Espera que mesa inicie</div>`;
+      espera.classList.remove('hidden');
+
+    } else if (data.accion === 'nueva-competencia') {
+      // Nueva competencia: volver a espera
+      poomsaeActiva = 1;
+      precisonBloqueada = true;
+      precisionConfirmada = { A: false, B: false, C: false };
+      turnoActual = null;
+      document.getElementById('overlay-enviado').classList.add('hidden');
+      document.getElementById('panel-calificacion').style.display = 'none';
+      document.getElementById('panel-calificacion').classList.remove('visible');
+      document.getElementById('overlay-espera').innerHTML = `
+        <div style="font-size:44px">⏸</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c">ESPERANDO TURNO</div>
+        <div style="font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase">Espera la señal de la mesa</div>`;
+      document.getElementById('overlay-espera').classList.remove('hidden');
+
+    } else if (data.accion === 'restablecer') {
+      // Reactivar botones si corresponde
+      precisonBloqueada = false;
+      document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
       });
     }
   });
 
-  socket.on('puntaje-confirmado', (data) => {
-    console.log(`✓ Puntaje confirmado comp ${data.competidorId}`);
+  socket.on('sala-finalizada', () => {
+    // Volver a login
+    document.getElementById('overlay-espera').classList.add('hidden');
+    document.getElementById('panel-calificacion').style.display = 'none';
+    document.getElementById('overlay-login').classList.remove('hidden');
+    salaInfo = {}; turnoActual = null;
   });
+
+  socket.on('puntaje-confirmado', (data) => {
+    console.log(`✓ Confirmado comp ${data.competidorId}`);
+  });
+
+  socket.on('disconnect', () => console.log('Desconectado'));
+  socket.on('reconnect', () => {
+    if (salaInfo.codigo) {
+      socket.emit('juez-unirse', { codigo: salaInfo.codigo, nombre: 'Juez', numJuez });
+    }
+  });
+
 
 </script>
 </body>
