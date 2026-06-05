@@ -16,15 +16,21 @@ app.use(express.static('public'));
 
 const salas = {};
 
+// ── CÁLCULO DE TOTAL (única fuente de verdad — fix #13) ──
+// Recibe un array de { juez, precision, presentacion, desglose }
+// Devuelve el promedio (trimmed mean si numJueces >= 5), redondeado a 2 decimales.
 function calcularTotal(puntajes, numJueces) {
   if (puntajes.length < numJueces) return null;
   const valores = puntajes.map(p => p.precision + p.presentacion);
+  let resultado;
   if (numJueces >= 5) {
     const sorted = [...valores].sort((a, b) => a - b);
-    const recortados = sorted.slice(1, -1);
-    return recortados.reduce((a, b) => a + b, 0) / recortados.length;
+    const recortados = sorted.slice(1, -1); // elimina el menor y el mayor
+    resultado = recortados.reduce((a, b) => a + b, 0) / recortados.length;
+  } else {
+    resultado = valores.reduce((a, b) => a + b, 0) / valores.length;
   }
-  return valores.reduce((a, b) => a + b, 0) / valores.length;
+  return Math.round(resultado * 100) / 100;
 }
 
 function getRanking(sala) {
@@ -34,9 +40,36 @@ function getRanking(sala) {
     .map((c, i) => ({ ...c, pos: i + 1 }));
 }
 
+// ── HELPER: construir objeto turno a partir del estado de la sala ──
+function buildTurno(sala, ti) {
+  const m = sala.modo;
+  if (m === '1v1-simultaneo') {
+    return {
+      tipo: '1v1-simultaneo',
+      competidorA: sala.competidores[ti] || null,
+      competidorB: sala.competidores[ti + 1] || null,
+    };
+  } else if (m === '1v1-secuencial') {
+    return {
+      tipo: '1v1-secuencial',
+      competidorA: sala.competidores[ti] || null,
+      competidorB: sala.competidores[ti + 1] || null,
+      fase: 'A',
+    };
+  } else {
+    return {
+      tipo: 'cutoff',
+      competidor: sala.competidores[ti] || null,
+      numero: ti + 1,
+      total: sala.competidores.length,
+    };
+  }
+}
+
 io.on('connection', (socket) => {
   console.log('Conectado:', socket.id);
 
+  // ── MESA: CREAR SALA ──
   socket.on('mesa-crear-sala', ({ codigo, tipo, modo, numJueces, categoria, ronda, grupoCategoria }) => {
     if (salas[codigo]) {
       socket.emit('error-sala', { msg: 'Esa sala ya existe' });
@@ -50,64 +83,65 @@ io.on('connection', (socket) => {
       turnoIndex: 0,
       estado: 'setup',
       mesaId: socket.id,
+      // Poomsaes del enfrentamiento activo
       poomsae1: null,
-      poomsae2: null
+      poomsae2: null,
+      // Fase actual para reenviar a jueces reconectados (fix #8)
+      faseActual: 'sorteo',
+      cronoActivo: false,
     };
     socket.join(codigo);
     socket.emit('sala-creada', { codigo, tipo, modo, numJueces, categoria, ronda });
     console.log(`Sala creada: ${codigo}`);
   });
 
+  // ── MESA: INICIAR COMPETENCIA ──
+  // FIX #3: el servidor asigna IDs y los devuelve a Mesa en competencia-iniciada.
+  // Mesa debe escuchar este evento y reemplazar su array local con los competidores indexados.
   socket.on('mesa-iniciar', ({ codigo, competidores, modo, tipo }) => {
     const sala = salas[codigo];
     if (!sala) return;
+
     sala.competidores = competidores.map((c, i) => ({
-      id: i, nombre: c.nombre, puntajes: [], total: null
+      id: i,
+      nombre: c.nombre,
+      // FIX #1: puntajes separados por poomsae
+      puntajesP1: [],
+      puntajesP2: [],
+      totalP1: null,
+      totalP2: null,
+      total: null,       // suma totalP1 + totalP2 (se calcula al tener ambos)
     }));
     sala.turnoIndex = 0;
     sala.estado = 'activo';
+    sala.faseActual = 'sorteo';
+
+    // FIX #3: devolver los competidores con sus IDs reales a TODOS (mesa incluida)
     io.to(codigo).emit('competencia-iniciada', {
-      competidores: sala.competidores, modo: sala.modo, tipo: sala.tipo
+      competidores: sala.competidores,
+      modo: sala.modo,
+      tipo: sala.tipo,
     });
   });
 
+  // ── MESA: TURNO ──
   socket.on('mesa-turno', ({ codigo, turnoIndex, modo }) => {
     const sala = salas[codigo];
     if (!sala) return;
     sala.turnoIndex = turnoIndex;
-    let turno = {};
-    if (modo === '1v1-simultaneo') {
-      turno = {
-        tipo: '1v1-simultaneo',
-        competidorA: sala.competidores[turnoIndex] || null,
-        competidorB: sala.competidores[turnoIndex + 1] || null
-      };
-    } else if (modo === '1v1-secuencial') {
-      turno = {
-        tipo: '1v1-secuencial',
-        competidorA: sala.competidores[turnoIndex] || null,
-        competidorB: sala.competidores[turnoIndex + 1] || null,
-        fase: 'A'
-      };
-    } else {
-      turno = {
-        tipo: 'cutoff',
-        competidor: sala.competidores[turnoIndex] || null,
-        numero: turnoIndex + 1,
-        total: sala.competidores.length
-      };
-    }
+    const turno = buildTurno(sala, turnoIndex);
     io.to(codigo).emit('turno-actualizado', { turno, salaInfo: { tipo: sala.tipo } });
   });
 
-  // ── JUEZ: UNIRSE ──
+  // ── JUEZ: UNIRSE / RECONECTAR ──
   socket.on('juez-unirse', ({ codigo, nombre, numJuez }) => {
     const sala = salas[codigo];
     if (!sala) {
       socket.emit('error-sala', { msg: 'Sala no encontrada' });
       return;
     }
-    // Eliminar sesión anterior del mismo número
+
+    // Reemplazar sesión anterior del mismo número
     sala.jueces = sala.jueces.filter(j => j.num !== numJuez);
     sala.jueces.push({ id: socket.id, num: numJuez, nombre });
     socket.join(codigo);
@@ -120,124 +154,124 @@ io.on('connection', (socket) => {
         codigo: sala.codigo, tipo: sala.tipo, modo: sala.modo,
         numJueces: sala.numJueces, categoria: sala.categoria,
         ronda: sala.ronda, estado: sala.estado,
-        competidores: sala.competidores, turnoIndex: sala.turnoIndex
-      }
+        competidores: sala.competidores, turnoIndex: sala.turnoIndex,
+      },
     });
 
-    // Si hay competencia activa, reenviar turno actual
+    // Si hay competencia activa, reenviar turno Y estado completo (fix #8)
     if (sala.estado === 'activo' && sala.competidores.length > 0) {
-      const ti = sala.turnoIndex;
-      const m = sala.modo;
-      let turno = {};
-      if (m === '1v1-simultaneo') {
-        turno = {
-          tipo: '1v1-simultaneo',
-          competidorA: sala.competidores[ti] || null,
-          competidorB: sala.competidores[ti + 1] || null
-        };
-      } else if (m === '1v1-secuencial') {
-        turno = {
-          tipo: '1v1-secuencial',
-          competidorA: sala.competidores[ti] || null,
-          competidorB: sala.competidores[ti + 1] || null,
-          fase: 'A'
-        };
-      } else {
-        turno = {
-          tipo: 'cutoff',
-          competidor: sala.competidores[ti] || null,
-          numero: ti + 1,
-          total: sala.competidores.length
-        };
-      }
+      const turno = buildTurno(sala, sala.turnoIndex);
       socket.emit('turno-actualizado', { turno, salaInfo: { tipo: sala.tipo } });
+
+      // FIX #8: reenviar fase y poomsae activa para que el juez se reubique correctamente
+      socket.emit('control-actualizado', {
+        accion: sala.cronoActivo ? 'iniciar' : 'detener',
+        fase: sala.faseActual,
+        poomsae1: sala.poomsae1,
+        poomsae2: sala.poomsae2,
+        esReconexion: true,
+      });
     }
 
-    // Notificar a TODOS incluyendo mesa
-    io.to(codigo).emit('juez-conectado', {
-      jueces: sala.jueces,
-      nombre,
-      numJuez
-    });
+    io.to(codigo).emit('juez-conectado', { jueces: sala.jueces, nombre, numJuez });
     console.log(`Juez ${numJuez} (${nombre}) en sala ${codigo}`);
   });
 
-    // ── MESA: FASE ──
+  // ── MESA: FASE ──
   socket.on('mesa-fase', ({ codigo, fase }) => {
     const sala = salas[codigo];
     if (!sala) return;
     sala.faseActual = fase;
     io.to(codigo).emit('fase-actualizada', { fase });
   });
-    // ── MESA: CONTROL CRONÓMETRO CON FASE ──
-  socket.on('mesa-control', ({ codigo, accion, fase }) => {
+
+  // ── MESA: CONTROL (iniciar / detener / nueva-poomsae / nueva-competencia / restablecer) ──
+  socket.on('mesa-control', ({ codigo, accion, fase, poomsae }) => {
     const sala = salas[codigo];
     if (!sala) return;
-    sala.faseActual = fase;
-    sala.cronoActivo = accion === 'iniciar';
-    io.to(codigo).emit('control-actualizado', { accion, fase });
+    if (fase) sala.faseActual = fase;
+    sala.cronoActivo = (accion === 'iniciar');
+    // FIX #8: guardar poomsae activa para reenviar al reconectar
+    io.to(codigo).emit('control-actualizado', { accion, fase, poomsae });
   });
+
+  // ── JUEZ: PRECISIÓN (envío inmediato al confirmar, antes de presentación) ──
   socket.on('juez-precision', ({ codigo, competidorId, precision, poomsae }) => {
     const sala = salas[codigo];
     if (!sala) return;
     const numJuez = socket.data.numJuez;
-    // Emitir a mesa para mostrar en tiempo real
+    // Solo relay: Mesa recibe en tiempo real, el almacenamiento definitivo
+    // llega con juez-puntaje (que incluye presentación).
     io.to(codigo).emit('precision-recibida', {
-      competidorId, juezNum: numJuez, precision, poomsae
+      competidorId, juezNum: numJuez, precision, poomsae,
     });
-    console.log(`Precisión J${numJuez} comp${competidorId}: ${precision}`);
+    console.log(`Precisión J${numJuez} comp${competidorId} P${poomsae}: ${precision}`);
   });
 
-  // ── FIN DE SALA ──
-  socket.on('mesa-fin-sala', ({ codigo }) => {
-    const sala = salas[codigo];
-    if (!sala) return;
-    io.to(codigo).emit('sala-finalizada');
-    delete salas[codigo];
-  });
-
-
-  // ── JUEZ: PUNTAJE ──
-    socket.on('juez-puntaje', ({ codigo, competidorId, precision, presentacion, desglose, poomsae }) => {
+  // ── JUEZ: PUNTAJE COMPLETO (precisión + presentación) ──
+  // FIX #1: separar almacenamiento y cálculo por poomsae (P1 y P2)
+  socket.on('juez-puntaje', ({ codigo, competidorId, precision, presentacion, desglose, poomsae }) => {
     const sala = salas[codigo];
     if (!sala) return;
 
     const comp = sala.competidores.find(c => c.id === competidorId);
     if (!comp) {
-      console.log(`⚠️ Comp no encontrado: ${competidorId} en sala ${codigo}`);
-      console.log(`Competidores disponibles:`, sala.competidores.map(c => c.id));
+      console.log(`⚠️ Comp no encontrado: id=${competidorId} en sala ${codigo}`);
+      console.log(`IDs disponibles:`, sala.competidores.map(c => c.id));
       return;
     }
 
     const numJuez = socket.data.numJuez;
-    comp.puntajes = comp.puntajes.filter(p => p.juez !== numJuez);
-    comp.puntajes.push({ juez: numJuez, precision, presentacion, desglose });
+    const entrada = { juez: numJuez, precision, presentacion, desglose };
 
-    const totalRecibidos = comp.puntajes.length;
-
-    // Calcular total de este competidor si todos calificaron
     let totalComp = null;
-    if (totalRecibidos === sala.numJueces) {
-      totalComp = calcularTotal(comp.puntajes, sala.numJueces);
-      comp.total = totalComp;
+
+    if (poomsae === 1) {
+      // Reemplazar si el mismo juez ya envió para esta poomsae
+      comp.puntajesP1 = comp.puntajesP1.filter(p => p.juez !== numJuez);
+      comp.puntajesP1.push(entrada);
+
+      if (comp.puntajesP1.length === sala.numJueces) {
+        comp.totalP1 = calcularTotal(comp.puntajesP1, sala.numJueces);
+        console.log(`✅ Total P1 ${comp.nombre}: ${comp.totalP1}`);
+      }
+      totalComp = comp.totalP1;
+
+    } else if (poomsae === 2) {
+      comp.puntajesP2 = comp.puntajesP2.filter(p => p.juez !== numJuez);
+      comp.puntajesP2.push(entrada);
+
+      if (comp.puntajesP2.length === sala.numJueces) {
+        comp.totalP2 = calcularTotal(comp.puntajesP2, sala.numJueces);
+        console.log(`✅ Total P2 ${comp.nombre}: ${comp.totalP2}`);
+      }
+      totalComp = comp.totalP2;
+
+      // FIX #13: calcular total final en el servidor cuando llegan ambas poomsaes
+      if (comp.totalP1 !== null && comp.totalP2 !== null) {
+        comp.total = Math.round((comp.totalP1 + comp.totalP2) * 100) / 100;
+        console.log(`🏆 Total final ${comp.nombre}: ${comp.total}`);
+      }
     }
 
-    // Emitir inmediatamente con toda la info
+    const totalRecibidosP = poomsae === 1 ? comp.puntajesP1.length : comp.puntajesP2.length;
+
     io.to(codigo).emit('puntaje-recibido', {
       competidorId,
       competidorNombre: comp.nombre,
       juezNum: numJuez,
-      totalPuntajes: totalRecibidos,
+      totalPuntajes: totalRecibidosP,
       numJueces: sala.numJueces,
       precision,
       presentacion,
       desglose,
-      totalComp,
-      poomsae
+      totalComp,        // total de la poomsae actual (null hasta que lleguen todos)
+      totalFinal: comp.total, // total acumulado P1+P2 (null hasta tener ambas)
+      poomsae,
     });
 
-    socket.emit('puntaje-confirmado', { competidorId, juezNum: numJuez });
-    console.log(`Puntaje J${numJuez} → ${comp.nombre}(${competidorId}): prec=${precision} pres=${presentacion}`);
+    socket.emit('puntaje-confirmado', { competidorId, juezNum: numJuez, poomsae });
+    console.log(`Puntaje J${numJuez} → ${comp.nombre}(id=${competidorId}) P${poomsae}: prec=${precision} pres=${presentacion}`);
   });
 
   // ── MESA: REVELAR ──
@@ -258,6 +292,7 @@ io.on('connection', (socket) => {
   });
 
   // ── SORTEO POOMSAE ──
+  // FIX #8: guardar poomsaes en sala para reenviarlas al reconectar
   socket.on('mesa-sortear-poomsae', ({ codigo, numero, poomsae }) => {
     const sala = salas[codigo];
     if (!sala) return;
@@ -266,14 +301,16 @@ io.on('connection', (socket) => {
     io.to(codigo).emit('poomsae-sorteada', { numero, poomsae });
   });
 
-  // ── CRONÓMETRO ──
+  // ── CRONÓMETRO (relay puro) ──
   socket.on('mesa-cronometro', ({ codigo, accion, duracion, tipo }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (accion === 'iniciar') sala.cronoActivo = true;
+    if (accion === 'detener' || accion === 'restablecer') sala.cronoActivo = false;
     io.to(codigo).emit('cronometro-update', { accion, duracion, tipo });
   });
 
-  // ── CORTE ──
+  // ── CORTE (cutoff) ──
   socket.on('mesa-corte', ({ codigo, topN }) => {
     const sala = salas[codigo];
     if (!sala) return;
@@ -281,18 +318,28 @@ io.on('connection', (socket) => {
     io.to(codigo).emit('corte-aplicado', { ranking, topN });
   });
 
+  // ── FIN DE SALA ──
+  socket.on('mesa-fin-sala', ({ codigo }) => {
+    const sala = salas[codigo];
+    if (!sala) return;
+    io.to(codigo).emit('sala-finalizada');
+    delete salas[codigo];
+    console.log(`Sala eliminada: ${codigo}`);
+  });
+
   // ── RESTAURAR SALA ──
   socket.on('mesa-restaurar', ({ codigo }) => {
-    if (salas[codigo]) {
-      const sala = salas[codigo];
-      // Conservar jueces conectados, resetear competencia
-      sala.competidores = [];
-      sala.turnoIndex = 0;
-      sala.estado = 'setup';
-      sala.poomsae1 = null;
-      sala.poomsae2 = null;
-      io.to(codigo).emit('sistema-restaurado');
-    }
+    const sala = salas[codigo];
+    if (!sala) return;
+    sala.competidores = [];
+    sala.turnoIndex = 0;
+    sala.estado = 'setup';
+    sala.poomsae1 = null;
+    sala.poomsae2 = null;
+    sala.faseActual = 'sorteo';
+    sala.cronoActivo = false;
+    io.to(codigo).emit('sistema-restaurado');
+    console.log(`Sala restaurada: ${codigo}`);
   });
 
   // ── DESCONEXIÓN ──
@@ -302,15 +349,12 @@ io.on('connection', (socket) => {
     console.log(`Desconectado: ${socket.id} — razón: ${reason}`);
 
     if (codigo && salas[codigo]) {
-      // Solo remover si el socket actual es el registrado para ese número
       const sala = salas[codigo];
       const juezActual = sala.jueces.find(j => j.num === numJuez);
+      // Solo remover si el socket actual es el registrado para ese número
       if (juezActual && juezActual.id === socket.id) {
         sala.jueces = sala.jueces.filter(j => j.id !== socket.id);
-        io.to(codigo).emit('juez-desconectado', {
-          jueces: sala.jueces,
-          numJuez
-        });
+        io.to(codigo).emit('juez-desconectado', { jueces: sala.jueces, numJuez });
       }
     }
   });
