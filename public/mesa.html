@@ -55,7 +55,6 @@
     .btn-del { background: none; border: none; color: #444; font-size: 16px; cursor: pointer; padding: 4px 8px; }
     .btn-del:active { color: #dc2626; }
 
-    /* CRONÓMETRO */
     .cronometro-card { background: #0a0a0a; border: 1px solid #333; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 10px; }
     .cronometro-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 6px; }
     .cronometro-display { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 4px; color: #c9a84c; line-height: 1; text-shadow: 0 0 20px rgba(201,168,76,0.4); }
@@ -63,24 +62,11 @@
     .cronometro-display.verde { color: #22c55e; }
     .crono-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
 
-    /* POOMSAE */
-    .poomsae-card { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
-    .poomsae-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 6px; }
-    .poomsae-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 4px; color: #c9a84c; text-align: center; }
+    .poomsae-card { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 14px; margin-bottom: 10px; text-align: center; }
+    .poomsae-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 8px; }
+    .poomsae-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 4px; color: #c9a84c; }
     .poomsae-nombre.vacio { color: #333; font-size: 16px; letter-spacing: 2px; }
 
-    /* POOMSAES DISPONIBLES */
-    .poomsaes-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
-    .poomsae-chip {
-      padding: 6px 12px; border-radius: 20px; cursor: pointer;
-      font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px;
-      border: 1px solid #2a2a2a; background: #1a1a1a; color: #666;
-      transition: all 0.15s;
-    }
-    .poomsae-chip.selected { background: #c9a84c; border-color: #c9a84c; color: #000; }
-    .poomsae-chip.usado { background: #1a1a1a; border-color: #1a1a1a; color: #333; cursor: not-allowed; text-decoration: line-through; }
-
-    /* TURNO */
     .turno-card { background: #0a0a0a; border: 1px solid #c9a84c; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 12px; }
     .turno-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 8px; }
     .turno-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: #fff; }
@@ -134,7 +120,7 @@
       <option value="SEMIFINAL">Semifinal</option>
       <option value="FINAL">Final</option>
     </select>
-    <label class="input-label">Grupo de Categoría (para poomsaes)</label>
+    <label class="input-label">Grupo de Categoría (para sorteo)</label>
     <select class="input-field" id="input-grupo">
       <option value="cadetes">Cadetes (Taegeuk 4 → Taebaek)</option>
       <option value="junior">Junior (Taegeuk 5 → Pyongwon)</option>
@@ -188,54 +174,48 @@
   <!-- CONTROL 1V1 SIMULTÁNEO -->
   <div class="panel hidden" id="panel-control-simultaneo">
 
-    <!-- ENFRENTAMIENTO -->
     <div class="panel-titulo">Enfrentamiento</div>
     <div id="display-turno-sim"></div>
 
-    <!-- FASE -->
     <div style="text-align:center;margin-bottom:10px">
       <span class="fase-badge sorteo" id="fase-badge">Sortear 1ra Poomsae</span>
     </div>
 
-    <!-- POOMSAE 1 -->
+    <!-- SORTEO 1 -->
     <div id="bloque-sorteo-1">
       <div class="poomsae-card">
         <div class="poomsae-label">1ra Poomsae</div>
         <div class="poomsae-nombre vacio" id="display-p1">— Sin sortear —</div>
       </div>
-      <div class="panel-titulo" style="margin-top:8px">Poomsaes disponibles</div>
-      <div class="poomsaes-chips" id="chips-p1"></div>
-      <button class="btn-blue" onclick="sortearAleatorio(1)">🎲 SORTEO ALEATORIO</button>
+      <button class="btn-blue" onclick="sortear(1)">🎲 SORTEAR 1ra POOMSAE</button>
     </div>
 
-    <!-- POOMSAE 2 -->
+    <!-- SORTEO 2 -->
     <div id="bloque-sorteo-2" class="hidden">
       <div class="poomsae-card">
         <div class="poomsae-label">2da Poomsae</div>
         <div class="poomsae-nombre vacio" id="display-p2">— Sin sortear —</div>
       </div>
-      <div class="panel-titulo" style="margin-top:8px">Poomsaes disponibles</div>
-      <div class="poomsaes-chips" id="chips-p2"></div>
-      <button class="btn-blue" onclick="sortearAleatorio(2)">🎲 SORTEO ALEATORIO</button>
+      <button class="btn-blue" onclick="sortear(2)">🎲 SORTEAR 2da POOMSAE</button>
     </div>
 
     <!-- CRONÓMETRO -->
-    <div class="cronometro-card" id="bloque-crono" style="margin-top:10px">
+    <div class="cronometro-card hidden" id="bloque-crono">
       <div class="cronometro-label" id="crono-label">—</div>
       <div class="cronometro-display" id="crono-display">—</div>
       <div class="crono-btns">
-        <button class="btn-green" id="btn-crono-iniciar" onclick="iniciarCrono()">▶ INICIAR</button>
-        <button class="btn-red" id="btn-crono-detener" onclick="detenerCrono()">⏹ DETENER</button>
+        <button class="btn-green" onclick="iniciarCrono()">▶ INICIAR</button>
+        <button class="btn-red" onclick="detenerCrono()">⏹ DETENER</button>
       </div>
       <button class="btn-orange hidden" id="btn-descanso" onclick="irADescanso()" style="margin-top:6px">
         ☕ INICIAR DESCANSO
       </button>
-      <button class="btn-dark" id="btn-restablecer" onclick="restablecerCrono()" style="margin-top:4px">
+      <button class="btn-dark" onclick="restablecerCrono()" style="margin-top:4px">
         ↺ RESTABLECER TIEMPO
       </button>
     </div>
 
-    <!-- ACCIONES -->
+    <!-- ACCIONES CALIFICACIÓN -->
     <div id="bloque-acciones" class="hidden" style="margin-top:8px">
       <div class="puntajes-bar" id="puntajes-bar"></div>
       <button class="btn-gold hidden" id="btn-revelar" onclick="revelarPuntaje()">REVELAR PUNTAJE</button>
@@ -277,28 +257,19 @@
   let grupoCategoria = 'cadetes';
   let puntajesRecibidos = {};
 
-  // Poomsaes por grupo
   const POOMSAES_GRUPO = {
-    cadetes:  ['Taegeuk 4','Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek'],
-    junior:   ['Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek','Pyongwon'],
-    under30:  ['Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek','Pyongwon','Sipjin','Jitae'],
-    under40:  ['Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek','Pyongwon','Sipjin','Jitae']
+    cadetes: ['Taegeuk 4','Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek'],
+    junior:  ['Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek','Pyongwon'],
+    under30: ['Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek','Pyongwon','Sipjin','Jitae'],
+    under40: ['Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek','Pyongwon','Sipjin','Jitae']
   };
 
-  // Estado sorteo
   let poomsae1 = null;
   let poomsae2 = null;
-  let chipSeleccionado1 = null;
-  let chipSeleccionado2 = null;
-
-  // Cronómetro
   let cronoInterval = null;
   let cronoSegundos = 90;
-  let cronoTipoActual = 'ejecucion';
   let cronoOriginal = 90;
-
-  // Fase
-  // sorteo1 → ejecucion1 → calificacion1 → descanso → sorteo2 → ejecucion2 → calificacion2 → resultado
+  let cronoTipoActual = 'ejecucion';
   let faseActual = 'sorteo1';
 
   // ── CREAR SALA ──
@@ -341,13 +312,11 @@
     turnoIndex = 0;
     socket.emit('mesa-iniciar', { codigo: salaActual, competidores, modo, tipo });
     document.getElementById('panel-competidores').classList.add('hidden');
-
     if (modo === '1v1-simultaneo') {
       document.getElementById('panel-control-simultaneo').classList.remove('hidden');
       faseActual = 'sorteo1';
       poomsae1 = null; poomsae2 = null;
       mostrarTurnoSimultaneo();
-      renderChips(1);
       actualizarFaseUI();
     } else {
       document.getElementById('panel-control').classList.remove('hidden');
@@ -356,49 +325,13 @@
     }
   }
 
-  // ── CHIPS DE POOMSAES ──
-  function renderChips(numero) {
-    const lista = POOMSAES_GRUPO[grupoCategoria] || [];
-    const containerId = `chips-p${numero}`;
-    const el = document.getElementById(containerId);
-    if (!el) return;
-
-    el.innerHTML = lista.map(p => {
-      const esUsada = numero === 2 && p === poomsae1;
-      return `<div class="poomsae-chip ${esUsada ? 'usado' : ''}" 
-        id="chip-${numero}-${p.replace(/ /g,'_')}"
-        onclick="${esUsada ? '' : `seleccionarChip(${numero},'${p}')`}">${p}</div>`;
-    }).join('');
-  }
-
-  function seleccionarChip(numero, poomsae) {
-    // Deseleccionar anterior
-    const lista = POOMSAES_GRUPO[grupoCategoria] || [];
-    lista.forEach(p => {
-      const el = document.getElementById(`chip-${numero}-${p.replace(/ /g,'_')}`);
-      if (el) el.classList.remove('selected');
-    });
-
-    const el = document.getElementById(`chip-${numero}-${poomsae.replace(/ /g,'_')}`);
-    if (el) el.classList.add('selected');
-
-    if (numero === 1) chipSeleccionado1 = poomsae;
-    else chipSeleccionado2 = poomsae;
-
-    // Confirmar selección
-    confirmarPoomsae(numero, poomsae);
-  }
-
-  function sortearAleatorio(numero) {
+  // ── SORTEO — el sistema elige aleatoriamente ──
+  function sortear(numero) {
     const lista = POOMSAES_GRUPO[grupoCategoria] || [];
     const disponibles = numero === 2 ? lista.filter(p => p !== poomsae1) : lista;
-    if (!disponibles.length) return;
+    if (!disponibles.length) return alert('No hay poomsaes disponibles');
     const sorteada = disponibles[Math.floor(Math.random() * disponibles.length)];
-    confirmarPoomsae(numero, sorteada);
-  }
-
-  function confirmarPoomsae(numero, poomsae) {
-    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero, poomsae });
+    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero, poomsae: sorteada });
   }
 
   // ── CRONÓMETRO ──
@@ -408,8 +341,8 @@
     cronoOriginal = segundos;
     cronoTipoActual = tipo;
     document.getElementById('crono-label').textContent = label;
-    actualizarDisplayCrono();
     document.getElementById('btn-descanso').classList.add('hidden');
+    actualizarDisplayCrono();
   }
 
   function iniciarCrono() {
@@ -430,18 +363,17 @@
   function detenerCrono() {
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundos, tipo: cronoTipoActual });
-    // Si estaba en ejecución, mostrar botón de descanso
-    if (cronoTipoActual === 'ejecucion' && faseActual === 'ejecucion1') {
+    if (cronoTipoActual === 'ejecucion') {
       document.getElementById('btn-descanso').classList.remove('hidden');
     }
   }
 
   function restablecerCrono() {
-    detenerCrono();
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     cronoSegundos = cronoOriginal;
     actualizarDisplayCrono();
-    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginal, tipo: cronoTipoActual });
     document.getElementById('btn-descanso').classList.add('hidden');
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginal, tipo: cronoTipoActual });
   }
 
   function irADescanso() {
@@ -464,14 +396,11 @@
 
   function onCronoFin() {
     if (cronoTipoActual === 'ejecucion') {
-      // Fin ejecución → calificación
-      if (faseActual === 'ejecucion1') faseActual = 'calificacion1';
-      else if (faseActual === 'ejecucion2') faseActual = 'calificacion2';
+      faseActual = (faseActual === 'ejecucion1') ? 'calificacion1' : 'calificacion2';
       puntajesRecibidos = {};
       renderPuntajesBar({}, 'puntajes-bar');
       actualizarFaseUI();
     } else if (cronoTipoActual === 'descanso') {
-      // Fin descanso → sorteo 2da
       faseActual = 'sorteo2';
       actualizarFaseUI();
     }
@@ -487,57 +416,62 @@
     const btnRevelar = document.getElementById('btn-revelar');
     const btnSig = document.getElementById('btn-siguiente');
 
-    // Reset visibilidad
+    // Reset todo
     bloqueSorteo1.classList.add('hidden');
     bloqueSorteo2.classList.add('hidden');
     bloqueAcciones.classList.add('hidden');
+    bloqueCreno.classList.add('hidden');
     btnRevelar.classList.add('hidden');
     btnSig.classList.add('hidden');
-    bloqueCreno.classList.add('hidden');
 
     if (faseActual === 'sorteo1') {
-      badge.className = 'fase-badge sorteo'; badge.textContent = '🎲 Sortear 1ra Poomsae';
+      badge.className = 'fase-badge sorteo';
+      badge.textContent = '🎲 Sortear 1ra Poomsae';
       bloqueSorteo1.classList.remove('hidden');
 
     } else if (faseActual === 'ejecucion1') {
-      badge.className = 'fase-badge ejecucion'; badge.textContent = '▶ Ejecución 1ra Poomsae';
+      badge.className = 'fase-badge ejecucion';
+      badge.textContent = '▶ Ejecución 1ra Poomsae';
       bloqueCreno.classList.remove('hidden');
       setCrono(90, 'ejecucion', '1ra Poomsae · Tiempo de Ejecución');
 
     } else if (faseActual === 'calificacion1') {
-      badge.className = 'fase-badge calificacion'; badge.textContent = '📋 Calificación 1ra Poomsae';
+      badge.className = 'fase-badge calificacion';
+      badge.textContent = '📋 Calificación 1ra Poomsae';
       bloqueAcciones.classList.remove('hidden');
-      bloqueCreno.classList.remove('hidden');
-      // Cronómetro queda en 0, sin auto-iniciar
-      document.getElementById('crono-label').textContent = 'Listo para descanso';
-      document.getElementById('crono-display').textContent = '1:00';
-      document.getElementById('crono-display').className = 'cronometro-display';
-      document.getElementById('btn-descanso').classList.add('hidden');
       btnRevelar.classList.remove('hidden');
+      // Mostrar crono listo para descanso
+      bloqueCreno.classList.remove('hidden');
+      setCrono(60, 'descanso', 'Tiempo de Descanso — listo');
+      document.getElementById('btn-descanso').classList.add('hidden');
 
     } else if (faseActual === 'descanso') {
-      badge.className = 'fase-badge descanso'; badge.textContent = '☕ Tiempo de Descanso';
+      badge.className = 'fase-badge descanso';
+      badge.textContent = '☕ Tiempo de Descanso';
       bloqueCreno.classList.remove('hidden');
       setCrono(60, 'descanso', 'Tiempo de Descanso');
       iniciarCrono();
 
     } else if (faseActual === 'sorteo2') {
-      badge.className = 'fase-badge sorteo'; badge.textContent = '🎲 Sortear 2da Poomsae';
+      badge.className = 'fase-badge sorteo';
+      badge.textContent = '🎲 Sortear 2da Poomsae';
       bloqueSorteo2.classList.remove('hidden');
-      renderChips(2);
 
     } else if (faseActual === 'ejecucion2') {
-      badge.className = 'fase-badge ejecucion'; badge.textContent = '▶ Ejecución 2da Poomsae';
+      badge.className = 'fase-badge ejecucion';
+      badge.textContent = '▶ Ejecución 2da Poomsae';
       bloqueCreno.classList.remove('hidden');
       setCrono(90, 'ejecucion', '2da Poomsae · Tiempo de Ejecución');
 
     } else if (faseActual === 'calificacion2') {
-      badge.className = 'fase-badge calificacion'; badge.textContent = '📋 Calificación 2da Poomsae';
+      badge.className = 'fase-badge calificacion';
+      badge.textContent = '📋 Calificación 2da Poomsae';
       bloqueAcciones.classList.remove('hidden');
       btnRevelar.classList.remove('hidden');
 
     } else if (faseActual === 'resultado') {
-      badge.className = 'fase-badge ejecucion'; badge.textContent = '🏆 Resultado Final';
+      badge.className = 'fase-badge ejecucion';
+      badge.textContent = '🏆 Resultado Final';
       bloqueAcciones.classList.remove('hidden');
       btnRevelar.classList.remove('hidden');
     }
@@ -558,12 +492,9 @@
     document.getElementById('btn-revelar').classList.add('hidden');
     const btnSig = document.getElementById('btn-siguiente');
     btnSig.classList.remove('hidden');
-
-    if (faseActual === 'calificacion1') {
-      btnSig.textContent = 'IR A DESCANSO →';
-    } else if (faseActual === 'calificacion2') {
-      btnSig.textContent = 'VER RESULTADO →';
-    } else if (faseActual === 'resultado') {
+    if (faseActual === 'calificacion1') btnSig.textContent = 'IR A DESCANSO →';
+    else if (faseActual === 'calificacion2') btnSig.textContent = 'VER RESULTADO →';
+    else if (faseActual === 'resultado') {
       turnoIndex += 2;
       btnSig.textContent = 'SIGUIENTE ENFRENTAMIENTO →';
     }
@@ -716,14 +647,16 @@
   socket.on('poomsae-sorteada', (data) => {
     if (data.numero === 1) {
       poomsae1 = data.poomsae;
-      document.getElementById('display-p1').textContent = data.poomsae;
-      document.getElementById('display-p1').classList.remove('vacio');
+      const el = document.getElementById('display-p1');
+      el.textContent = data.poomsae;
+      el.classList.remove('vacio');
       faseActual = 'ejecucion1';
       actualizarFaseUI();
     } else {
       poomsae2 = data.poomsae;
-      document.getElementById('display-p2').textContent = data.poomsae;
-      document.getElementById('display-p2').classList.remove('vacio');
+      const el = document.getElementById('display-p2');
+      el.textContent = data.poomsae;
+      el.classList.remove('vacio');
       faseActual = 'ejecucion2';
       actualizarFaseUI();
     }
