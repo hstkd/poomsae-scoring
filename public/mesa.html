@@ -7,13 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      background: #0d0d0d; color: white;
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh; padding: 12px;
-      user-select: none; -webkit-user-select: none;
-      touch-action: manipulation;
-    }
+    body { background: #0d0d0d; color: white; font-family: 'Inter', sans-serif; min-height: 100vh; padding: 12px; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
     .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #1a1a1a; }
     .header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 4px; color: #c9a84c; }
     .header-badge { background: #1a1a1a; border: 1px solid #333; color: #888; font-size: 9px; font-weight: 700; letter-spacing: 2px; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
@@ -33,61 +27,52 @@
     .btn-blue:active { filter: brightness(0.85); }
     .btn-red { width: 100%; background: #dc2626; color: #fff; border: none; padding: 13px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
     .btn-red:active { filter: brightness(0.85); }
-    .btn-orange { width: 100%; background: #ea580c; color: #fff; border: none; padding: 13px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
-    .btn-orange:active { filter: brightness(0.85); }
     .hidden { display: none; }
-
     .sala-codigo { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 6px; color: #c9a84c; text-align: center; line-height: 1; }
     .sala-sub { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; text-align: center; margin-top: 4px; }
     .sala-categoria { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 4px; color: #fff; text-align: center; margin-top: 8px; line-height: 1; }
     .sala-ronda { font-family: 'Bebas Neue', sans-serif; font-size: 15px; letter-spacing: 3px; color: #c9a84c; text-align: center; margin-top: 2px; }
-
     .jueces-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .juez-chip { display: flex; align-items: center; gap: 6px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 20px; padding: 5px 12px; }
     .juez-dot { width: 7px; height: 7px; border-radius: 50%; background: #333; }
     .juez-dot.activo { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
     .juez-txt { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #444; text-transform: uppercase; }
     .juez-chip.activo .juez-txt { color: #22c55e; }
-
     .comp-item { display: flex; align-items: center; justify-content: space-between; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
     .comp-num { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: #555; width: 24px; }
     .comp-nombre { font-size: 13px; font-weight: 700; letter-spacing: 1px; flex: 1; }
     .btn-del { background: none; border: none; color: #444; font-size: 16px; cursor: pointer; padding: 4px 8px; }
     .btn-del:active { color: #dc2626; }
-
     .cronometro-card { background: #0a0a0a; border: 1px solid #333; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 10px; }
     .cronometro-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 6px; }
     .cronometro-display { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 4px; color: #c9a84c; line-height: 1; text-shadow: 0 0 20px rgba(201,168,76,0.4); }
     .cronometro-display.rojo { color: #dc2626; text-shadow: 0 0 20px rgba(220,38,38,0.4); }
-    .cronometro-display.verde { color: #22c55e; }
     .crono-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-
     .poomsae-card { background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 14px; margin-bottom: 10px; text-align: center; }
     .poomsae-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 8px; }
     .poomsae-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 4px; color: #c9a84c; }
     .poomsae-nombre.vacio { color: #333; font-size: 16px; letter-spacing: 2px; }
-
     .turno-card { background: #0a0a0a; border: 1px solid #c9a84c; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 12px; }
     .turno-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 8px; }
     .turno-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: #fff; }
     .vs-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
     .vs-sep { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #333; }
-
-    .puntajes-bar { display: flex; gap: 6px; justify-content: center; margin-bottom: 12px; }
-    .pj-chip { width: 36px; height: 36px; border-radius: 50%; background: #1a1a1a; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #444; font-family: 'Bebas Neue', sans-serif; }
+    .puntajes-bar { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+    .pj-chip { min-width: 42px; padding: 0 8px; height: 42px; border-radius: 10px; background: #1a1a1a; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #444; font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; }
     .pj-chip.recibido { background: #16a34a; border-color: #22c55e; color: #fff; }
-
     .rank-item { display: flex; align-items: center; gap: 10px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
     .rank-pos { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; width: 28px; }
     .rank-nombre { flex: 1; font-size: 13px; font-weight: 700; }
     .rank-total { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; }
-
     .fase-badge { display: inline-block; padding: 5px 16px; border-radius: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; margin-bottom: 10px; }
     .fase-badge.ejecucion { background: #16a34a; color: #fff; }
-    .fase-badge.descanso { background: #0ea5e9; color: #fff; }
     .fase-badge.sorteo { background: #c9a84c; color: #000; }
     .fase-badge.calificacion { background: #7c3aed; color: #fff; }
-
+    .notas-juez { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
+    .notas-juez-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .notas-juez-num { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px; color: #c9a84c; }
+    .notas-juez-total { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #fff; }
+    .notas-juez-detalle { font-size: 9px; color: #555; letter-spacing: 1px; }
     #log { font-size: 9px; color: #444; margin-top: 10px; max-height: 60px; overflow-y: auto; }
     .add-row { display: flex; gap: 8px; }
     .add-row .input-field { margin-bottom: 0; flex: 1; }
@@ -95,6 +80,9 @@
     .btn-add:active { background: #c9a84c; color: #000; }
     .corte-row { display: flex; gap: 8px; margin-top: 10px; }
     .corte-row .input-field { margin-bottom: 0; flex: 1; width: auto; }
+    .resultado-final { background: #0a0a0a; border: 2px solid #c9a84c; border-radius: 12px; padding: 16px; text-align: center; margin-top: 12px; }
+    .resultado-ganador { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 4px; color: #c9a84c; }
+    .resultado-detalle { font-size: 11px; color: #555; letter-spacing: 2px; margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -158,10 +146,9 @@
     <div class="sala-ronda" id="display-ronda">—</div>
     <div class="jueces-grid" id="display-jueces"></div>
     <div id="log"></div>
-    <button class="btn-dark" onclick="restaurarSistema()" style="margin-top:10px;color:#dc2626;border-color:#dc2626;font-size:11px;padding:8px">
+    <button class="btn-dark" onclick="restaurarSistema()" style="margin-top:10px;color:#dc2626;border-color:#3a0000;font-size:11px;padding:8px">
       ↺ RESTAURAR SISTEMA
     </button>
-
   </div>
 
   <!-- COMPETIDORES -->
@@ -182,7 +169,7 @@
     <div id="display-turno-sim"></div>
 
     <div style="text-align:center;margin-bottom:10px">
-      <span class="fase-badge sorteo" id="fase-badge">Sortear 1ra Poomsae</span>
+      <span class="fase-badge sorteo" id="fase-badge">Sortear Poomsaes</span>
     </div>
 
     <!-- SORTEO -->
@@ -195,12 +182,9 @@
         <div class="poomsae-label">2da Poomsae</div>
         <div class="poomsae-nombre vacio" id="display-p2">— Sin sortear —</div>
       </div>
-      <button class="btn-blue" onclick="sortear(1)">🎲 SORTEAR AMBAS POOMSAES</button>
+      <button class="btn-blue" onclick="sortear()">🎲 SORTEAR AMBAS POOMSAES</button>
     </div>
-
-    <!-- este bloque ya no se usa pero lo dejamos oculto para no romper referencias -->
     <div id="bloque-sorteo-2" class="hidden"></div>
-
 
     <!-- CRONÓMETRO -->
     <div class="cronometro-card hidden" id="bloque-crono">
@@ -210,20 +194,23 @@
         <button class="btn-green" onclick="iniciarCrono()">▶ INICIAR</button>
         <button class="btn-red" onclick="detenerCrono()">⏹ DETENER</button>
       </div>
-      <button class="btn-orange hidden" id="btn-descanso" onclick="irADescanso()" style="margin-top:6px">
-        ☕ INICIAR DESCANSO
-      </button>
-      <button class="btn-dark" onclick="restablecerCrono()" style="margin-top:4px">
-        ↺ RESTABLECER TIEMPO
-      </button>
+      <button class="btn-dark" onclick="restablecerCrono()" style="margin-top:6px">↺ RESTABLECER TIEMPO</button>
     </div>
 
-    <!-- ACCIONES CALIFICACIÓN -->
-    <div id="bloque-acciones" class="hidden" style="margin-top:8px">
+    <!-- NOTAS RECIBIDAS -->
+    <div id="bloque-notas" class="hidden" style="margin-top:8px">
+      <div class="panel-titulo">Notas Recibidas</div>
       <div class="puntajes-bar" id="puntajes-bar"></div>
-      <button class="btn-gold hidden" id="btn-revelar" onclick="revelarPuntaje()">REVELAR PUNTAJE</button>
-      <button class="btn-dark hidden" id="btn-siguiente" onclick="siguienteFase()" style="margin-top:6px">SIGUIENTE →</button>
+      <div id="detalle-notas"></div>
     </div>
+
+    <!-- RESULTADO FINAL -->
+    <div id="bloque-resultado" class="hidden"></div>
+
+    <!-- SIGUIENTE -->
+    <button class="btn-gold hidden" id="btn-siguiente-enfrentamiento" onclick="siguienteEnfrentamiento()" style="margin-top:8px">
+      SIGUIENTE ENFRENTAMIENTO →
+    </button>
 
   </div>
 
@@ -250,7 +237,8 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  const socket = io();
+  const socket = io({ reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+
   let salaActual = null;
   let competidores = [];
   let turnoIndex = 0;
@@ -259,6 +247,7 @@
   let numJueces = 3;
   let grupoCategoria = 'cadetes';
   let puntajesRecibidos = {};
+  let notasDetalle = {}; // { juezNum: { precision, vel, rit, exp, total } }
 
   const POOMSAES_GRUPO = {
     cadetes: ['Taegeuk 4','Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek'],
@@ -274,6 +263,10 @@
   let cronoOriginal = 90;
   let cronoTipoActual = 'ejecucion';
   let faseActual = 'sorteo1';
+
+  // Notas acumuladas por competidor para calcular resultado
+  let notasPoomsae1 = {}; // { compId: total }
+  let notasPoomsae2 = {}; // { compId: total }
 
   // ── CREAR SALA ──
   function crearSala() {
@@ -308,11 +301,6 @@
         </div>`).join('');
   }
   function eliminarCompetidor(i) { competidores.splice(i,1); renderCompetidores(); }
-  function restaurarSistema() {
-    const ok = confirm('¿Restaurar el sistema? Se borrará la competencia actual y se podrá iniciar una nueva. Los jueces permanecerán conectados.');
-    if (!ok) return;
-    socket.emit('mesa-restaurar', { codigo: salaActual });
-  }
 
   // ── INICIAR ──
   function iniciarCompetencia() {
@@ -324,6 +312,7 @@
       document.getElementById('panel-control-simultaneo').classList.remove('hidden');
       faseActual = 'sorteo1';
       poomsae1 = null; poomsae2 = null;
+      notasPoomsae1 = {}; notasPoomsae2 = {};
       mostrarTurnoSimultaneo();
       actualizarFaseUI();
     } else {
@@ -333,48 +322,45 @@
     }
   }
 
-  // ── SORTEO — el sistema elige aleatoriamente ──
-  function sortear(numero) {
+  // ── SORTEO ──
+  function sortear() {
     const lista = POOMSAES_GRUPO[grupoCategoria] || [];
     if (!lista.length) return alert('No hay poomsaes disponibles');
-
-    // Sortear las dos de una vez
     const idx1 = Math.floor(Math.random() * lista.length);
     poomsae1 = lista[idx1];
-
     const restantes = lista.filter(p => p !== poomsae1);
-    const idx2 = Math.floor(Math.random() * restantes.length);
-    poomsae2 = restantes[idx2];
+    poomsae2 = restantes[Math.floor(Math.random() * restantes.length)];
 
     socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 1, poomsae: poomsae1 });
     socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 2, poomsae: poomsae2 });
 
-    // Actualizar displays localmente
     const el1 = document.getElementById('display-p1');
     const el2 = document.getElementById('display-p2');
     if (el1) { el1.textContent = poomsae1; el1.classList.remove('vacio'); }
     if (el2) { el2.textContent = poomsae2; el2.classList.remove('vacio'); }
 
-    // Ir directo a ejecución 1
     faseActual = 'ejecucion1';
+    notasDetalle = {};
+    puntajesRecibidos = {};
     mostrarTurnoSimultaneo();
     actualizarFaseUI();
     log(`Sorteadas: ${poomsae1} / ${poomsae2}`);
   }
 
   // ── CRONÓMETRO ──
-  function setCrono(segundos, tipo, label) {
+  function setCrono(segundos, tipoC, label) {
     detenerCrono();
     cronoSegundos = segundos;
     cronoOriginal = segundos;
-    cronoTipoActual = tipo;
+    cronoTipoActual = tipoC;
     document.getElementById('crono-label').textContent = label;
-    document.getElementById('btn-descanso').classList.add('hidden');
     actualizarDisplayCrono();
   }
 
   function iniciarCrono() {
     if (cronoInterval) return;
+    // Notificar a jueces que pueden calificar
+    socket.emit('mesa-fase', { codigo: salaActual, fase: faseActual });
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundos, tipo: cronoTipoActual });
     cronoInterval = setInterval(() => {
       cronoSegundos--;
@@ -383,7 +369,6 @@
       if (cronoSegundos <= 0) {
         detenerCrono();
         socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'fin', duracion: 0, tipo: cronoTipoActual });
-        onCronoFin();
       }
     }, 1000);
   }
@@ -391,25 +376,13 @@
   function detenerCrono() {
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundos, tipo: cronoTipoActual });
-    if (cronoTipoActual === 'ejecucion') {
-      document.getElementById('btn-descanso').classList.remove('hidden');
-    }
   }
 
   function restablecerCrono() {
-    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    detenerCrono();
     cronoSegundos = cronoOriginal;
     actualizarDisplayCrono();
-    document.getElementById('btn-descanso').classList.add('hidden');
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginal, tipo: cronoTipoActual });
-  }
-
-  function irADescanso() {
-    document.getElementById('btn-descanso').classList.add('hidden');
-    faseActual = 'calificacion1';
-    puntajesRecibidos = {};
-    renderPuntajesBar({}, 'puntajes-bar');
-    actualizarFaseUI();
   }
 
   function actualizarDisplayCrono() {
@@ -419,155 +392,51 @@
     el.textContent = `${min}:${seg.toString().padStart(2,'0')}`;
     el.className = 'cronometro-display';
     if (cronoSegundos <= 10 && cronoSegundos > 0) el.classList.add('rojo');
-    else if (cronoTipoActual === 'descanso') el.classList.add('verde');
   }
-
-   function onCronoFin() {
-    if (cronoTipoActual === 'ejecucion') {
-      faseActual = (faseActual === 'ejecucion1') ? 'calificacion1' : 'calificacion2';
-      puntajesRecibidos = {};
-      renderPuntajesBar({}, 'puntajes-bar');
-      actualizarFaseUI();
-    }
-  }
-
 
   // ── FASE UI ──
   function actualizarFaseUI() {
     const badge = document.getElementById('fase-badge');
-    const bloqueSorteo1 = document.getElementById('bloque-sorteo-1');
-    const bloqueSorteo2 = document.getElementById('bloque-sorteo-2');
-    const bloqueAcciones = document.getElementById('bloque-acciones');
+    const bloqueSorteo = document.getElementById('bloque-sorteo-1');
     const bloqueCreno = document.getElementById('bloque-crono');
-    const btnRevelar = document.getElementById('btn-revelar');
-    const btnSig = document.getElementById('btn-siguiente');
+    const bloqueNotas = document.getElementById('bloque-notas');
 
-    bloqueSorteo1.classList.add('hidden');
-    bloqueSorteo2.classList.add('hidden');
-    bloqueAcciones.classList.add('hidden');
+    bloqueSorteo.classList.add('hidden');
     bloqueCreno.classList.add('hidden');
-    btnRevelar.classList.add('hidden');
-    btnSig.classList.add('hidden');
 
-    // Actualizar banner en cada cambio de fase
     mostrarTurnoSimultaneo();
 
     if (faseActual === 'sorteo1') {
       badge.className = 'fase-badge sorteo';
       badge.textContent = '🎲 Sortear Poomsaes';
-      bloqueSorteo1.classList.remove('hidden');
+      bloqueSorteo.classList.remove('hidden');
+      bloqueNotas.classList.add('hidden');
 
     } else if (faseActual === 'ejecucion1') {
       badge.className = 'fase-badge ejecucion';
-      badge.textContent = '▶ Ejecución 1ra Poomsae';
+      badge.textContent = '▶ Poomsae 1 · Ejecución';
       bloqueCreno.classList.remove('hidden');
+      bloqueNotas.classList.remove('hidden');
       setCrono(90, 'ejecucion', '1ra Poomsae · Tiempo de Ejecución');
-
-    } else if (faseActual === 'calificacion1') {
-      badge.className = 'fase-badge calificacion';
-      badge.textContent = '📋 Calificación 1ra Poomsae';
-      bloqueAcciones.classList.remove('hidden');
-      btnRevelar.classList.remove('hidden');
+      notasDetalle = {};
+      puntajesRecibidos = {};
+      renderPuntajesBar({}, 'puntajes-bar');
+      renderDetalleNotas();
 
     } else if (faseActual === 'ejecucion2') {
       badge.className = 'fase-badge ejecucion';
-      badge.textContent = '▶ Ejecución 2da Poomsae';
+      badge.textContent = '▶ Poomsae 2 · Ejecución';
       bloqueCreno.classList.remove('hidden');
+      bloqueNotas.classList.remove('hidden');
       setCrono(90, 'ejecucion', '2da Poomsae · Tiempo de Ejecución');
-
-    } else if (faseActual === 'calificacion2') {
-      badge.className = 'fase-badge calificacion';
-      badge.textContent = '📋 Calificación 2da Poomsae';
-      bloqueAcciones.classList.remove('hidden');
-      btnRevelar.classList.remove('hidden');
-
-    } else if (faseActual === 'resultado') {
-      badge.className = 'fase-badge ejecucion';
-      badge.textContent = '🏆 Resultado Final';
-      bloqueAcciones.classList.remove('hidden');
-      btnRevelar.classList.remove('hidden');
+      notasDetalle = {};
+      puntajesRecibidos = {};
+      renderPuntajesBar({}, 'puntajes-bar');
+      renderDetalleNotas();
     }
   }
 
-
-  function siguienteFase() {
-    const flujo = ['sorteo1','ejecucion1','calificacion1','ejecucion2','calificacion2','resultado'];
-    const idx = flujo.indexOf(faseActual);
-
-    if (faseActual === 'resultado') {
-      // Siguiente enfrentamiento
-      turnoIndex += 2;
-      poomsae1 = null;
-      poomsae2 = null;
-      faseActual = 'sorteo1';
-      // Limpiar displays
-      const el1 = document.getElementById('display-p1');
-      const el2 = document.getElementById('display-p2');
-      if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
-      if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
-    } else if (idx < flujo.length - 1) {
-      faseActual = flujo[idx + 1];
-    }
-
-    puntajesRecibidos = {};
-    renderPuntajesBar({}, 'puntajes-bar');
-    mostrarTurnoSimultaneo();
-    actualizarFaseUI();
-  }
-
-
-
-  // ── REVELAR ──
-  function revelarPuntaje() {
-    socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
-    document.getElementById('btn-revelar').classList.add('hidden');
-    const btnSig = document.getElementById('btn-siguiente');
-
-    if (faseActual === 'calificacion1') {
-      btnSig.classList.remove('hidden');
-      btnSig.textContent = 'IR A 2DA POOMSAE →';
-
-    } else if (faseActual === 'calificacion2') {
-      btnSig.classList.remove('hidden');
-      btnSig.textContent = 'VER RESULTADO FINAL →';
-
-    } else if (faseActual === 'resultado') {
-      // Calcular ganador
-      const a = competidores[turnoIndex];
-      const b = competidores[turnoIndex + 1];
-      if (a && b && a.total !== null && b.total !== null) {
-        const ganador = a.total > b.total ? a.nombre : b.total > a.total ? b.nombre : 'EMPATE';
-        const color = a.total > b.total ? '#ff6666' : b.total > a.total ? '#6699ff' : '#c9a84c';
-        const div = document.getElementById('display-turno-sim');
-        div.innerHTML += `
-          <div style="
-            background:#0a0a0a; border:2px solid #c9a84c;
-            border-radius:10px; padding:14px; text-align:center; margin-top:10px;
-          ">
-            <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:6px">
-              Resultado Final
-            </div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:#555;margin-bottom:4px">
-              ${a.nombre}: ${a.total.toFixed(2)} &nbsp;·&nbsp; ${b.nombre}: ${b.total.toFixed(2)}
-            </div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:${color}">
-              🏆 ${ganador}
-            </div>
-          </div>`;
-      }
-      btnSig.classList.remove('hidden');
-      btnSig.textContent = 'SIGUIENTE ENFRENTAMIENTO →';
-    }
-  }
-
-
-  function revelarPuntajeGen() {
-    socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
-    document.getElementById('btn-revelar-gen').classList.add('hidden');
-    document.getElementById('btn-siguiente-gen').classList.remove('hidden');
-  }
-
-  // ── TURNO SIMULTÁNEO ──
+  // ── MOSTRAR TURNO ──
   function mostrarTurnoSimultaneo() {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
@@ -579,27 +448,17 @@
       return;
     }
 
-    // Mostrar solo la poomsae de la fase actual
-    let poomsaeActual = '';
-    let labelPoomsae = '';
-    if (faseActual === 'sorteo1') {
-      // Ambas al sortear
-      if (poomsae1 && poomsae2) {
-        poomsaeActual = `1ra: ${poomsae1} &nbsp;·&nbsp; 2da: ${poomsae2}`;
-      }
-    } else if (['ejecucion1','calificacion1'].includes(faseActual)) {
-      poomsaeActual = poomsae1 ? `1ra: ${poomsae1}` : '';
-    } else if (['ejecucion2','calificacion2','resultado'].includes(faseActual)) {
-      poomsaeActual = poomsae2 ? `2da: ${poomsae2}` : '';
+    let poomsaeLine = '';
+    if (faseActual === 'sorteo1' && poomsae1 && poomsae2) {
+      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:8px">
+        1ra: ${poomsae1} &nbsp;·&nbsp; 2da: ${poomsae2}</div>`;
+    } else if (['ejecucion1','calificacion1'].includes(faseActual) && poomsae1) {
+      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:8px">
+        1ra: ${poomsae1}</div>`;
+    } else if (['ejecucion2','resultado'].includes(faseActual) && poomsae2) {
+      poomsaeLine = `<div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c;margin-bottom:8px;border-bottom:1px solid #2a2a2a;padding-bottom:8px">
+        2da: ${poomsae2}</div>`;
     }
-
-    const poomsaeLine = poomsaeActual ? `
-      <div style="
-        font-family:'Bebas Neue',sans-serif;
-        font-size:22px; letter-spacing:4px;
-        color:#c9a84c; margin-bottom:8px;
-        border-bottom:1px solid #2a2a2a; padding-bottom:8px;
-      ">${poomsaeActual}</div>` : '';
 
     document.getElementById('display-turno-sim').innerHTML = `
       <div class="turno-card">
@@ -612,6 +471,92 @@
         </div>
       </div>`;
     socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
+  }
+
+  // ── NOTAS DETALLE ──
+  function renderDetalleNotas() {
+    const div = document.getElementById('detalle-notas');
+    if (!div) return;
+    if (Object.keys(notasDetalle).length === 0) {
+      div.innerHTML = `<div style="font-size:10px;color:#444;text-align:center;padding:8px">Esperando notas de jueces...</div>`;
+      return;
+    }
+    let html = '';
+    for (let i = 1; i <= numJueces; i++) {
+      const n = notasDetalle[i];
+      if (!n) continue;
+      html += `<div class="notas-juez">
+        <div class="notas-juez-header">
+          <span class="notas-juez-num">Juez ${i}</span>
+          <span class="notas-juez-total">${(n.precision + n.vel + n.rit + n.exp).toFixed(2)}</span>
+        </div>
+        <div class="notas-juez-detalle">
+          Prec: ${n.precision.toFixed(1)} &nbsp;·&nbsp;
+          Vel: ${n.vel.toFixed(1)} &nbsp;·&nbsp;
+          Rit: ${n.rit.toFixed(1)} &nbsp;·&nbsp;
+          Exp: ${n.exp.toFixed(1)}
+        </div>
+      </div>`;
+    }
+    div.innerHTML = html;
+  }
+
+  // ── CALCULAR RESULTADO FINAL ──
+  function calcularResultadoFinal() {
+    const a = competidores[turnoIndex];
+    const b = competidores[turnoIndex + 1];
+    if (!a || !b) return;
+
+    const totalA = (notasPoomsae1[a.id] || 0) + (notasPoomsae2[a.id] || 0);
+    const totalB = (notasPoomsae1[b.id] || 0) + (notasPoomsae2[b.id] || 0);
+
+    const ganador = totalA > totalB ? a.nombre : totalB > totalA ? b.nombre : 'EMPATE';
+    const colorGanador = totalA > totalB ? '#ff6666' : totalB > totalA ? '#6699ff' : '#c9a84c';
+
+    document.getElementById('bloque-resultado').classList.remove('hidden');
+    document.getElementById('bloque-resultado').innerHTML = `
+      <div class="resultado-final">
+        <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:10px">Resultado Final</div>
+        <div style="display:flex;justify-content:space-around;margin-bottom:12px">
+          <div style="text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#ff6666">${a.nombre}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff">${totalA.toFixed(2)}</div>
+            <div style="font-size:9px;color:#555">P1: ${(notasPoomsae1[a.id]||0).toFixed(2)} · P2: ${(notasPoomsae2[a.id]||0).toFixed(2)}</div>
+          </div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#333;align-self:center">VS</div>
+          <div style="text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#6699ff">${b.nombre}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#fff">${totalB.toFixed(2)}</div>
+            <div style="font-size:9px;color:#555">P1: ${(notasPoomsae1[b.id]||0).toFixed(2)} · P2: ${(notasPoomsae2[b.id]||0).toFixed(2)}</div>
+          </div>
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:#555;margin-bottom:4px">GANADOR</div>
+        <div class="resultado-ganador" style="color:${colorGanador}">🏆 ${ganador}</div>
+      </div>`;
+
+    document.getElementById('btn-siguiente-enfrentamiento').classList.remove('hidden');
+    faseActual = 'resultado';
+    mostrarTurnoSimultaneo();
+    log(`Resultado: ${a.nombre} ${totalA.toFixed(2)} vs ${b.nombre} ${totalB.toFixed(2)} → ${ganador}`);
+  }
+
+  function siguienteEnfrentamiento() {
+    turnoIndex += 2;
+    poomsae1 = null; poomsae2 = null;
+    notasPoomsae1 = {}; notasPoomsae2 = {};
+    notasDetalle = {}; puntajesRecibidos = {};
+    faseActual = 'sorteo1';
+    const el1 = document.getElementById('display-p1');
+    const el2 = document.getElementById('display-p2');
+    if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
+    if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
+    document.getElementById('bloque-resultado').classList.add('hidden');
+    document.getElementById('bloque-resultado').innerHTML = '';
+    document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
+    renderPuntajesBar({}, 'puntajes-bar');
+    renderDetalleNotas();
+    mostrarTurnoSimultaneo();
+    actualizarFaseUI();
   }
 
   // ── TURNO GENERAL ──
@@ -649,6 +594,12 @@
     document.getElementById('btn-siguiente-gen').classList.add('hidden');
   }
 
+  function revelarPuntajeGen() {
+    socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
+    document.getElementById('btn-revelar-gen').classList.add('hidden');
+    document.getElementById('btn-siguiente-gen').classList.remove('hidden');
+  }
+
   function siguienteTurno() {
     turnoIndex += (modo === '1v1-secuencial') ? 2 : 1;
     mostrarTurnoActual();
@@ -660,6 +611,13 @@
     socket.emit('mesa-corte', { codigo: salaActual, topN });
   }
 
+  // ── RESTAURAR ──
+  function restaurarSistema() {
+    const ok = confirm('¿Restaurar el sistema? Se borrará la competencia actual.');
+    if (!ok) return;
+    socket.emit('mesa-restaurar', { codigo: salaActual });
+  }
+
   // ── RENDER HELPERS ──
   function renderJueces(jueces) {
     const el = document.getElementById('display-jueces');
@@ -667,14 +625,13 @@
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
       const c = jueces.find(j => j.num === i);
-      html += `<div class="juez-chip ${c ? 'activo' : ''}">
-        <div class="juez-dot ${c ? 'activo' : ''}"></div>
-        <span class="juez-txt">J${i}${c?.nombre ? ' · ' + c.nombre : ''}</span>
+      html += `<div class="juez-chip ${c?'activo':''}">
+        <div class="juez-dot ${c?'activo':''}"></div>
+        <span class="juez-txt">J${i}${c?.nombre?' · '+c.nombre:''}</span>
       </div>`;
     }
     el.innerHTML = html;
   }
-
 
   function renderPuntajesBar(recibidos, elId) {
     const el = document.getElementById(elId);
@@ -721,36 +678,9 @@
     log('Sala creada');
   });
 
-    socket.on('sistema-restaurado', () => {
-    // Resetear estado local
-    competidores = [];
-    turnoIndex = 0;
-    poomsae1 = null;
-    poomsae2 = null;
-    faseActual = 'sorteo1';
-    puntajesRecibidos = {};
-
-    // Resetear displays
-    const el1 = document.getElementById('display-p1');
-    const el2 = document.getElementById('display-p2');
-    if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
-    if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
-
-    // Volver a panel de competidores
-    document.getElementById('panel-control-simultaneo').classList.add('hidden');
-    document.getElementById('panel-control').classList.add('hidden');
-    document.getElementById('panel-ranking').classList.add('hidden');
-    document.getElementById('panel-competidores').classList.remove('hidden');
-    document.getElementById('lista-competidores').innerHTML = '';
-
-    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
-
-    log('Sistema restaurado');
-  });
-
-     socket.on('juez-conectado', (data) => {
+  socket.on('juez-conectado', (data) => {
     renderJueces(data.jueces);
-    log(`Juez ${data.numJuez} conectado: ${data.nombre || ''}`);
+    log(`Juez ${data.numJuez} conectado: ${data.nombre||''}`);
   });
 
   socket.on('juez-desconectado', (data) => {
@@ -759,29 +689,85 @@
   });
 
   socket.on('puntaje-recibido', (data) => {
-    if (!puntajesRecibidos[data.juezNum]) puntajesRecibidos[data.juezNum] = 0;
-    puntajesRecibidos[data.juezNum]++;
+    // Actualizar barra
+    puntajesRecibidos[data.juezNum] = true;
     const barId = modo === '1v1-simultaneo' ? 'puntajes-bar' : 'puntajes-bar-gen';
     renderPuntajesBar(puntajesRecibidos, barId);
-    log(`✓ Juez ${data.juezNum} · Prec ${data.precision?.toFixed(1)} · Pres ${data.presentacion?.toFixed(1)} (${data.totalPuntajes}/${data.numJueces})`);
+
+    // Guardar desglose
+    if (data.desglose) {
+      notasDetalle[data.juezNum] = {
+        precision: data.desglose.precision,
+        vel: data.desglose.vel,
+        rit: data.desglose.rit,
+        exp: data.desglose.exp
+      };
+      renderDetalleNotas();
+
+      // Acumular por poomsae
+      if (faseActual === 'ejecucion1') {
+        if (!notasPoomsae1[data.competidorId]) notasPoomsae1[data.competidorId] = 0;
+      } else if (faseActual === 'ejecucion2') {
+        if (!notasPoomsae2[data.competidorId]) notasPoomsae2[data.competidorId] = 0;
+      }
+    }
+
+    // Verificar si todos enviaron para ambos competidores
+    if (modo === '1v1-simultaneo') {
+      const a = competidores[turnoIndex];
+      const b = competidores[turnoIndex + 1];
+      if (a && b) {
+        const todosListos = Object.keys(puntajesRecibidos).length >= numJueces * 2 ||
+          (data.totalPuntajesA >= numJueces && data.totalPuntajesB >= numJueces);
+        if (data.todosCompletos) {
+          // Guardar totales
+          if (faseActual === 'ejecucion1') {
+            notasPoomsae1[a.id] = data.totalA || 0;
+            notasPoomsae1[b.id] = data.totalB || 0;
+            // Pasar a poomsae 2
+            faseActual = 'ejecucion2';
+            actualizarFaseUI();
+          } else if (faseActual === 'ejecucion2') {
+            notasPoomsae2[a.id] = data.totalA || 0;
+            notasPoomsae2[b.id] = data.totalB || 0;
+            calcularResultadoFinal();
+          }
+        }
+      }
+    }
+
+    log(`✓ J${data.juezNum} (${data.totalPuntajes}/${data.numJueces})`);
   });
 
-
-
-  socket.on('puntaje-recibido', (data) => {
-    if (!puntajesRecibidos[data.juezNum]) puntajesRecibidos[data.juezNum] = 0;
-    puntajesRecibidos[data.juezNum]++;
-    const barId = modo === '1v1-simultaneo' ? 'puntajes-bar' : 'puntajes-bar-gen';
-    renderPuntajesBar(puntajesRecibidos, barId);
-    log(`Puntaje · Juez ${data.juezNum} (${data.totalPuntajes}/${data.numJueces})`);
-  });
-
-   socket.on('poomsae-sorteada', (data) => {
+  socket.on('poomsae-sorteada', (data) => {
     log(`Poomsae ${data.numero}: ${data.poomsae}`);
   });
 
   socket.on('ranking-actualizado', (data) => { renderRanking(data.ranking, null); });
   socket.on('corte-aplicado', (data) => { renderRanking(data.ranking, data.topN); });
+
+  socket.on('sistema-restaurado', () => {
+    competidores = [];
+    turnoIndex = 0;
+    poomsae1 = null; poomsae2 = null;
+    faseActual = 'sorteo1';
+    puntajesRecibidos = {};
+    notasDetalle = {};
+    notasPoomsae1 = {}; notasPoomsae2 = {};
+    const el1 = document.getElementById('display-p1');
+    const el2 = document.getElementById('display-p2');
+    if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
+    if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
+    document.getElementById('panel-control-simultaneo').classList.add('hidden');
+    document.getElementById('panel-control').classList.add('hidden');
+    document.getElementById('panel-ranking').classList.add('hidden');
+    document.getElementById('panel-competidores').classList.remove('hidden');
+    document.getElementById('lista-competidores').innerHTML = '';
+    document.getElementById('bloque-resultado').classList.add('hidden');
+    document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    log('Sistema restaurado');
+  });
 </script>
 </body>
 </html>
