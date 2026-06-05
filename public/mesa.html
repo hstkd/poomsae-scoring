@@ -517,8 +517,24 @@
         </div>`;
       return;
     }
+
+    const p1txt = poomsae1 ? poomsae1 : '';
+    const p2txt = poomsae2 ? poomsae2 : '';
+    const poomsaeLine = (p1txt || p2txt) ? `
+      <div style="
+        font-family:'Bebas Neue',sans-serif;
+        font-size:22px; letter-spacing:4px;
+        color:#c9a84c; margin-bottom:6px;
+        border-bottom:1px solid #2a2a2a; padding-bottom:8px;
+      ">
+        ${p1txt ? '1ra: ' + p1txt : ''}
+        ${p1txt && p2txt ? '&nbsp;·&nbsp;' : ''}
+        ${p2txt ? '2da: ' + p2txt : ''}
+      </div>` : '';
+
     document.getElementById('display-turno-sim').innerHTML = `
       <div class="turno-card">
+        ${poomsaeLine}
         <div class="turno-label">Enfrentamiento</div>
         <div class="vs-row">
           <span class="turno-nombre" style="color:#ff6666">${a.nombre}</span>
@@ -652,6 +668,7 @@
       el.classList.remove('vacio');
       faseActual = 'ejecucion1';
       actualizarFaseUI();
+      mostrarTurnoSimultaneo();
     } else {
       poomsae2 = data.poomsae;
       const el = document.getElementById('display-p2');
@@ -659,6 +676,7 @@
       el.classList.remove('vacio');
       faseActual = 'ejecucion2';
       actualizarFaseUI();
+      mostrarTurnoSimultaneo();
     }
     log(`Poomsae ${data.numero}: ${data.poomsae}`);
   });
