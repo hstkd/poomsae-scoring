@@ -177,6 +177,16 @@ io.on('connection', (socket) => {
     sala.cronoActivo = accion === 'iniciar';
     io.to(codigo).emit('control-actualizado', { accion, fase });
   });
+  socket.on('juez-precision', ({ codigo, competidorId, precision, poomsae }) => {
+    const sala = salas[codigo];
+    if (!sala) return;
+    const numJuez = socket.data.numJuez;
+    // Emitir a mesa para mostrar en tiempo real
+    io.to(codigo).emit('precision-recibida', {
+      competidorId, juezNum: numJuez, precision, poomsae
+    });
+    console.log(`Precisión J${numJuez} comp${competidorId}: ${precision}`);
+  });
 
   // ── FIN DE SALA ──
   socket.on('mesa-fin-sala', ({ codigo }) => {
