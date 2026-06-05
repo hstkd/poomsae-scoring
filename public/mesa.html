@@ -181,23 +181,22 @@
       <span class="fase-badge sorteo" id="fase-badge">Sortear 1ra Poomsae</span>
     </div>
 
-    <!-- SORTEO 1 -->
+    <!-- SORTEO -->
     <div id="bloque-sorteo-1">
       <div class="poomsae-card">
         <div class="poomsae-label">1ra Poomsae</div>
         <div class="poomsae-nombre vacio" id="display-p1">— Sin sortear —</div>
       </div>
-      <button class="btn-blue" onclick="sortear(1)">🎲 SORTEAR 1ra POOMSAE</button>
-    </div>
-
-    <!-- SORTEO 2 -->
-    <div id="bloque-sorteo-2" class="hidden">
-      <div class="poomsae-card">
+      <div class="poomsae-card" style="margin-top:8px">
         <div class="poomsae-label">2da Poomsae</div>
         <div class="poomsae-nombre vacio" id="display-p2">— Sin sortear —</div>
       </div>
-      <button class="btn-blue" onclick="sortear(2)">🎲 SORTEAR 2da POOMSAE</button>
+      <button class="btn-blue" onclick="sortear(1)">🎲 SORTEAR AMBAS POOMSAES</button>
     </div>
+
+    <!-- este bloque ya no se usa pero lo dejamos oculto para no romper referencias -->
+    <div id="bloque-sorteo-2" class="hidden"></div>
+
 
     <!-- CRONÓMETRO -->
     <div class="cronometro-card hidden" id="bloque-crono">
@@ -328,10 +327,30 @@
   // ── SORTEO — el sistema elige aleatoriamente ──
   function sortear(numero) {
     const lista = POOMSAES_GRUPO[grupoCategoria] || [];
-    const disponibles = numero === 2 ? lista.filter(p => p !== poomsae1) : lista;
-    if (!disponibles.length) return alert('No hay poomsaes disponibles');
-    const sorteada = disponibles[Math.floor(Math.random() * disponibles.length)];
-    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero, poomsae: sorteada });
+    if (!lista.length) return alert('No hay poomsaes disponibles');
+
+    // Sortear las dos de una vez
+    const idx1 = Math.floor(Math.random() * lista.length);
+    poomsae1 = lista[idx1];
+
+    const restantes = lista.filter(p => p !== poomsae1);
+    const idx2 = Math.floor(Math.random() * restantes.length);
+    poomsae2 = restantes[idx2];
+
+    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 1, poomsae: poomsae1 });
+    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 2, poomsae: poomsae2 });
+
+    // Actualizar displays localmente
+    const el1 = document.getElementById('display-p1');
+    const el2 = document.getElementById('display-p2');
+    if (el1) { el1.textContent = poomsae1; el1.classList.remove('vacio'); }
+    if (el2) { el2.textContent = poomsae2; el2.classList.remove('vacio'); }
+
+    // Ir directo a ejecución 1
+    faseActual = 'ejecucion1';
+    mostrarTurnoSimultaneo();
+    actualizarFaseUI();
+    log(`Sorteadas: ${poomsae1} / ${poomsae2}`);
   }
 
   // ── CRONÓMETRO ──
@@ -394,17 +413,15 @@
     else if (cronoTipoActual === 'descanso') el.classList.add('verde');
   }
 
-  function onCronoFin() {
+   function onCronoFin() {
     if (cronoTipoActual === 'ejecucion') {
       faseActual = (faseActual === 'ejecucion1') ? 'calificacion1' : 'calificacion2';
       puntajesRecibidos = {};
       renderPuntajesBar({}, 'puntajes-bar');
       actualizarFaseUI();
-    } else if (cronoTipoActual === 'descanso') {
-      faseActual = 'sorteo2';
-      actualizarFaseUI();
     }
   }
+
 
   // ── FASE UI ──
   function actualizarFaseUI() {
@@ -426,7 +443,7 @@
 
     if (faseActual === 'sorteo1') {
       badge.className = 'fase-badge sorteo';
-      badge.textContent = '🎲 Sortear 1ra Poomsae';
+      badge.textContent = '🎲 Sortear Poomsaes';
       bloqueSorteo1.classList.remove('hidden');
 
     } else if (faseActual === 'ejecucion1') {
@@ -440,22 +457,6 @@
       badge.textContent = '📋 Calificación 1ra Poomsae';
       bloqueAcciones.classList.remove('hidden');
       btnRevelar.classList.remove('hidden');
-      // Mostrar crono listo para descanso
-      bloqueCreno.classList.remove('hidden');
-      setCrono(60, 'descanso', 'Tiempo de Descanso — listo');
-      document.getElementById('btn-descanso').classList.add('hidden');
-
-    } else if (faseActual === 'descanso') {
-      badge.className = 'fase-badge descanso';
-      badge.textContent = '☕ Tiempo de Descanso';
-      bloqueCreno.classList.remove('hidden');
-      setCrono(60, 'descanso', 'Tiempo de Descanso');
-      iniciarCrono();
-
-    } else if (faseActual === 'sorteo2') {
-      badge.className = 'fase-badge sorteo';
-      badge.textContent = '🎲 Sortear 2da Poomsae';
-      bloqueSorteo2.classList.remove('hidden');
 
     } else if (faseActual === 'ejecucion2') {
       badge.className = 'fase-badge ejecucion';
@@ -478,7 +479,7 @@
   }
 
   function siguienteFase() {
-    const flujo = ['sorteo1','ejecucion1','calificacion1','descanso','sorteo2','ejecucion2','calificacion2','resultado'];
+    const flujo = ['sorteo1','ejecucion1','calificacion1','ejecucion2','calificacion2','resultado'];
     const idx = flujo.indexOf(faseActual);
     if (idx < flujo.length - 1) faseActual = flujo[idx + 1];
     puntajesRecibidos = {};
@@ -486,15 +487,18 @@
     actualizarFaseUI();
   }
 
+
   // ── REVELAR ──
   function revelarPuntaje() {
     socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
     document.getElementById('btn-revelar').classList.add('hidden');
     const btnSig = document.getElementById('btn-siguiente');
     btnSig.classList.remove('hidden');
-    if (faseActual === 'calificacion1') btnSig.textContent = 'IR A DESCANSO →';
-    else if (faseActual === 'calificacion2') btnSig.textContent = 'VER RESULTADO →';
-    else if (faseActual === 'resultado') {
+    if (faseActual === 'calificacion1') {
+      btnSig.textContent = 'IR A 2DA POOMSAE →';
+    } else if (faseActual === 'calificacion2') {
+      btnSig.textContent = 'VER RESULTADO →';
+    } else if (faseActual === 'resultado') {
       turnoIndex += 2;
       btnSig.textContent = 'SIGUIENTE ENFRENTAMIENTO →';
     }
@@ -660,24 +664,7 @@
     log(`Puntaje · Juez ${data.juezNum} (${data.totalPuntajes}/${data.numJueces})`);
   });
 
-  socket.on('poomsae-sorteada', (data) => {
-    if (data.numero === 1) {
-      poomsae1 = data.poomsae;
-      const el = document.getElementById('display-p1');
-      el.textContent = data.poomsae;
-      el.classList.remove('vacio');
-      faseActual = 'ejecucion1';
-      actualizarFaseUI();
-      mostrarTurnoSimultaneo();
-    } else {
-      poomsae2 = data.poomsae;
-      const el = document.getElementById('display-p2');
-      el.textContent = data.poomsae;
-      el.classList.remove('vacio');
-      faseActual = 'ejecucion2';
-      actualizarFaseUI();
-      mostrarTurnoSimultaneo();
-    }
+   socket.on('poomsae-sorteada', (data) => {
     log(`Poomsae ${data.numero}: ${data.poomsae}`);
   });
 
