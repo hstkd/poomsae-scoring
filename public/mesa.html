@@ -158,6 +158,10 @@
     <div class="sala-ronda" id="display-ronda">—</div>
     <div class="jueces-grid" id="display-jueces"></div>
     <div id="log"></div>
+    <button class="btn-dark" onclick="restaurarSistema()" style="margin-top:10px;color:#dc2626;border-color:#dc2626;font-size:11px;padding:8px">
+      ↺ RESTAURAR SISTEMA
+    </button>
+
   </div>
 
   <!-- COMPETIDORES -->
@@ -304,6 +308,11 @@
         </div>`).join('');
   }
   function eliminarCompetidor(i) { competidores.splice(i,1); renderCompetidores(); }
+  function restaurarSistema() {
+    const ok = confirm('¿Restaurar el sistema? Se borrará la competencia actual y se podrá iniciar una nueva. Los jueces permanecerán conectados.');
+    if (!ok) return;
+    socket.emit('mesa-restaurar', { codigo: salaActual });
+  }
 
   // ── INICIAR ──
   function iniciarCompetencia() {
@@ -712,15 +721,51 @@
     log('Sala creada');
   });
 
-    socket.on('juez-conectado', (data) => {
+    socket.on('sistema-restaurado', () => {
+    // Resetear estado local
+    competidores = [];
+    turnoIndex = 0;
+    poomsae1 = null;
+    poomsae2 = null;
+    faseActual = 'sorteo1';
+    puntajesRecibidos = {};
+
+    // Resetear displays
+    const el1 = document.getElementById('display-p1');
+    const el2 = document.getElementById('display-p2');
+    if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
+    if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
+
+    // Volver a panel de competidores
+    document.getElementById('panel-control-simultaneo').classList.add('hidden');
+    document.getElementById('panel-control').classList.add('hidden');
+    document.getElementById('panel-ranking').classList.add('hidden');
+    document.getElementById('panel-competidores').classList.remove('hidden');
+    document.getElementById('lista-competidores').innerHTML = '';
+
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+
+    log('Sistema restaurado');
+  });
+
+     socket.on('juez-conectado', (data) => {
     renderJueces(data.jueces);
-    log('Juez conectado: ' + (data.nombre || ''));
+    log(`Juez ${data.numJuez} conectado: ${data.nombre || ''}`);
   });
 
   socket.on('juez-desconectado', (data) => {
     renderJueces(data.jueces);
-    log('Juez desconectado');
+    log(`Juez ${data.numJuez} desconectado`);
   });
+
+  socket.on('puntaje-recibido', (data) => {
+    if (!puntajesRecibidos[data.juezNum]) puntajesRecibidos[data.juezNum] = 0;
+    puntajesRecibidos[data.juezNum]++;
+    const barId = modo === '1v1-simultaneo' ? 'puntajes-bar' : 'puntajes-bar-gen';
+    renderPuntajesBar(puntajesRecibidos, barId);
+    log(`✓ Juez ${data.juezNum} · Prec ${data.precision?.toFixed(1)} · Pres ${data.presentacion?.toFixed(1)} (${data.totalPuntajes}/${data.numJueces})`);
+  });
+
 
 
   socket.on('puntaje-recibido', (data) => {
