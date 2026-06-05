@@ -654,10 +654,16 @@
       </div>`;
   }
 
-  function irPresentacion() {
-    const panel = document.getElementById('panel-calificacion');
+   function irPresentacion() {
+    // Enviar precisión de ambos al confirmar
+    if (turnoActual?.tipo === '1v1-simultaneo') {
+      enviarPrecision('A', turnoActual.competidorA);
+      enviarPrecision('B', turnoActual.competidorB);
+    }
+    // Pasar a pantalla de presentación
     const nomA = turnoActual.competidorA?.nombre || '—';
     const nomB = turnoActual.competidorB?.nombre || '—';
+    const panel = document.getElementById('panel-calificacion');
     panel.innerHTML = `
       <div class="paso-pres" id="paso-pres">
         ${headerHTML('Simultáneo', null, null, true)}
@@ -684,6 +690,7 @@
     actualizarSubtotal('A');
     actualizarSubtotal('B');
   }
+
 
   // ── RENDER UNO (cutoff / secuencial) ──
   function renderUno(panel, comp, sub, key, fase) {
@@ -721,6 +728,13 @@
   }
 
   function irPresentacionUno(key, fase, nombre) {
+    // Enviar precisión al confirmar
+    let comp;
+    if (fase === 'A') comp = turnoActual.competidorA;
+    else if (fase === 'B') comp = turnoActual.competidorB;
+    else comp = turnoActual.competidor;
+    enviarPrecision(key, comp);
+
     const panel = document.getElementById('panel-calificacion');
     panel.innerHTML = `
       <div class="paso-pres">
@@ -742,6 +756,7 @@
     `;
     actualizarSubtotal(key);
   }
+
 
   // ── HEADER HTML ──
   function headerHTML(tipo, nombre, sub, esSimultaneo) {
@@ -923,8 +938,8 @@
   let precisionConfirmada = { A: false, B: false, C: false };
 
   // ── ENVIAR PRECISIÓN (al confirmar) ──
-  function enviarPrecision(key, comp) {
-    if (precisonBloqueada) return;
+    function enviarPrecision(key, comp) {
+    if (!comp) return;
     const prec = precisionVal[key] || 0;
     socket.emit('juez-precision', {
       codigo: salaInfo.codigo,
@@ -933,31 +948,9 @@
       poomsae: poomsaeActiva
     });
     precisionConfirmada[key] = true;
-    log(`Precisión enviada: ${prec.toFixed(1)}`);
   }
 
-  // Modificar irPresentacion para enviar precisión primero
-  const _irPresentacionOrig = irPresentacion;
-  function irPresentacion() {
-    // Enviar precisión de ambos al confirmar
-    if (turnoActual?.tipo === '1v1-simultaneo') {
-      enviarPrecision('A', turnoActual.competidorA);
-      enviarPrecision('B', turnoActual.competidorB);
-    }
-    _irPresentacionOrig?.();
-  }
-
-  const _irPresentacionUnoOrig = irPresentacionUno;
-  function irPresentacionUno(key, fase, nombre) {
-    if (turnoActual?.tipo === '1v1-secuencial') {
-      const comp = fase === 'A' ? turnoActual.competidorA : turnoActual.competidorB;
-      enviarPrecision(key, comp);
-    } else {
-      enviarPrecision(key, turnoActual?.competidor);
-    }
-    _irPresentacionUnoOrig?.(key, fase, nombre);
-  }
-
+  
   // ── ENVIAR PRESENTACIÓN con desglose ──
   function enviarAmbos() {
     const vA = getValores('A'), vB = getValores('B');
@@ -1016,13 +1009,19 @@
         btn.style.pointerEvents = 'auto';
       });
 
-    } else if (data.accion === 'detener') {
-      // Bloquear precisión
+      } else if (data.accion === 'detener') {
+      // Bloquear deducción pero NO bloquear el botón confirmar
       precisonBloqueada = true;
       document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
         btn.style.opacity = '0.3';
         btn.style.pointerEvents = 'none';
       });
+      // El botón CONFIRMAR PRECISIÓN debe seguir activo
+      document.querySelectorAll('.btn-confirmar').forEach(btn => {
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+      });
+
 
     } else if (data.accion === 'nueva-poomsae') {
       // Poomsae 2: reactivar sin recargar
