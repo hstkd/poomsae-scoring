@@ -86,6 +86,10 @@
     .btn-add:active { background: #c9a84c; color: #000; }
     .corte-row { display: flex; gap: 8px; margin-top: 10px; }
     .corte-row .input-field { margin-bottom: 0; flex: 1; width: auto; }
+    .rank-item { display: flex; align-items: center; gap: 10px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
+    .rank-pos { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; width: 28px; }
+    .rank-nombre { flex: 1; font-size: 13px; font-weight: 700; }
+    .rank-total { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; }
   </style>
 </head>
 <body>
@@ -208,19 +212,19 @@
     <div id="bloque-notas" class="hidden" style="margin-top:8px">
       <div class="panel-titulo">Notas Recibidas</div>
       <div class="notas-grid">
-        <div class="notas-comp" id="notas-comp-A">
+        <div class="notas-comp">
           <div class="notas-comp-titulo rojo" id="nombre-comp-A">—</div>
           <div id="notas-rows-A"></div>
           <div class="total-comp">
-            <span class="total-comp-label">Total P<span id="poomsae-num-label">1</span></span>
+            <span class="total-comp-label">Total P<span id="poomsae-num-label-A">1</span></span>
             <span class="total-comp-val" id="total-A">—</span>
           </div>
         </div>
-        <div class="notas-comp" id="notas-comp-B">
+        <div class="notas-comp">
           <div class="notas-comp-titulo azul" id="nombre-comp-B">—</div>
           <div id="notas-rows-B"></div>
           <div class="total-comp">
-            <span class="total-comp-label">Total P<span class="poomsae-num-label">1</span></span>
+            <span class="total-comp-label">Total P<span id="poomsae-num-label-B">1</span></span>
             <span class="total-comp-val" id="total-B">—</span>
           </div>
         </div>
@@ -237,7 +241,7 @@
 
   </div>
 
-  <!-- CONTROL GENERAL -->
+  <!-- CONTROL GENERAL (cutoff / secuencial) -->
   <div class="panel hidden" id="panel-control">
     <div class="panel-titulo">Turno Actual</div>
     <div id="display-turno"></div>
@@ -262,13 +266,18 @@
 <script>
   const socket = io({ reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
 
+  // ── ESTADO GLOBAL ──
   let salaActual = null;
-  let competidores = [];
   let turnoIndex = 0;
   let modo = '';
   let tipo = '';
   let numJueces = 3;
   let grupoCategoria = 'cadetes';
+
+  // FIX #3: competidores se puebla desde el servidor (con IDs reales),
+  // no se construye localmente. Se usa un array temporal solo para setup.
+  let competidoresSetup = [];  // solo para el panel de agregar antes de iniciar
+  let competidores = [];        // array definitivo sincronizado con el servidor
 
   const POOMSAES_GRUPO = {
     cadetes: ['Taegeuk 4','Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8','Koryo','Keumgang','Taebaek'],
@@ -282,13 +291,14 @@
   let cronoSegundos = 90, cronoOriginal = 90;
   let cronoActivo = false;
 
-  // fases: sorteo → p1_corriendo → p1_detenido → p2_corriendo → p2_detenido → resultado
+  // FIX #6: fases completas incluyendo _corriendo
+  // sorteo → p1_listo → p1_corriendo → p1_detenido → p2_listo → p2_corriendo → p2_detenido → resultado
   let faseActual = 'sorteo';
 
-  // Notas recibidas { compId: { jueces: {juezNum: {prec, vel, rit, exp}}, total } }
+  // FIX #4: notas indexadas por poomsae y usando data.poomsae del servidor como fuente de verdad
+  // Estructura: { [compId]: { jueces: { [numJuez]: {prec,vel,rit,exp} }, total: null } }
   let notasP1 = {};
   let notasP2 = {};
-  let notasActuales = {}; // referencia a la poomsae activa
 
   // ── CREAR SALA ──
   function crearSala() {
@@ -305,55 +315,57 @@
     socket.emit('mesa-crear-sala', { codigo, tipo, modo, numJueces, categoria, ronda, grupoCategoria });
   }
 
-  // ── COMPETIDORES ──
+  // ── COMPETIDORES (panel setup) ──
   function agregarCompetidor() {
     const nombre = document.getElementById('input-competidor').value.trim().toUpperCase();
     if (!nombre) return;
-    competidores.push({ nombre, puntajes: [], total: null });
+    // FIX #3: en setup solo guardamos nombres; el ID real lo asigna el servidor
+    competidoresSetup.push({ nombre });
     document.getElementById('input-competidor').value = '';
-    renderCompetidores();
+    renderCompetidoresSetup();
   }
-  function renderCompetidores() {
+
+  function renderCompetidoresSetup() {
     document.getElementById('lista-competidores').innerHTML =
-      competidores.map((c,i) => `
+      competidoresSetup.map((c, i) => `
         <div class="comp-item">
-          <span class="comp-num">${i+1}</span>
+          <span class="comp-num">${i + 1}</span>
           <span class="comp-nombre">${c.nombre}</span>
           <button class="btn-del" onclick="eliminarCompetidor(${i})">✕</button>
         </div>`).join('');
   }
-  function eliminarCompetidor(i) { competidores.splice(i,1); renderCompetidores(); }
+
+  function eliminarCompetidor(i) {
+    competidoresSetup.splice(i, 1);
+    renderCompetidoresSetup();
+  }
 
   // ── INICIAR COMPETENCIA ──
   function iniciarCompetencia() {
-    if (competidores.length < 2) return alert('Agrega al menos 2 competidores');
+    if (competidoresSetup.length < 2) return alert('Agrega al menos 2 competidores');
     turnoIndex = 0;
-    socket.emit('mesa-iniciar', { codigo: salaActual, competidores, modo, tipo });
-    document.getElementById('panel-competidores').classList.add('hidden');
-    if (modo === '1v1-simultaneo') {
-      document.getElementById('panel-control-simultaneo').classList.remove('hidden');
-      resetSimultaneo();
-    } else {
-      document.getElementById('panel-control').classList.remove('hidden');
-      if (modo === 'cutoff' || tipo === 'freestyle') document.getElementById('panel-ranking').classList.remove('hidden');
-      mostrarTurnoActual();
-    }
+    // FIX #3: enviamos los nombres al servidor; él asigna IDs y los devuelve
+    socket.emit('mesa-iniciar', { codigo: salaActual, competidores: competidoresSetup, modo, tipo });
+    // NO activamos el panel aquí: esperamos la confirmación de competencia-iniciada
+    // para tener los competidores con IDs correctos antes de hacer cualquier otra cosa.
   }
 
+  // ── RESET PANEL SIMULTÁNEO ──
   function resetSimultaneo() {
     faseActual = 'sorteo';
     poomsae1 = null; poomsae2 = null;
-    notasP1 = {}; notasP2 = {}; notasActuales = {};
+    notasP1 = {}; notasP2 = {};
     const el1 = document.getElementById('display-p1');
     const el2 = document.getElementById('display-p2');
     if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
     if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
-    document.getElementById('bloque-resultado').innerHTML = '';
-    document.getElementById('bloque-resultado').classList.add('hidden');
+    const bloqueRes = document.getElementById('bloque-resultado');
+    if (bloqueRes) { bloqueRes.innerHTML = ''; bloqueRes.classList.add('hidden'); }
     document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
     document.getElementById('btn-next').classList.add('hidden');
     document.getElementById('bloque-notas').classList.add('hidden');
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    cronoActivo = false;
     mostrarTurnoSimultaneo();
     actualizarFaseUI();
   }
@@ -366,13 +378,18 @@
     poomsae1 = lista[idx1];
     const restantes = lista.filter(p => p !== poomsae1);
     poomsae2 = restantes[Math.floor(Math.random() * restantes.length)];
+
     socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 1, poomsae: poomsae1 });
     socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 2, poomsae: poomsae2 });
+
     const el1 = document.getElementById('display-p1');
     const el2 = document.getElementById('display-p2');
     if (el1) { el1.textContent = poomsae1; el1.classList.remove('vacio'); }
     if (el2) { el2.textContent = poomsae2; el2.classList.remove('vacio'); }
+
     faseActual = 'p1_listo';
+
+    // FIX #11: inicializar notas DESPUÉS de que turnoIndex y competidores ya están listos
     inicializarNotasComp();
     mostrarTurnoSimultaneo();
     actualizarFaseUI();
@@ -382,16 +399,24 @@
   function inicializarNotasComp() {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
-    if (!a || !b) return;
+    if (!a || !b) { console.error('inicializarNotasComp: competidores no disponibles'); return; }
+    // FIX #3: ahora a.id y b.id son números reales asignados por el servidor
     document.getElementById('nombre-comp-A').textContent = a.nombre;
     document.getElementById('nombre-comp-B').textContent = b.nombre;
-    notasP1 = { [a.id]: { jueces: {}, total: null }, [b.id]: { jueces: {}, total: null } };
-    notasP2 = { [a.id]: { jueces: {}, total: null }, [b.id]: { jueces: {}, total: null } };
+    notasP1 = {
+      [a.id]: { jueces: {}, total: null },
+      [b.id]: { jueces: {}, total: null }
+    };
+    notasP2 = {
+      [a.id]: { jueces: {}, total: null },
+      [b.id]: { jueces: {}, total: null }
+    };
   }
 
   // ── CRONÓMETRO ──
   function setCrono(segundos, label) {
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    cronoActivo = false;
     cronoSegundos = segundos;
     cronoOriginal = segundos;
     document.getElementById('crono-label').textContent = label;
@@ -401,11 +426,21 @@
   function iniciarCrono() {
     if (cronoInterval) return;
     cronoActivo = true;
-    // Notificar jueces: habilitar precisión
+    // FIX #6: actualizar fase a _corriendo al iniciar
+    if (faseActual === 'p1_listo') faseActual = 'p1_corriendo';
+    else if (faseActual === 'p2_listo') faseActual = 'p2_corriendo';
+
     socket.emit('mesa-control', { codigo: salaActual, accion: 'iniciar', fase: faseActual });
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundos });
+
     // Ocultar NEXT mientras corre
     document.getElementById('btn-next').classList.add('hidden');
+
+    // Actualizar badge sin redibujar toda la UI
+    const badge = document.getElementById('fase-badge');
+    badge.className = 'fase-badge ejecucion';
+    badge.textContent = faseActual === 'p1_corriendo' ? '▶ Poomsae 1 · En ejecución' : '▶ Poomsae 2 · En ejecución';
+
     cronoInterval = setInterval(() => {
       cronoSegundos--;
       actualizarDisplayCrono();
@@ -419,20 +454,31 @@
   function detenerCrono() {
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     cronoActivo = false;
+
+    // FIX #6: actualizar fase a _detenido al detener
+    if (faseActual === 'p1_corriendo') faseActual = 'p1_detenido';
+    else if (faseActual === 'p2_corriendo') faseActual = 'p2_detenido';
+
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundos });
     // Notificar jueces: bloquear precisión, habilitar presentación
     socket.emit('mesa-control', { codigo: salaActual, accion: 'detener', fase: faseActual });
+
     // Mostrar NEXT
     document.getElementById('btn-next').classList.remove('hidden');
-    // Actualizar badge
+
     const badge = document.getElementById('fase-badge');
     badge.className = 'fase-badge detenido';
-    badge.textContent = '⏹ Detenido — Jueces califican';
+    badge.textContent = faseActual === 'p1_detenido'
+      ? '⏹ Poomsae 1 · Jueces califican'
+      : '⏹ Poomsae 2 · Jueces califican';
   }
 
   function restablecerCrono() {
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     cronoActivo = false;
+    // Volver a _listo si estábamos en _corriendo o _detenido
+    if (['p1_corriendo','p1_detenido'].includes(faseActual)) faseActual = 'p1_listo';
+    else if (['p2_corriendo','p2_detenido'].includes(faseActual)) faseActual = 'p2_listo';
     cronoSegundos = cronoOriginal;
     actualizarDisplayCrono();
     document.getElementById('btn-next').classList.add('hidden');
@@ -440,33 +486,44 @@
     socket.emit('mesa-control', { codigo: salaActual, accion: 'restablecer', fase: faseActual });
     const badge = document.getElementById('fase-badge');
     badge.className = 'fase-badge ejecucion';
-    badge.textContent = faseActual === 'p1_corriendo' ? '▶ Poomsae 1 · Ejecución' : '▶ Poomsae 2 · Ejecución';
+    badge.textContent = faseActual === 'p1_listo' ? '▶ Poomsae 1 · Listo para iniciar' : '▶ Poomsae 2 · Listo para iniciar';
   }
 
   function actualizarDisplayCrono() {
     const min = Math.floor(cronoSegundos / 60);
     const seg = cronoSegundos % 60;
     const el = document.getElementById('crono-display');
-    el.textContent = `${min}:${seg.toString().padStart(2,'0')}`;
+    el.textContent = `${min}:${seg.toString().padStart(2, '0')}`;
     el.className = 'cronometro-display';
     if (cronoSegundos <= 10 && cronoSegundos > 0) el.classList.add('rojo');
   }
 
   // ── NEXT ──
+  // FIX #7: NEXT solo avanza de fase; el resultado final lo dispara el servidor
+  // cuando llegan todos los puntajes de P2, no el botón NEXT directamente.
   function presionarNext() {
     document.getElementById('btn-next').classList.add('hidden');
+
     if (faseActual === 'p1_detenido') {
-      // Ir a Poomsae 2
+      // Pasar a Poomsae 2
       faseActual = 'p2_listo';
-      // Limpiar notas de la vista
       limpiarNotasVista();
-      // Notificar jueces: nueva poomsae disponible
-      socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-poomsae', fase: 'p2', poomsae: poomsae2 });
+      // FIX #8: enviar poomsae2 para que jueces reconectados la conozcan
+      socket.emit('mesa-control', {
+        codigo: salaActual,
+        accion: 'nueva-poomsae',
+        fase: 'p2_listo',
+        poomsae: poomsae2
+      });
       mostrarTurnoSimultaneo();
       actualizarFaseUI();
+
     } else if (faseActual === 'p2_detenido') {
-      // Calcular resultado final
-      calcularResultadoFinal();
+      // FIX #10: no calcular resultado aquí directamente.
+      // El resultado se muestra cuando el servidor confirma totalFinal para ambos.
+      // Si ya tenemos los totales (llegaron todos los puntajes antes del NEXT),
+      // los mostramos; si no, esperamos el próximo puntaje-recibido.
+      intentarMostrarResultado();
     }
   }
 
@@ -475,9 +532,8 @@
     document.getElementById('notas-rows-B').innerHTML = '';
     document.getElementById('total-A').textContent = '—';
     document.getElementById('total-B').textContent = '—';
-    // Actualizar label de poomsae
-    document.querySelectorAll('.poomsae-num-label').forEach(el => el.textContent = '2');
-    document.getElementById('poomsae-num-label').textContent = '2';
+    document.getElementById('poomsae-num-label-A').textContent = '2';
+    document.getElementById('poomsae-num-label-B').textContent = '2';
   }
 
   // ── FASE UI ──
@@ -570,52 +626,41 @@
   }
 
   // ── NOTAS ──
-    function actualizarNotasVista(compId, juezNum, datos, esA) {
-    const suffix = esA ? 'A' : 'B';
-
-    // Usar la poomsae correcta según la fase
-    const enP1 = ['p1_listo','p1_corriendo','p1_detenido'].includes(faseActual);
-    const notasObj = enP1 ? notasP1 : notasP2;
-
+  // FIX #4 + #13: enrutar por data.poomsae (del servidor), no por faseActual.
+  // El total lo muestra el servidor (data.totalComp), Mesa ya no recalcula.
+  function actualizarNotasVista(data) {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
     if (!a || !b) return;
 
-    // Usar el id real del competidor
-    const idReal = esA ? a.id : b.id;
+    const numPoomsae = data.poomsae; // 1 o 2 — fuente de verdad del servidor
+    const notasObj = numPoomsae === 1 ? notasP1 : notasP2;
+    const suffix = data.competidorId === a.id ? 'A' : 'B';
+    const idComp = data.competidorId;
 
-    if (!notasObj[idReal]) notasObj[idReal] = { jueces: {}, total: null };
-    notasObj[idReal].jueces[juezNum] = datos;
+    if (!notasObj[idComp]) notasObj[idComp] = { jueces: {}, total: null };
+    // Guardar desglose del juez
+    notasObj[idComp].jueces[data.juezNum] = data.desglose;
 
-    // Calcular total
-    const vals = Object.values(notasObj[idReal].jueces)
-      .map(d => (d.prec || 0) + (d.vel || 0) + (d.rit || 0) + (d.exp || 0));
-
-    let total = null;
-    if (vals.length === numJueces) {
-      if (numJueces >= 5) {
-        const sorted = [...vals].sort((x,y) => x - y);
-        total = sorted.slice(1,-1).reduce((s,v) => s+v, 0) / (numJueces - 2);
-      } else {
-        total = vals.reduce((s,v) => s+v, 0) / vals.length;
-      }
-      notasObj[idReal].total = Math.round(total * 100) / 100;
-      document.getElementById(`total-${suffix}`).textContent = notasObj[idReal].total.toFixed(2);
+    // FIX #13: usar el total calculado por el servidor, no recalcular aquí
+    if (data.totalComp !== null && data.totalComp !== undefined) {
+      notasObj[idComp].total = data.totalComp;
+      document.getElementById(`total-${suffix}`).textContent = data.totalComp.toFixed(2);
     }
 
-    // Render filas
+    // Render filas de jueces
     const div = document.getElementById(`notas-rows-${suffix}`);
     if (!div) return;
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
-      const d = notasObj[idReal].jueces[i];
+      const d = notasObj[idComp].jueces[i];
       if (!d) {
         html += `<div class="nota-juez-row">
           <span class="nota-juez-num">J${i}</span>
           <span class="nota-juez-detalle" style="color:#333">—</span>
         </div>`;
       } else {
-        const tot = ((d.prec||0)+(d.vel||0)+(d.rit||0)+(d.exp||0)).toFixed(2);
+        const tot = ((d.prec || 0) + (d.vel || 0) + (d.rit || 0) + (d.exp || 0)).toFixed(2);
         html += `<div class="nota-juez-row">
           <span class="nota-juez-num">J${i}</span>
           <span class="nota-juez-detalle">${(d.prec||0).toFixed(1)} / ${(d.vel||0).toFixed(1)} ${(d.rit||0).toFixed(1)} ${(d.exp||0).toFixed(1)}</span>
@@ -625,55 +670,56 @@
     }
     div.innerHTML = html;
 
-    verificarCompletitud();
-  }
-
-
-   function verificarCompletitud() {
-    const a = competidores[turnoIndex];
-    const b = competidores[turnoIndex + 1];
-    if (!a || !b) return;
-
-    const enP1 = ['p1_listo','p1_corriendo','p1_detenido'].includes(faseActual);
-    const notasObj = enP1 ? notasP1 : notasP2;
-
-    const totA = notasObj[a.id]?.total;
-    const totB = notasObj[b.id]?.total;
-
-    console.log(`Verificando: A(${a.nombre})=${totA} B(${b.nombre})=${totB} fase=${faseActual}`);
-
-    if (totA !== null && totA !== undefined && totB !== null && totB !== undefined) {
-      if (enP1) {
-        log(`✅ P1: ${a.nombre} ${totA.toFixed(2)} · ${b.nombre} ${totB.toFixed(2)}`);
-      } else {
-        log(`✅ P2: ${a.nombre} ${totA.toFixed(2)} · ${b.nombre} ${totB.toFixed(2)}`);
-        calcularResultadoFinal();
+    // FIX #10: verificar completitud solo si estamos en p2_detenido Y Mesa ya presionó NEXT
+    // El resultado final lo desencadena intentarMostrarResultado(), no este handler directamente.
+    if (numPoomsae === 2 && data.totalFinal !== null && data.totalFinal !== undefined) {
+      // El servidor ya calculó totalFinal para este competidor.
+      // Guardarlo para cuando Mesa presione NEXT (o si ya lo presionó, mostrar ahora).
+      const comp = competidores.find(c => c.id === idComp);
+      if (comp) comp.totalFinal = data.totalFinal;
+      // Si Mesa ya presionó NEXT (btn-next oculto y fase p2_detenido), mostrar resultado
+      if (faseActual === 'p2_detenido' && document.getElementById('btn-next').classList.contains('hidden')) {
+        intentarMostrarResultado();
       }
     }
   }
 
-
-  // ── RESULTADO FINAL ──
-  function calcularResultadoFinal() {
+  // FIX #10: resultado solo se muestra cuando AMBAS condiciones se cumplen:
+  // 1) Mesa presionó NEXT en p2_detenido
+  // 2) El servidor tiene totalFinal para los dos competidores del enfrentamiento
+  function intentarMostrarResultado() {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
     if (!a || !b) return;
 
-    const totA1 = notasP1[a.id]?.total || 0;
-    const totB1 = notasP1[b.id]?.total || 0;
-    const totA2 = notasP2[a.id]?.total || 0;
-    const totB2 = notasP2[b.id]?.total || 0;
-    const totalA = totA1 + totA2;
-    const totalB = totB1 + totB2;
+    // Usar los totales por poomsae que guardamos de los eventos del servidor
+    const totA1 = notasP1[a.id]?.total;
+    const totB1 = notasP1[b.id]?.total;
+    const totA2 = notasP2[a.id]?.total;
+    const totB2 = notasP2[b.id]?.total;
 
+    // Solo mostrar si tenemos los 4 totales
+    if (totA1 == null || totB1 == null || totA2 == null || totB2 == null) {
+      log('⏳ Esperando puntajes pendientes...');
+      return;
+    }
+
+    mostrarResultadoFinal(a, b, totA1, totB1, totA2, totB2);
+  }
+
+  // ── RESULTADO FINAL ──
+  function mostrarResultadoFinal(a, b, totA1, totB1, totA2, totB2) {
+    const totalA = Math.round((totA1 + totA2) * 100) / 100;
+    const totalB = Math.round((totB1 + totB2) * 100) / 100;
     const ganador = totalA > totalB ? a.nombre : totalB > totalA ? b.nombre : 'EMPATE';
     const colorGanador = totalA > totalB ? '#ff6666' : totalB > totalA ? '#6699ff' : '#c9a84c';
 
     faseActual = 'resultado';
     mostrarTurnoSimultaneo();
 
-    document.getElementById('bloque-resultado').classList.remove('hidden');
-    document.getElementById('bloque-resultado').innerHTML = `
+    const bloqueRes = document.getElementById('bloque-resultado');
+    bloqueRes.classList.remove('hidden');
+    bloqueRes.innerHTML = `
       <div class="resultado-final">
         <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:12px">Resultado Final</div>
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:14px">
@@ -693,12 +739,10 @@
         <div class="resultado-ganador" style="color:${colorGanador}">🏆 ${ganador}</div>
       </div>`;
 
-    // Ver si hay siguiente enfrentamiento
     const haySiguiente = competidores[turnoIndex + 2] && competidores[turnoIndex + 3];
     if (haySiguiente) {
       document.getElementById('btn-siguiente-enfrentamiento').classList.remove('hidden');
     } else {
-      // Fin de todos los enfrentamientos
       setTimeout(() => finDeSala(), 2000);
     }
     log(`🏆 Ganador: ${ganador} | ${a.nombre} ${totalA.toFixed(2)} vs ${b.nombre} ${totalB.toFixed(2)}`);
@@ -706,18 +750,18 @@
 
   function siguienteEnfrentamiento() {
     turnoIndex += 2;
-    // Notificar jueces nueva competencia
     socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-competencia', fase: 'sorteo' });
     document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
+    // FIX #11: resetSimultaneo después de incrementar turnoIndex,
+    // para que inicializarNotasComp() lea los competidores correctos al sortear
     resetSimultaneo();
-    mostrarTurnoSimultaneo();
   }
 
   function finDeSala() {
     socket.emit('mesa-fin-sala', { codigo: salaActual });
   }
 
-  // ── TURNO GENERAL ──
+  // ── TURNO GENERAL (cutoff / secuencial) ──
   function mostrarTurnoActual() {
     const div = document.getElementById('display-turno');
     if (modo === '1v1-secuencial') {
@@ -732,7 +776,7 @@
     } else {
       const c = competidores[turnoIndex];
       if (!c) { finGen(); return; }
-      div.innerHTML = `<div class="turno-card"><div class="turno-label">${turnoIndex+1} de ${competidores.length}</div>
+      div.innerHTML = `<div class="turno-card"><div class="turno-label">${turnoIndex + 1} de ${competidores.length}</div>
         <div class="turno-nombre">${c.nombre}</div></div>`;
     }
     document.getElementById('btn-revelar-gen').classList.remove('hidden');
@@ -772,16 +816,16 @@
     socket.emit('mesa-restaurar', { codigo: salaActual });
   }
 
-  // ── RENDER ──
+  // ── RENDER HELPERS ──
   function renderJueces(jueces) {
     const el = document.getElementById('display-jueces');
     if (!el) return;
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
       const c = jueces.find(j => j.num === i);
-      html += `<div class="juez-chip ${c?'activo':''}">
-        <div class="juez-dot ${c?'activo':''}"></div>
-        <span class="juez-txt">J${i}${c?.nombre?' · '+c.nombre:''}</span>
+      html += `<div class="juez-chip ${c ? 'activo' : ''}">
+        <div class="juez-dot ${c ? 'activo' : ''}"></div>
+        <span class="juez-txt">J${i}${c?.nombre ? ' · ' + c.nombre : ''}</span>
       </div>`;
     }
     el.innerHTML = html;
@@ -791,13 +835,13 @@
     const div = document.getElementById('display-ranking');
     if (!div) return;
     let html = '';
-    ranking.forEach((c,i) => {
+    ranking.forEach((c, i) => {
       const clase = topN ? (i < topN ? 'pasa' : 'fuera') : '';
       if (topN && i === topN) html += `<hr style="border-color:#c9a84c;margin:6px 0">`;
       html += `<div class="rank-item ${clase}">
-        <span class="rank-pos">${i+1}</span>
+        <span class="rank-pos">${i + 1}</span>
         <span class="rank-nombre">${c.nombre}</span>
-        <span class="rank-total">${c.total!==null?c.total.toFixed(2):'—'}</span>
+        <span class="rank-total">${c.total !== null ? c.total.toFixed(2) : '—'}</span>
       </div>`;
     });
     div.innerHTML = html;
@@ -809,7 +853,10 @@
     div.scrollTop = div.scrollHeight;
   }
 
-  // ── SOCKET ──
+  // ════════════════════════════════════════
+  // SOCKET EVENTS
+  // ════════════════════════════════════════
+
   socket.on('sala-creada', (data) => {
     document.getElementById('seccion-setup').classList.add('hidden');
     document.getElementById('seccion-sala').classList.remove('hidden');
@@ -822,40 +869,60 @@
     log('Sala creada');
   });
 
-  socket.on('juez-conectado', (data) => { renderJueces(data.jueces); log(`Juez ${data.numJuez} conectado`); });
-  socket.on('juez-desconectado', (data) => { renderJueces(data.jueces); log(`Juez ${data.numJuez} desconectado`); });
+  // FIX #3: competencia-iniciada ahora llega con los competidores indexados por el servidor.
+  // Mesa reemplaza su array local con estos para que los IDs sean correctos.
+  socket.on('competencia-iniciada', (data) => {
+    competidores = data.competidores; // [{id:0, nombre:...}, {id:1, nombre:...}, ...]
+    log(`Competencia iniciada · ${competidores.length} competidores`);
 
-   socket.on('puntaje-recibido', (data) => {
-    if (!data.desglose) return;
-    const a = competidores[turnoIndex];
-    const b = competidores[turnoIndex + 1];
-    if (!a || !b) return;
+    document.getElementById('panel-competidores').classList.add('hidden');
 
-    console.log(`Puntaje recibido: comp=${data.competidorId} juez=${data.juezNum}`);
-    console.log(`CompA id=${a.id} nombre=${a.nombre}`);
-    console.log(`CompB id=${b.id} nombre=${b.nombre}`);
-
-    // Identificar por ID o por nombre como fallback
-    const esA = data.competidorId === a.id ||
-                data.competidorNombre === a.nombre;
-
-    actualizarNotasVista(
-      data.competidorId,
-      data.juezNum,
-      data.desglose,
-      esA
-    );
-
-    log(`J${data.juezNum} → ${data.competidorNombre}: ${(data.desglose.prec + data.desglose.vel + data.desglose.rit + data.desglose.exp).toFixed(2)}`);
+    if (modo === '1v1-simultaneo') {
+      document.getElementById('panel-control-simultaneo').classList.remove('hidden');
+      resetSimultaneo();
+    } else {
+      document.getElementById('panel-control').classList.remove('hidden');
+      if (modo === 'cutoff' || tipo === 'freestyle') {
+        document.getElementById('panel-ranking').classList.remove('hidden');
+      }
+      mostrarTurnoActual();
+    }
   });
 
+  socket.on('juez-conectado', (data) => {
+    renderJueces(data.jueces);
+    log(`Juez ${data.numJuez} conectado`);
+  });
+
+  socket.on('juez-desconectado', (data) => {
+    renderJueces(data.jueces);
+    log(`Juez ${data.numJuez} desconectado`);
+  });
+
+  // FIX #4 + #13: enrutar por data.poomsae y usar totalComp del servidor
+  socket.on('puntaje-recibido', (data) => {
+    if (!data.desglose) return;
+    if (modo !== '1v1-simultaneo') return; // cutoff/secuencial no usan este panel
+
+    actualizarNotasVista(data);
+
+    const tot = ((data.desglose.prec || 0) + (data.desglose.vel || 0) +
+                 (data.desglose.rit  || 0) + (data.desglose.exp  || 0)).toFixed(2);
+    log(`J${data.juezNum} P${data.poomsae} → ${data.competidorNombre}: ${tot}`);
+  });
+
+  // FIX #12: handler real para poomsae-sorteada (antes era un no-op vacío)
+  socket.on('poomsae-sorteada', (data) => {
+    log(`Poomsae ${data.numero} sorteada: ${data.poomsae}`);
+  });
 
   socket.on('ranking-actualizado', (data) => { renderRanking(data.ranking, null); });
   socket.on('corte-aplicado', (data) => { renderRanking(data.ranking, data.topN); });
-  socket.on('poomsae-sorteada', () => {});
 
   socket.on('sistema-restaurado', () => {
-    competidores = []; turnoIndex = 0;
+    competidores = [];
+    competidoresSetup = [];
+    turnoIndex = 0;
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     document.getElementById('panel-control-simultaneo').classList.add('hidden');
     document.getElementById('panel-control').classList.add('hidden');
@@ -867,7 +934,6 @@
   });
 
   socket.on('sala-finalizada', () => {
-    // Regresar a inicio
     document.getElementById('seccion-sala').classList.add('hidden');
     document.getElementById('seccion-setup').classList.remove('hidden');
     document.getElementById('panel-control-simultaneo').classList.add('hidden');
@@ -875,7 +941,10 @@
     document.getElementById('panel-ranking').classList.add('hidden');
     document.getElementById('panel-competidores').classList.remove('hidden');
     document.getElementById('lista-competidores').innerHTML = '';
-    competidores = []; turnoIndex = 0; salaActual = null;
+    competidores = [];
+    competidoresSetup = [];
+    turnoIndex = 0;
+    salaActual = null;
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     log('Sala finalizada');
   });
