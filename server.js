@@ -198,58 +198,47 @@ io.on('connection', (socket) => {
 
 
   // ── JUEZ: PUNTAJE ──
-   socket.on('juez-puntaje', ({ codigo, competidorId, precision, presentacion, desglose }) => {
+    socket.on('juez-puntaje', ({ codigo, competidorId, precision, presentacion, desglose, poomsae }) => {
     const sala = salas[codigo];
     if (!sala) return;
-    const comp = sala.competidores.find(c => c.id === competidorId);
-    if (!comp) return;
-    const numJuez = socket.data.numJuez;
 
+    const comp = sala.competidores.find(c => c.id === competidorId);
+    if (!comp) {
+      console.log(`⚠️ Comp no encontrado: ${competidorId} en sala ${codigo}`);
+      console.log(`Competidores disponibles:`, sala.competidores.map(c => c.id));
+      return;
+    }
+
+    const numJuez = socket.data.numJuez;
     comp.puntajes = comp.puntajes.filter(p => p.juez !== numJuez);
     comp.puntajes.push({ juez: numJuez, precision, presentacion, desglose });
 
     const totalRecibidos = comp.puntajes.length;
 
-    // Verificar si todos calificaron ambos competidores (1v1)
-    let todosCompletos = false;
-    let totalA = null, totalB = null;
-    if (sala.modo === '1v1-simultaneo') {
-      const ti = sala.turnoIndex;
-      const compA = sala.competidores[ti];
-      const compB = sala.competidores[ti + 1];
-      if (compA && compB &&
-          compA.puntajes.length === sala.numJueces &&
-          compB.puntajes.length === sala.numJueces) {
-        compA.total = calcularTotal(compA.puntajes, sala.numJueces);
-        compB.total = calcularTotal(compB.puntajes, sala.numJueces);
-        todosCompletos = true;
-        totalA = compA.total;
-        totalB = compB.total;
-      }
-    } else {
-      if (totalRecibidos === sala.numJueces) {
-        comp.total = calcularTotal(comp.puntajes, sala.numJueces);
-        io.to(codigo).emit('ranking-actualizado', { ranking: getRanking(sala) });
-      }
+    // Calcular total de este competidor si todos calificaron
+    let totalComp = null;
+    if (totalRecibidos === sala.numJueces) {
+      totalComp = calcularTotal(comp.puntajes, sala.numJueces);
+      comp.total = totalComp;
     }
 
+    // Emitir inmediatamente con toda la info
     io.to(codigo).emit('puntaje-recibido', {
       competidorId,
+      competidorNombre: comp.nombre,
       juezNum: numJuez,
       totalPuntajes: totalRecibidos,
       numJueces: sala.numJueces,
       precision,
       presentacion,
       desglose,
-      todosCompletos,
-      totalA,
-      totalB
+      totalComp,
+      poomsae
     });
 
     socket.emit('puntaje-confirmado', { competidorId, juezNum: numJuez });
-    console.log(`Puntaje J${numJuez} → comp ${competidorId}: ${precision}+${presentacion}`);
+    console.log(`Puntaje J${numJuez} → ${comp.nombre}(${competidorId}): prec=${precision} pres=${presentacion}`);
   });
-
 
   // ── MESA: REVELAR ──
   socket.on('mesa-revelar', ({ codigo, turnoIndex }) => {
