@@ -570,65 +570,88 @@
   }
 
   // ── NOTAS ──
-  function actualizarNotasVista(compId, juezNum, datos, esA) {
+    function actualizarNotasVista(compId, juezNum, datos, esA) {
     const suffix = esA ? 'A' : 'B';
-    const notasObj = faseActual.startsWith('p1') ? notasP1 : notasP2;
-    if (!notasObj[compId]) notasObj[compId] = { jueces: {}, total: null };
-    notasObj[compId].jueces[juezNum] = datos;
 
-    // Calcular total del comp
-    const vals = Object.values(notasObj[compId].jueces).map(d => d.prec + d.vel + d.rit + d.exp);
+    // Usar la poomsae correcta según la fase
+    const enP1 = ['p1_listo','p1_corriendo','p1_detenido'].includes(faseActual);
+    const notasObj = enP1 ? notasP1 : notasP2;
+
+    const a = competidores[turnoIndex];
+    const b = competidores[turnoIndex + 1];
+    if (!a || !b) return;
+
+    // Usar el id real del competidor
+    const idReal = esA ? a.id : b.id;
+
+    if (!notasObj[idReal]) notasObj[idReal] = { jueces: {}, total: null };
+    notasObj[idReal].jueces[juezNum] = datos;
+
+    // Calcular total
+    const vals = Object.values(notasObj[idReal].jueces)
+      .map(d => (d.prec || 0) + (d.vel || 0) + (d.rit || 0) + (d.exp || 0));
+
     let total = null;
     if (vals.length === numJueces) {
       if (numJueces >= 5) {
-        const sorted = [...vals].sort((a,b) => a-b);
-        total = sorted.slice(1,-1).reduce((a,b) => a+b, 0) / (numJueces - 2);
+        const sorted = [...vals].sort((x,y) => x - y);
+        total = sorted.slice(1,-1).reduce((s,v) => s+v, 0) / (numJueces - 2);
       } else {
-        total = vals.reduce((a,b) => a+b, 0) / vals.length;
+        total = vals.reduce((s,v) => s+v, 0) / vals.length;
       }
-      notasObj[compId].total = total;
-      document.getElementById(`total-${suffix}`).textContent = total.toFixed(2);
+      notasObj[idReal].total = Math.round(total * 100) / 100;
+      document.getElementById(`total-${suffix}`).textContent = notasObj[idReal].total.toFixed(2);
     }
 
-    // Render filas de jueces
+    // Render filas
     const div = document.getElementById(`notas-rows-${suffix}`);
+    if (!div) return;
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
-      const d = notasObj[compId].jueces[i];
+      const d = notasObj[idReal].jueces[i];
       if (!d) {
-        html += `<div class="nota-juez-row"><span class="nota-juez-num">J${i}</span><span class="nota-juez-detalle">—</span></div>`;
-      } else {
-        const tot = (d.prec + d.vel + d.rit + d.exp).toFixed(2);
         html += `<div class="nota-juez-row">
           <span class="nota-juez-num">J${i}</span>
-          <span class="nota-juez-detalle">${d.prec.toFixed(1)} / ${d.vel.toFixed(1)} ${d.rit.toFixed(1)} ${d.exp.toFixed(1)}</span>
+          <span class="nota-juez-detalle" style="color:#333">—</span>
+        </div>`;
+      } else {
+        const tot = ((d.prec||0)+(d.vel||0)+(d.rit||0)+(d.exp||0)).toFixed(2);
+        html += `<div class="nota-juez-row">
+          <span class="nota-juez-num">J${i}</span>
+          <span class="nota-juez-detalle">${(d.prec||0).toFixed(1)} / ${(d.vel||0).toFixed(1)} ${(d.rit||0).toFixed(1)} ${(d.exp||0).toFixed(1)}</span>
           <span class="nota-juez-val">${tot}</span>
         </div>`;
       }
     }
     div.innerHTML = html;
 
-    // Verificar si todos calificaron ambos comps
     verificarCompletitud();
   }
 
-  function verificarCompletitud() {
+
+   function verificarCompletitud() {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
     if (!a || !b) return;
-    const notasObj = faseActual.startsWith('p1') ? notasP1 : notasP2;
+
+    const enP1 = ['p1_listo','p1_corriendo','p1_detenido'].includes(faseActual);
+    const notasObj = enP1 ? notasP1 : notasP2;
+
     const totA = notasObj[a.id]?.total;
     const totB = notasObj[b.id]?.total;
+
+    console.log(`Verificando: A(${a.nombre})=${totA} B(${b.nombre})=${totB} fase=${faseActual}`);
+
     if (totA !== null && totA !== undefined && totB !== null && totB !== undefined) {
-      // Todos calificaron esta poomsae
-      if (faseActual === 'p1_detenido') {
-        log(`✅ Poomsae 1 completa: ${a.nombre} ${totA.toFixed(2)} · ${b.nombre} ${totB.toFixed(2)}`);
-      } else if (faseActual === 'p2_detenido') {
-        log(`✅ Poomsae 2 completa: ${a.nombre} ${totA.toFixed(2)} · ${b.nombre} ${totB.toFixed(2)}`);
+      if (enP1) {
+        log(`✅ P1: ${a.nombre} ${totA.toFixed(2)} · ${b.nombre} ${totB.toFixed(2)}`);
+      } else {
+        log(`✅ P2: ${a.nombre} ${totA.toFixed(2)} · ${b.nombre} ${totB.toFixed(2)}`);
         calcularResultadoFinal();
       }
     }
   }
+
 
   // ── RESULTADO FINAL ──
   function calcularResultadoFinal() {
@@ -802,15 +825,30 @@
   socket.on('juez-conectado', (data) => { renderJueces(data.jueces); log(`Juez ${data.numJuez} conectado`); });
   socket.on('juez-desconectado', (data) => { renderJueces(data.jueces); log(`Juez ${data.numJuez} desconectado`); });
 
-  socket.on('puntaje-recibido', (data) => {
+   socket.on('puntaje-recibido', (data) => {
     if (!data.desglose) return;
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
     if (!a || !b) return;
-    const esA = data.competidorId === a.id;
-    actualizarNotasVista(data.competidorId, data.juezNum, data.desglose, esA);
-    log(`J${data.juezNum} → ${esA ? a.nombre : b.nombre}: ${(data.desglose.prec + data.desglose.vel + data.desglose.rit + data.desglose.exp).toFixed(2)}`);
+
+    console.log(`Puntaje recibido: comp=${data.competidorId} juez=${data.juezNum}`);
+    console.log(`CompA id=${a.id} nombre=${a.nombre}`);
+    console.log(`CompB id=${b.id} nombre=${b.nombre}`);
+
+    // Identificar por ID o por nombre como fallback
+    const esA = data.competidorId === a.id ||
+                data.competidorNombre === a.nombre;
+
+    actualizarNotasVista(
+      data.competidorId,
+      data.juezNum,
+      data.desglose,
+      esA
+    );
+
+    log(`J${data.juezNum} → ${data.competidorNombre}: ${(data.desglose.prec + data.desglose.vel + data.desglose.rit + data.desglose.exp).toFixed(2)}`);
   });
+
 
   socket.on('ranking-actualizado', (data) => { renderRanking(data.ranking, null); });
   socket.on('corte-aplicado', (data) => { renderRanking(data.ranking, data.topN); });
