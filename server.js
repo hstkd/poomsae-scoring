@@ -169,6 +169,23 @@ io.on('connection', (socket) => {
     sala.faseActual = fase;
     io.to(codigo).emit('fase-actualizada', { fase });
   });
+    // ── MESA: CONTROL CRONÓMETRO CON FASE ──
+  socket.on('mesa-control', ({ codigo, accion, fase }) => {
+    const sala = salas[codigo];
+    if (!sala) return;
+    sala.faseActual = fase;
+    sala.cronoActivo = accion === 'iniciar';
+    io.to(codigo).emit('control-actualizado', { accion, fase });
+  });
+
+  // ── FIN DE SALA ──
+  socket.on('mesa-fin-sala', ({ codigo }) => {
+    const sala = salas[codigo];
+    if (!sala) return;
+    io.to(codigo).emit('sala-finalizada');
+    delete salas[codigo];
+  });
+
 
   // ── JUEZ: PUNTAJE ──
    socket.on('juez-puntaje', ({ codigo, competidorId, precision, presentacion, desglose }) => {
