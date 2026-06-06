@@ -298,6 +298,13 @@
   <div class="espera-logo">POOMSAE</div>
   <div class="espera-sub" id="espera-sub">Esperando inicio</div>
 </div>
+<!-- CRONÓMETRO — fuera del cuerpo para que siempre sea visible -->
+<div id="crono-wrap" class="hidden" style="
+  position:fixed; top:60px; left:50%; transform:translateX(-50%);
+  z-index:100; text-align:center; pointer-events:none;">
+  <div class="crono-label-txt" id="crono-label">Tiempo de Ejecución</div>
+  <div class="crono-display" id="crono-display">1:30</div>
+</div>
 
 <!-- CUERPO -->
 <div id="cuerpo" class="hidden">
@@ -323,33 +330,28 @@
     </div>
   </div>
 
-  <!-- CRONÓMETRO -->
-  <div id="crono-wrap" class="hidden">
-    <div class="crono-label-txt" id="crono-label">Tiempo de Ejecución</div>
-    <div class="crono-display" id="crono-display">1:30</div>
-  </div>
-
   <!-- JUECES STATUS -->
   <div class="jueces-bar" id="jueces-bar"></div>
 
-  <!-- 1V1 -->
+    <!-- 1V1 -->
   <div id="vista-1v1">
-    <div class="lado lado-rojo" id="panel-A">
+    <div class="lado lado-rojo" id="panel-B">
       <div class="comp-etiqueta" style="color:#dc262655">Competidor Rojo</div>
-      <div class="comp-nombre-g" id="nombre-A">—</div>
-      <div class="notas-progresivas" id="notas-A"></div>
-      <div class="comp-score-g" id="score-A">—</div>
-      <div class="comp-badge" id="badge-A"></div>
-    </div>
-    <div class="centro-vs"><div class="vs-txt">VS</div></div>
-    <div class="lado lado-azul" id="panel-B">
-      <div class="comp-etiqueta" style="color:#3b82f655">Competidor Azul</div>
       <div class="comp-nombre-g" id="nombre-B">—</div>
       <div class="notas-progresivas" id="notas-B"></div>
       <div class="comp-score-g" id="score-B">—</div>
       <div class="comp-badge" id="badge-B"></div>
     </div>
+    <div class="centro-vs"><div class="vs-txt">VS</div></div>
+    <div class="lado lado-azul" id="panel-A">
+      <div class="comp-etiqueta" style="color:#3b82f655">Competidor Azul</div>
+      <div class="comp-nombre-g" id="nombre-A">—</div>
+      <div class="notas-progresivas" id="notas-A"></div>
+      <div class="comp-score-g" id="score-A">—</div>
+      <div class="comp-badge" id="badge-A"></div>
+    </div>
   </div>
+
 
   <!-- CUTOFF -->
   <div id="vista-cutoff">
@@ -555,8 +557,8 @@
     document.getElementById('score-B').textContent = '—';
     document.getElementById('badge-A').innerHTML = '';
     document.getElementById('badge-B').innerHTML = '';
-    document.getElementById('panel-A').className = 'lado lado-rojo';
-    document.getElementById('panel-B').className = 'lado lado-azul';
+    document.getElementById('panel-A').className = 'lado lado-azul';
+    document.getElementById('panel-B').className = 'lado lado-rojo';
     initNotasGrid('A');
     initNotasGrid('B');
   }
@@ -741,18 +743,27 @@
       }
       if (ta != null && tb != null) {
         if (ta > tb) {
-          document.getElementById('panel-A').className = 'lado lado-rojo ganador';
-          document.getElementById('panel-B').className = 'lado lado-azul perdedor';
-          document.getElementById('badge-A').innerHTML = '<span class="ganador-tag">🏆 GANADOR</span>';
+          document.getElementById('panel-A').className = 'lado lado-azul ganador';
+          document.getElementById('panel-B').className = 'lado lado-rojo perdedor';
+          document.getElementById('badge-A').innerHTML = `
+            <div class="ganador-overlay">
+              <div class="ganador-texto-grande">GANADOR</div>
+              <div class="ganador-nombre-sub">${document.getElementById('nombre-A').textContent}</div>
+            </div>`;
         } else if (tb > ta) {
-          document.getElementById('panel-B').className = 'lado lado-azul ganador';
-          document.getElementById('panel-A').className = 'lado lado-rojo perdedor';
-          document.getElementById('badge-B').innerHTML = '<span class="ganador-tag">🏆 GANADOR</span>';
+          document.getElementById('panel-B').className = 'lado lado-rojo ganador';
+          document.getElementById('panel-A').className = 'lado lado-azul perdedor';
+          document.getElementById('badge-B').innerHTML = `
+            <div class="ganador-overlay">
+              <div class="ganador-texto-grande">GANADOR</div>
+              <div class="ganador-nombre-sub">${document.getElementById('nombre-B').textContent}</div>
+            </div>`;
         } else {
-          document.getElementById('badge-A').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:3px;color:#888">EMPATE</span>';
-          document.getElementById('badge-B').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:3px;color:#888">EMPATE</span>';
+          document.getElementById('badge-A').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:4px;color:#888;font-size:20px">EMPATE</span>';
+          document.getElementById('badge-B').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:4px;color:#888;font-size:20px">EMPATE</span>';
         }
       }
+
     } else {
       const score = document.getElementById('turno-score');
       score.textContent = data.competidor?.total != null ? data.competidor.total.toFixed(2) : '—';
