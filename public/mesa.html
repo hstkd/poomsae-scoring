@@ -66,9 +66,13 @@
     .fase-badge.resultado { background: #7c3aed; color: #fff; }
     .notas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
     .notas-comp { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 10px; padding: 10px; }
+    .notas-comp.rojo { background: #1a0505; border-color: #7f1d1d; }
+    .notas-comp.azul { background: #050a1a; border-color: #1d3a7f; }
     .notas-comp-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; margin-bottom: 8px; text-align: center; }
     .notas-comp-titulo.rojo { color: #ff6666; }
     .notas-comp-titulo.azul { color: #6699ff; }
+    .btn-finalizar { width: 100%; background: #c9a84c; color: #000; border: none; padding: 14px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 10px; }
+    .btn-finalizar:active { filter: brightness(0.85); }
     .nota-juez-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #1a1a1a; font-size: 10px; }
     .nota-juez-row:last-child { border-bottom: none; }
     .nota-juez-num { color: #555; letter-spacing: 1px; }
@@ -212,18 +216,18 @@
     <div id="bloque-notas" class="hidden" style="margin-top:8px">
       <div class="panel-titulo">Notas Recibidas</div>
       <div class="notas-grid">
-        <div class="notas-comp">
+        <div class="notas-comp rojo">
           <div class="notas-comp-titulo rojo" id="nombre-comp-A">—</div>
           <div id="notas-rows-A"></div>
-          <div class="total-comp">
+          <div class="total-comp" style="border-top-color:#7f1d1d">
             <span class="total-comp-label">Total P<span id="poomsae-num-label-A">1</span></span>
             <span class="total-comp-val" id="total-A">—</span>
           </div>
         </div>
-        <div class="notas-comp">
+        <div class="notas-comp azul">
           <div class="notas-comp-titulo azul" id="nombre-comp-B">—</div>
           <div id="notas-rows-B"></div>
-          <div class="total-comp">
+          <div class="total-comp" style="border-top-color:#1d3a7f">
             <span class="total-comp-label">Total P<span id="poomsae-num-label-B">1</span></span>
             <span class="total-comp-val" id="total-B">—</span>
           </div>
@@ -234,9 +238,9 @@
     <!-- RESULTADO FINAL -->
     <div id="bloque-resultado" class="hidden"></div>
 
-    <!-- SIGUIENTE ENFRENTAMIENTO -->
-    <button class="btn-gold hidden" id="btn-siguiente-enfrentamiento" onclick="siguienteEnfrentamiento()" style="margin-top:8px">
-      SIGUIENTE ENFRENTAMIENTO →
+    <!-- BOTÓN FINALIZAR (reemplaza btn-siguiente-enfrentamiento) -->
+    <button class="btn-finalizar hidden" id="btn-finalizar" onclick="presionarFinalizar()">
+      FINALIZAR ›
     </button>
 
   </div>
@@ -361,7 +365,7 @@
     if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
     const bloqueRes = document.getElementById('bloque-resultado');
     if (bloqueRes) { bloqueRes.innerHTML = ''; bloqueRes.classList.add('hidden'); }
-    document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
+    document.getElementById('btn-finalizar').classList.add('hidden');
     document.getElementById('btn-next').classList.add('hidden');
     document.getElementById('bloque-notas').classList.add('hidden');
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
@@ -708,52 +712,82 @@
   }
 
   // ── RESULTADO FINAL ──
+  // CAMBIO: resultado = promedio (P1 + P2) / 2 — no suma
+  // CAMBIO: botón FINALIZAR manual, sin setTimeout
   function mostrarResultadoFinal(a, b, totA1, totB1, totA2, totB2) {
-    const totalA = Math.round((totA1 + totA2) * 100) / 100;
-    const totalB = Math.round((totB1 + totB2) * 100) / 100;
-    const ganador = totalA > totalB ? a.nombre : totalB > totalA ? b.nombre : 'EMPATE';
-    const colorGanador = totalA > totalB ? '#ff6666' : totalB > totalA ? '#6699ff' : '#c9a84c';
+    const promA = Math.round(((totA1 + totA2) / 2) * 100) / 100;
+    const promB = Math.round(((totB1 + totB2) / 2) * 100) / 100;
+    const ganador = promA > promB ? a.nombre : promB > promA ? b.nombre : 'EMPATE';
+    const colorGanador = promA > promB ? '#ff6666' : promB > promA ? '#6699ff' : '#c9a84c';
 
     faseActual = 'resultado';
     mostrarTurnoSimultaneo();
+
+    const haySiguiente = competidores[turnoIndex + 2] && competidores[turnoIndex + 3];
+    const labelFinalizar = haySiguiente ? 'SIGUIENTE ENFRENTAMIENTO →' : 'FINALIZAR COMPETENCIA ✓';
 
     const bloqueRes = document.getElementById('bloque-resultado');
     bloqueRes.classList.remove('hidden');
     bloqueRes.innerHTML = `
       <div class="resultado-final">
         <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:12px">Resultado Final</div>
-        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center;margin-bottom:14px">
-          <div style="text-align:center">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#ff6666">${a.nombre}</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff">${totalA.toFixed(2)}</div>
-            <div style="font-size:9px;color:#555">P1: ${totA1.toFixed(2)} · P2: ${totA2.toFixed(2)}</div>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:start;margin-bottom:14px">
+
+          <!-- Competidor A — rojo -->
+          <div style="background:#1a0505;border:1px solid #7f1d1d;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#ff6666;margin-bottom:6px">${a.nombre}</div>
+            <div style="font-size:9px;color:#aa5555;margin-bottom:2px">Poomsae 1</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ffaaaa">${totA1.toFixed(2)}</div>
+            <div style="font-size:9px;color:#aa5555;margin-top:6px;margin-bottom:2px">Poomsae 2</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ffaaaa">${totA2.toFixed(2)}</div>
+            <div style="border-top:1px solid #7f1d1d;margin-top:8px;padding-top:6px">
+              <div style="font-size:8px;font-weight:700;letter-spacing:2px;color:#aa5555;text-transform:uppercase;margin-bottom:2px">Promedio</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#fff;line-height:1">${promA.toFixed(2)}</div>
+            </div>
           </div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#333">VS</div>
-          <div style="text-align:center">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;color:#6699ff">${b.nombre}</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#fff">${totalB.toFixed(2)}</div>
-            <div style="font-size:9px;color:#555">P1: ${totB1.toFixed(2)} · P2: ${totB2.toFixed(2)}</div>
+
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#333;padding-top:40px">VS</div>
+
+          <!-- Competidor B — azul -->
+          <div style="background:#050a1a;border:1px solid #1d3a7f;border-radius:10px;padding:10px;text-align:center">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#6699ff;margin-bottom:6px">${b.nombre}</div>
+            <div style="font-size:9px;color:#4466aa;margin-bottom:2px">Poomsae 1</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#aabbff">${totB1.toFixed(2)}</div>
+            <div style="font-size:9px;color:#4466aa;margin-top:6px;margin-bottom:2px">Poomsae 2</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#aabbff">${totB2.toFixed(2)}</div>
+            <div style="border-top:1px solid #1d3a7f;margin-top:8px;padding-top:6px">
+              <div style="font-size:8px;font-weight:700;letter-spacing:2px;color:#4466aa;text-transform:uppercase;margin-bottom:2px">Promedio</div>
+              <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:#fff;line-height:1">${promB.toFixed(2)}</div>
+            </div>
           </div>
+
         </div>
         <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:4px">Ganador</div>
         <div class="resultado-ganador" style="color:${colorGanador}">🏆 ${ganador}</div>
       </div>`;
 
+    // CAMBIO: mostrar botón FINALIZAR manual (sin setTimeout)
+    const btnFin = document.getElementById('btn-finalizar');
+    btnFin.textContent = labelFinalizar;
+    btnFin.classList.remove('hidden');
+
+    log(`🏆 ${ganador} | ${a.nombre} prom=${promA.toFixed(2)} (P1=${totA1.toFixed(2)} P2=${totA2.toFixed(2)}) · ${b.nombre} prom=${promB.toFixed(2)} (P1=${totB1.toFixed(2)} P2=${totB2.toFixed(2)})`);
+  }
+
+  // NUEVO: botón FINALIZAR centraliza toda la lógica de avance/cierre
+  function presionarFinalizar() {
+    document.getElementById('btn-finalizar').classList.add('hidden');
     const haySiguiente = competidores[turnoIndex + 2] && competidores[turnoIndex + 3];
     if (haySiguiente) {
-      document.getElementById('btn-siguiente-enfrentamiento').classList.remove('hidden');
+      siguienteEnfrentamiento();
     } else {
-      setTimeout(() => finDeSala(), 2000);
+      finDeSala();
     }
-    log(`🏆 Ganador: ${ganador} | ${a.nombre} ${totalA.toFixed(2)} vs ${b.nombre} ${totalB.toFixed(2)}`);
   }
 
   function siguienteEnfrentamiento() {
     turnoIndex += 2;
     socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-competencia', fase: 'sorteo' });
-    document.getElementById('btn-siguiente-enfrentamiento').classList.add('hidden');
-    // FIX #11: resetSimultaneo después de incrementar turnoIndex,
-    // para que inicializarNotasComp() lea los competidores correctos al sortear
     resetSimultaneo();
   }
 
