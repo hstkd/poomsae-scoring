@@ -306,6 +306,94 @@
     @keyframes revelar { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
     .revelar-anim { animation: revelar 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 
+    /* Animación ganador */
+@keyframes ganador-brillo {
+  0%,100% { box-shadow: 0 0 20px transparent; filter: brightness(1); }
+  50%      { box-shadow: 0 0 80px rgba(201,168,76,0.9); filter: brightness(1.4); }
+}
+.lado.ganador { animation: ganador-brillo 0.8s ease-in-out infinite; }
+
+.ganador-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  background: rgba(0,0,0,0.6); z-index: 10;
+  animation: fadeIn 0.5s ease-out;
+}
+.ganador-texto-grande {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 120px; letter-spacing: 8px; color: #c9a84c;
+  text-shadow: 0 0 40px rgba(201,168,76,0.8); line-height: 1;
+}
+.ganador-nombre-sub {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 40px; letter-spacing: 6px; color: #fff; margin-top: 8px;
+}
+
+/* Overlay resumen final */
+#overlay-resumen {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center; gap: 24px;
+  z-index: 200;
+}
+.resumen-titulo-txt {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 6px; color: #555; text-transform: uppercase;
+}
+.resumen-grid {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px;
+  align-items: center; width: 80%; max-width: 900px;
+}
+.resumen-comp-card {
+  border-radius: 16px; padding: 24px; text-align: center;
+  animation: ganador-brillo 0.8s ease-in-out infinite;
+}
+.resumen-comp-card.rojo-card {
+  background: linear-gradient(135deg,#2a0000,#3d0505);
+  border: 2px solid #dc2626;
+}
+.resumen-comp-card.azul-card {
+  background: linear-gradient(135deg,#00002a,#05053d);
+  border: 2px solid #3b82f6;
+}
+.resumen-comp-card.perdedor-card {
+  animation: none; opacity: 0.4;
+}
+.resumen-comp-nombre {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px; letter-spacing: 4px; margin-bottom: 16px;
+}
+.resumen-comp-card.rojo-card .resumen-comp-nombre { color: #ff8888; }
+.resumen-comp-card.azul-card .resumen-comp-nombre { color: #8899ff; }
+.resumen-fila-score {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+  font-size: 12px;
+}
+.resumen-fila-label { color: #555; letter-spacing: 2px; text-transform: uppercase; font-size: 10px; }
+.resumen-fila-val {
+  font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #c9a84c;
+}
+.resumen-promedio {
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15);
+}
+.resumen-promedio-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.resumen-promedio-val {
+  font-family: 'Bebas Neue', sans-serif; font-size: 60px; color: #fff; line-height: 1;
+}
+.resumen-vs {
+  font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #222; text-align: center;
+}
+.resumen-ganador-banner {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px; letter-spacing: 6px; color: #c9a84c;
+  text-align: center; animation: fadeIn 0.6s ease-out;
+}
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -425,6 +513,8 @@
   </div>
 
 </div>
+<!-- OVERLAY RESUMEN FINAL -->
+<div id="overlay-resumen" class="hidden"></div>
 
 <!-- FOOTER -->
 <div class="footer hidden" id="footer">
@@ -651,6 +741,89 @@
     initNotasGrid('B');
   }
 
+    // Guardar scores por poomsae para resumen
+  function registrarScorePoomsae(poomsaeNum) {
+    const sA = document.getElementById('score-A')?.textContent;
+    const sB = document.getElementById('score-B')?.textContent;
+    if (poomsaeNum === 1) {
+      scoreP1A = sA !== '—' && sA ? parseFloat(sA) : null;
+      scoreP1B = sB !== '—' && sB ? parseFloat(sB) : null;
+    } else {
+      scoreP2A = sA !== '—' && sA ? parseFloat(sA) : null;
+      scoreP2B = sB !== '—' && sB ? parseFloat(sB) : null;
+    }
+  }
+
+  function mostrarResumenFinal() {
+    const nomA = document.getElementById('nombre-A')?.textContent || '—';
+    const nomB = document.getElementById('nombre-B')?.textContent || '—';
+    const p1A = scoreP1A ?? 0, p1B = scoreP1B ?? 0;
+    const p2A = scoreP2A ?? 0, p2B = scoreP2B ?? 0;
+    const promA = Math.round(((p1A + p2A) / 2) * 100) / 100;
+    const promB = Math.round(((p1B + p2B) / 2) * 100) / 100;
+
+    const ganadorA = promA > promB;
+    const ganadorB = promB > promA;
+    const empate   = promA === promB;
+
+    const claseA = ganadorA ? 'azul-card' : 'azul-card perdedor-card';
+    const claseB = ganadorB ? 'rojo-card' : 'rojo-card perdedor-card';
+    const bannerTxt = empate ? '⚖️ EMPATE' :
+      ganadorA ? `🏆 GANADOR — ${nomA}` : `🏆 GANADOR — ${nomB}`;
+
+    document.getElementById('overlay-resumen').innerHTML = `
+      <div class="resumen-titulo-txt">Resultado Final</div>
+      <div class="resumen-grid">
+
+        <div class="resumen-comp-card rojo-card ${ganadorB ? 'perdedor-card' : ''}">
+          <div class="resumen-comp-nombre">${nomB}</div>
+          <div class="resumen-fila-score">
+            <span class="resumen-fila-label">Poomsae 1</span>
+            <span class="resumen-fila-val">${p1B.toFixed(2)}</span>
+          </div>
+          <div class="resumen-fila-score">
+            <span class="resumen-fila-label">Poomsae 2</span>
+            <span class="resumen-fila-val">${p2B.toFixed(2)}</span>
+          </div>
+          <div class="resumen-promedio">
+            <div class="resumen-promedio-label">Promedio Final</div>
+            <div class="resumen-promedio-val">${promB.toFixed(2)}</div>
+          </div>
+          ${ganadorB ? '<div class="ganador-texto-grande" style="font-size:60px;margin-top:10px">GANADOR</div>' : ''}
+        </div>
+
+        <div class="resumen-vs">VS</div>
+
+        <div class="resumen-comp-card azul-card ${ganadorA ? '' : 'perdedor-card'}">
+          <div class="resumen-comp-nombre">${nomA}</div>
+          <div class="resumen-fila-score">
+            <span class="resumen-fila-label">Poomsae 1</span>
+            <span class="resumen-fila-val">${p1A.toFixed(2)}</span>
+          </div>
+          <div class="resumen-fila-score">
+            <span class="resumen-fila-label">Poomsae 2</span>
+            <span class="resumen-fila-val">${p2A.toFixed(2)}</span>
+          </div>
+          <div class="resumen-promedio">
+            <div class="resumen-promedio-label">Promedio Final</div>
+            <div class="resumen-promedio-val">${promA.toFixed(2)}</div>
+          </div>
+          ${ganadorA ? '<div class="ganador-texto-grande" style="font-size:60px;margin-top:10px">GANADOR</div>' : ''}
+        </div>
+
+      </div>
+      <div class="resumen-ganador-banner">${bannerTxt}</div>
+    `;
+    document.getElementById('overlay-resumen').classList.remove('hidden');
+  }
+
+  function ocultarResumenFinal() {
+    document.getElementById('overlay-resumen').classList.add('hidden');
+    document.getElementById('overlay-resumen').innerHTML = '';
+    scoreP1A = null; scoreP1B = null;
+    scoreP2A = null; scoreP2B = null;
+  }
+
   // ── SOCKET EVENTS ──
 
   socket.on('juez-ok', (data) => {
@@ -745,7 +918,8 @@
       document.getElementById('footer-estado').textContent = '⬤ En vivo';
 
     } else if (accion === 'nueva-poomsae') {
-     guardarScoresP1()
+     registrarScorePoomsae(1)
+      guardarScoresP1()
       // Poomsae 2
       poomsae2 = poomsae || poomsae2;
       resetVista1v1();
@@ -755,6 +929,7 @@
       document.getElementById('footer-estado').textContent = '⬤ En vivo';
 
     } else if (accion === 'nueva-competencia') {
+      ocultarResumenFinal()
       ocultarRonda()
       ocultarScoresP1()
       // Nuevo enfrentamiento
@@ -810,6 +985,15 @@
 
     const suffix = data.competidorId === compIdA ? 'A' : 'B';
     actualizarNotaGrid(suffix, data.juezNum, data.desglose, data.totalComp);
+    // Cuando llega el totalComp de P2 para ambos competidores, mostrar resumen
+    if (data.poomsae === 2 && data.totalComp !== null) {
+      registrarScorePoomsae(2);
+      const sA = scoreP2A ?? parseFloat(document.getElementById('score-A')?.textContent || '0');
+      const sB = scoreP2B ?? parseFloat(document.getElementById('score-B')?.textContent || '0');
+      if (sA > 0 && sB > 0) {
+        setTimeout(() => mostrarResumenFinal(), 1500);
+      }
+    }
 
     // Actualizar círculos de jueces
     const received = {};
@@ -818,11 +1002,16 @@
     renderJuecesBar(received);
   });
 
-  // ── PUNTAJE REVELADO (para cutoff/secuencial o si mesa aún lo usa) ──
+  // Variables para resumen
+  let scoreP1A = null, scoreP1B = null;
+  let scoreP2A = null, scoreP2B = null;
+  let fasePuntaje = 1; // 1 o 2
+
   socket.on('puntaje-revelado', (data) => {
     if (data.tipo === '1v1') {
       const ta = data.competidorA?.total;
       const tb = data.competidorB?.total;
+
       if (ta != null) {
         const sa = document.getElementById('score-A');
         sa.textContent = ta.toFixed(2);
@@ -835,29 +1024,8 @@
         sb.classList.add('revelar-anim');
         setTimeout(() => sb.classList.remove('revelar-anim'), 500);
       }
-      if (ta != null && tb != null) {
-        if (ta > tb) {
-          document.getElementById('panel-A').className = 'lado lado-azul ganador';
-          document.getElementById('panel-B').className = 'lado lado-rojo perdedor';
-          document.getElementById('badge-A').innerHTML = `
-            <div class="ganador-overlay">
-              <div class="ganador-texto-grande">GANADOR</div>
-              <div class="ganador-nombre-sub">${document.getElementById('nombre-A').textContent}</div>
-            </div>`;
-        } else if (tb > ta) {
-          document.getElementById('panel-B').className = 'lado lado-rojo ganador';
-          document.getElementById('panel-A').className = 'lado lado-azul perdedor';
-          document.getElementById('badge-B').innerHTML = `
-            <div class="ganador-overlay">
-              <div class="ganador-texto-grande">GANADOR</div>
-              <div class="ganador-nombre-sub">${document.getElementById('nombre-B').textContent}</div>
-            </div>`;
-        } else {
-          document.getElementById('badge-A').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:4px;color:#888;font-size:20px">EMPATE</span>';
-          document.getElementById('badge-B').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:4px;color:#888;font-size:20px">EMPATE</span>';
-        }
-      }
 
+      // No mostrar ganador aquí — el resumen final lo hace
     } else {
       const score = document.getElementById('turno-score');
       score.textContent = data.competidor?.total != null ? data.competidor.total.toFixed(2) : '—';
@@ -867,10 +1035,13 @@
     }
   });
 
+
   socket.on('ranking-actualizado', (data) => { renderRanking(data.ranking, topNActual); });
   socket.on('corte-aplicado', (data) => { topNActual = data.topN; renderRanking(data.ranking, data.topN); });
 
   socket.on('sala-finalizada', () => {
+        ocultarResumenFinal();
+
     document.getElementById('cuerpo').classList.add('hidden');
     document.getElementById('header').classList.add('hidden');
     document.getElementById('footer').classList.add('hidden');
