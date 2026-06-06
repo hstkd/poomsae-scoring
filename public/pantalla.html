@@ -18,49 +18,31 @@
     .header {
       background: linear-gradient(90deg, #0a0a0a, #1a1a1a, #0a0a0a);
       border-bottom: 2px solid #c9a84c;
-      padding: 10px 40px;
+      padding: 8px 30px;
       display: flex; align-items: center; justify-content: space-between;
       flex-shrink: 0;
     }
-    .header-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 26px; letter-spacing: 5px; color: #c9a84c;
-    }
-    .header-centro {
-      font-size: 10px; font-weight: 700; letter-spacing: 4px;
-      color: #555; text-transform: uppercase; text-align: center;
-    }
-    .header-sala {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 16px; letter-spacing: 4px; color: #c9a84c;
-    }
-    .jueces-dots { display: flex; gap: 6px; align-items: center; margin-left: 16px; }
-    .jdot {
-      width: 9px; height: 9px; border-radius: 50%;
-      background: #222; border: 1px solid #333; transition: all 0.3s;
-    }
+    .header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 5px; color: #c9a84c; }
+    .header-centro { font-size: 10px; font-weight: 700; letter-spacing: 4px; color: #555; text-transform: uppercase; text-align: center; }
+    .header-derecha { display: flex; align-items: center; gap: 12px; }
+    .header-sala { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 4px; color: #c9a84c; }
+    .jueces-dots { display: flex; gap: 5px; align-items: center; }
+    .jdot { width: 8px; height: 8px; border-radius: 50%; background: #222; border: 1px solid #333; transition: all 0.3s; }
     .jdot.activo { background: #22c55e; border-color: #22c55e; box-shadow: 0 0 6px #22c55e; }
 
-    /* ── LOGIN OVERLAY ── */
+    /* ── LOGIN ── */
     #overlay-login {
       position: fixed; inset: 0; background: #0a0a0a;
       display: flex; flex-direction: column;
       justify-content: center; align-items: center; gap: 16px; z-index: 999;
     }
-    .login-titulo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 60px; letter-spacing: 10px; color: #c9a84c;
-      text-shadow: 0 0 40px rgba(201,168,76,0.4);
-    }
-    .login-sub {
-      font-size: 10px; font-weight: 700; letter-spacing: 5px;
-      color: #444; text-transform: uppercase; margin-top: -10px;
-    }
+    .login-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 60px; letter-spacing: 10px; color: #c9a84c; text-shadow: 0 0 40px rgba(201,168,76,0.4); }
+    .login-sub { font-size: 10px; font-weight: 700; letter-spacing: 5px; color: #444; text-transform: uppercase; margin-top: -10px; }
     .login-input {
       background: #111; border: 1px solid #2a2a2a; border-radius: 10px;
-      color: #fff; padding: 14px 24px;
-      font-size: 28px; font-family: 'Bebas Neue', sans-serif;
-      letter-spacing: 8px; outline: none; text-align: center; width: 320px;
+      color: #fff; padding: 14px 24px; font-size: 28px;
+      font-family: 'Bebas Neue', sans-serif; letter-spacing: 8px;
+      outline: none; text-align: center; width: 320px;
     }
     .login-input:focus { border-color: #c9a84c; }
     .btn-login {
@@ -68,185 +50,225 @@
       padding: 14px 40px; font-family: 'Bebas Neue', sans-serif;
       font-size: 20px; letter-spacing: 4px; border-radius: 10px; cursor: pointer;
     }
-    .btn-login:active { filter: brightness(0.85); }
 
     /* ── ESPERA ── */
     #estado-espera {
       flex: 1; display: flex; flex-direction: column;
       justify-content: center; align-items: center; gap: 14px;
     }
-    .espera-logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 100px; letter-spacing: 14px; color: #141414;
-    }
-    .espera-sub {
-      font-size: 10px; font-weight: 700; letter-spacing: 6px;
-      color: #2a2a2a; text-transform: uppercase;
-    }
+    .espera-logo { font-family: 'Bebas Neue', sans-serif; font-size: 100px; letter-spacing: 14px; color: #141414; }
+    .espera-sub { font-size: 10px; font-weight: 700; letter-spacing: 6px; color: #2a2a2a; text-transform: uppercase; }
 
-    /* ── BODY ── */
+    /* ── CUERPO ── */
     #cuerpo { flex: 1; display: flex; position: relative; overflow: hidden; }
 
-    /* ── JUECES STATUS BAR ── */
+    /* ── OVERLAY POOMSAE (sorteo y ejecución) ── */
+    #overlay-poomsae {
+      position: absolute; top: 0; left: 0; right: 0;
+      z-index: 30; pointer-events: none;
+      display: flex; justify-content: center;
+    }
+    .poomsae-banner {
+      background: rgba(0,0,0,0.85); border-bottom: 2px solid #c9a84c;
+      padding: 10px 40px; text-align: center; width: 100%;
+    }
+    .poomsae-banner-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 4px;
+      color: #555; text-transform: uppercase; margin-bottom: 4px;
+    }
+    .poomsae-banner-nombre {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 36px; letter-spacing: 6px; color: #c9a84c;
+      text-shadow: 0 0 20px rgba(201,168,76,0.4);
+    }
+    .poomsae-banner-ambas {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: 4px; color: #c9a84c;
+    }
+
+    /* ── ANIMACIÓN SORTEO ── */
+    #overlay-sorteo {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.92);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: center; gap: 20px;
+      z-index: 50;
+    }
+    .sorteo-titulo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 6px; color: #555; text-transform: uppercase;
+    }
+    .sorteo-ruleta {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 60px; letter-spacing: 6px; color: #c9a84c;
+      text-shadow: 0 0 30px rgba(201,168,76,0.6);
+      min-height: 80px; display: flex; align-items: center;
+    }
+    .sorteo-resultado {
+      display: flex; gap: 40px; justify-content: center; align-items: center;
+    }
+    .sorteo-card {
+      text-align: center; background: #141414; border-radius: 16px;
+      padding: 20px 30px; border: 1px solid #2a2a2a;
+    }
+    .sorteo-card.activa { border-color: #c9a84c; box-shadow: 0 0 20px rgba(201,168,76,0.3); }
+    .sorteo-card-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555;
+      text-transform: uppercase; margin-bottom: 8px;
+    }
+    .sorteo-card-nombre {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 40px; letter-spacing: 4px; color: #c9a84c;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+    .fade-in { animation: fadeIn 0.4s ease-out; }
+
+    /* ── CRONÓMETRO ── */
+    #crono-wrap {
+      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+      z-index: 20; text-align: center; pointer-events: none;
+    }
+    .crono-label-txt {
+      font-size: 9px; font-weight: 700; letter-spacing: 3px;
+      color: #444; text-transform: uppercase; margin-bottom: 2px;
+    }
+    .crono-display {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 70px; letter-spacing: 6px; color: #c9a84c; line-height: 1;
+      text-shadow: 0 0 30px rgba(201,168,76,0.5);
+      background: rgba(0,0,0,0.75); border-radius: 10px; padding: 2px 18px;
+    }
+    .crono-display.urgente {
+      color: #dc2626; text-shadow: 0 0 30px rgba(220,38,38,0.6);
+      animation: parpadeo 0.5s infinite;
+    }
+    @keyframes parpadeo { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+    /* ── JUECES STATUS ── */
     .jueces-bar {
-      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
       display: flex; gap: 8px; z-index: 20;
     }
     .jcircle {
-      width: 44px; height: 44px; border-radius: 50%;
+      width: 42px; height: 42px; border-radius: 50%;
       background: #111; border: 1px solid #222;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Bebas Neue', sans-serif; font-size: 13px;
-      letter-spacing: 1px; color: #444; transition: all 0.3s;
+      font-family: 'Bebas Neue', sans-serif; font-size: 12px;
+      letter-spacing: 1px; color: #333; transition: all 0.3s;
     }
-    .jcircle.listo {
-      background: #16a34a; border-color: #22c55e; color: #fff;
-      box-shadow: 0 0 14px rgba(34,197,94,0.5);
-    }
+    .jcircle.listo { background: #16a34a; border-color: #22c55e; color: #fff; box-shadow: 0 0 12px rgba(34,197,94,0.5); }
 
-    /* ── VISTA 1V1 ── */
+    /* ── 1V1 ── */
     #vista-1v1 { flex: 1; display: none; }
     #vista-1v1.visible { display: flex; }
+
     .lado {
       flex: 1; display: flex; flex-direction: column;
       justify-content: center; align-items: center; position: relative;
+      transition: all 0.4s;
     }
-    .lado-izq {
-      background: linear-gradient(135deg, #0d0d0d, #141414);
-      border-right: 1px solid #222;
+
+    /* ROJO — izquierda */
+    .lado-rojo {
+      background: linear-gradient(135deg, #0d0000, #1a0505);
+      border-right: 1px solid #3d0000;
     }
-    .lado-der {
-      background: linear-gradient(225deg, #0d0d0d, #141414);
-      border-left: 1px solid #222;
-    }
-    .lado-izq::before, .lado-der::before {
+    .lado-rojo::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-      background: linear-gradient(90deg, #c9a84c, #f0d080);
+      background: linear-gradient(90deg, #dc2626, #ff6666);
     }
+    .lado-rojo.ganador { background: linear-gradient(135deg, #2a0000, #3d0505); border-right-color: #dc2626; }
+    .lado-rojo.perdedor { opacity: 0.25; }
+
+    /* AZUL — derecha */
+    .lado-azul {
+      background: linear-gradient(225deg, #00000d, #05051a);
+      border-left: 1px solid #00003d;
+    }
+    .lado-azul::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+      background: linear-gradient(90deg, #3b82f6, #6699ff);
+    }
+    .lado-azul.ganador { background: linear-gradient(225deg, #00002a, #05053d); border-left-color: #3b82f6; }
+    .lado-azul.perdedor { opacity: 0.25; }
+
     .comp-etiqueta {
-      font-size: 10px; font-weight: 700; letter-spacing: 5px;
-      color: #555; text-transform: uppercase; margin-bottom: 8px;
+      font-size: 9px; font-weight: 700; letter-spacing: 5px;
+      color: #555; text-transform: uppercase; margin-bottom: 6px;
     }
     .comp-nombre-g {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 52px; letter-spacing: 5px; margin-bottom: 16px;
+      font-size: 48px; letter-spacing: 4px; margin-bottom: 10px;
     }
+    .lado-rojo .comp-nombre-g { color: #ff8888; }
+    .lado-azul .comp-nombre-g { color: #8899ff; }
+
+    /* Notas progresivas */
+    .notas-progresivas {
+      display: flex; flex-direction: column; gap: 4px;
+      margin-bottom: 12px; width: 80%; max-width: 280px;
+    }
+    .nota-fila {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.04); border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; transition: all 0.3s;
+    }
+    .nota-fila.recibida { background: rgba(255,255,255,0.09); }
+    .nota-juez-id { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 1px; color: #555; }
+    .nota-juez-id.recibida { color: #888; }
+    .nota-juez-score { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #c9a84c; }
+    .nota-juez-detalle { font-size: 9px; color: #444; }
+
     .comp-score-g {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 160px; line-height: 1; color: #c9a84c;
+      font-size: 130px; line-height: 1; color: #c9a84c;
       text-shadow: 0 10px 40px rgba(201,168,76,0.3);
-      transition: all 0.3s;
     }
-    .comp-badge {
-      margin-top: 20px; height: 36px;
-    }
+    .comp-badge { margin-top: 16px; height: 36px; }
     .ganador-tag {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 18px; letter-spacing: 4px;
-      background: #c9a84c; color: #000;
-      padding: 6px 24px; border-radius: 30px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px;
+      background: #c9a84c; color: #000; padding: 6px 24px; border-radius: 30px;
     }
-    .lado.ganador { background: linear-gradient(135deg, #1a1400, #2a2000) !important; }
-    .lado.perdedor { opacity: 0.3; }
 
     .centro-vs {
-      width: 120px; display: flex; flex-direction: column;
-      justify-content: center; align-items: center; gap: 10px;
-      background: #0a0a0a; border-left: 1px solid #1a1a1a; border-right: 1px solid #1a1a1a;
-    }
-    .vs-txt {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px; letter-spacing: 4px; color: #222;
-    }
-
-    /* ── VISTA CUTOFF / FREESTYLE ── */
-    #vista-cutoff { flex: 1; display: none; }
-    #vista-cutoff.visible {
-      display: grid;
-      grid-template-columns: 1fr 340px;
-    }
-
-    .panel-turno {
-      display: flex; flex-direction: column;
+      width: 100px; display: flex; flex-direction: column;
       justify-content: center; align-items: center;
-      background: #0a0a0a; border-right: 1px solid #1a1a1a;
-      padding: 40px;
+      background: #0a0a0a;
+      border-left: 1px solid #1a1a1a; border-right: 1px solid #1a1a1a;
     }
-    .turno-etiqueta {
-      font-size: 10px; font-weight: 700; letter-spacing: 5px;
-      color: #444; text-transform: uppercase; margin-bottom: 12px;
-    }
-    .turno-nombre-grande {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 72px; letter-spacing: 6px; text-align: center;
-      margin-bottom: 16px;
-    }
-    .turno-score-grande {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 180px; line-height: 1; color: #c9a84c;
-      text-shadow: 0 10px 60px rgba(201,168,76,0.4);
-    }
-    @keyframes revelar {
-      0% { transform: scale(0.5); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-    .revelar-anim { animation: revelar 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    .vs-txt { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 4px; color: #1a1a1a; }
 
-    .panel-ranking {
-      background: #0f0f0f; border-left: 1px solid #1a1a1a;
-      display: flex; flex-direction: column; overflow: hidden;
+    /* ── CUTOFF ── */
+    #vista-cutoff { flex: 1; display: none; }
+    #vista-cutoff.visible { display: grid; grid-template-columns: 1fr 320px; }
+    .panel-turno {
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      background: #0a0a0a; border-right: 1px solid #1a1a1a; padding: 40px;
     }
-    .ranking-header {
-      padding: 16px 20px; border-bottom: 1px solid #1a1a1a;
-      font-size: 9px; font-weight: 700; letter-spacing: 4px;
-      color: #555; text-transform: uppercase;
-    }
+    .turno-etiqueta { font-size: 10px; font-weight: 700; letter-spacing: 5px; color: #444; text-transform: uppercase; margin-bottom: 12px; }
+    .turno-nombre-grande { font-family: 'Bebas Neue', sans-serif; font-size: 72px; letter-spacing: 6px; text-align: center; margin-bottom: 16px; }
+    .turno-score-grande { font-family: 'Bebas Neue', sans-serif; font-size: 180px; line-height: 1; color: #c9a84c; text-shadow: 0 10px 60px rgba(201,168,76,0.4); }
+    .panel-ranking { background: #0f0f0f; border-left: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; }
+    .ranking-header { padding: 14px 18px; border-bottom: 1px solid #1a1a1a; font-size: 9px; font-weight: 700; letter-spacing: 4px; color: #555; text-transform: uppercase; }
     .ranking-scroll { flex: 1; overflow-y: auto; padding: 10px; }
-    .rank-item {
-      display: flex; align-items: center; gap: 12px;
-      background: #141414; border: 1px solid #1a1a1a;
-      border-radius: 8px; padding: 10px 14px; margin-bottom: 5px;
-      transition: all 0.3s;
-    }
-    .rank-pos {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; color: #c9a84c; width: 28px;
-    }
-    .rank-nombre { flex: 1; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
-    .rank-total {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; color: #c9a84c;
-    }
+    .rank-item { display: flex; align-items: center; gap: 10px; background: #141414; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 5px; }
+    .rank-pos { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; width: 28px; }
+    .rank-nombre { flex: 1; font-size: 13px; font-weight: 700; }
+    .rank-total { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; }
     .rank-item.pasa { border-left: 3px solid #22c55e; }
     .rank-item.fuera { border-left: 3px solid #dc2626; opacity: 0.4; }
-    .rank-item.activo-ahora { border-left: 3px solid #c9a84c; background: #1a1500; }
-    .linea-corte { border: none; border-top: 1px dashed #c9a84c; margin: 6px 0; }
-    .corte-label {
-      text-align: center; font-size: 8px; font-weight: 700;
-      letter-spacing: 4px; color: #c9a84c; text-transform: uppercase; margin-bottom: 5px;
-    }
 
     /* ── FOOTER ── */
     .footer {
       background: #0a0a0a; border-top: 1px solid #1a1a1a;
-      padding: 7px 40px; display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 30px; display: flex; justify-content: space-between; align-items: center;
       flex-shrink: 0;
     }
     .footer-txt { font-size: 9px; letter-spacing: 2px; color: #2a2a2a; text-transform: uppercase; }
 
-    .hidden { display: none !important; }
-    .crono-pantalla-display {
-  font-family: 'Bebas Neue', sans-serif;
-  font-size: 80px; letter-spacing: 6px; color: #c9a84c; line-height: 1;
-  text-shadow: 0 0 30px rgba(201,168,76,0.5);
-  background: rgba(0,0,0,0.7); border-radius: 12px; padding: 4px 20px;
-}
-.crono-pantalla-display.urgente {
-  color: #dc2626; text-shadow: 0 0 30px rgba(220,38,38,0.6);
-  animation: parpadeo 0.5s infinite;
-}
-@keyframes parpadeo { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    @keyframes revelar { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+    .revelar-anim { animation: revelar 0.5s cubic-bezier(0.34,1.56,0.64,1); }
 
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -265,24 +287,11 @@
 <div class="header hidden" id="header">
   <div class="header-logo">POOMSAE</div>
   <div class="header-centro" id="header-centro">—</div>
-  <div style="display:flex; align-items:center; gap:16px">
+  <div class="header-derecha">
     <div class="header-sala" id="header-sala">—</div>
     <div class="jueces-dots" id="jueces-dots"></div>
   </div>
 </div>
-  
-  <!-- CRONÓMETRO PANTALLA -->
-<div id="crono-wrap" class="hidden" style="
-  position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
-  z-index: 50; text-align: center; pointer-events: none;">
-  <div id="crono-label-pantalla" style="
-    font-size: 10px; font-weight: 700; letter-spacing: 4px;
-    color: #555; text-transform: uppercase; margin-bottom: 4px;">
-    Tiempo de Ejecución
-  </div>
-  <div id="crono-pantalla" class="crono-pantalla-display">1:30</div>
-</div>
-
 
 <!-- ESPERA -->
 <div id="estado-espera" class="hidden">
@@ -293,27 +302,56 @@
 <!-- CUERPO -->
 <div id="cuerpo" class="hidden">
 
+  <!-- OVERLAY POOMSAE -->
+  <div id="overlay-poomsae" class="hidden">
+    <div class="poomsae-banner" id="poomsae-banner-inner"></div>
+  </div>
+
+  <!-- OVERLAY SORTEO (animación) -->
+  <div id="overlay-sorteo" class="hidden">
+    <div class="sorteo-titulo">Sorteando poomsaes</div>
+    <div class="sorteo-ruleta" id="sorteo-ruleta">—</div>
+    <div class="sorteo-resultado hidden" id="sorteo-resultado">
+      <div class="sorteo-card" id="sorteo-card-1">
+        <div class="sorteo-card-label">1ra Poomsae</div>
+        <div class="sorteo-card-nombre" id="sorteo-p1">—</div>
+      </div>
+      <div class="sorteo-card" id="sorteo-card-2">
+        <div class="sorteo-card-label">2da Poomsae</div>
+        <div class="sorteo-card-nombre" id="sorteo-p2">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRONÓMETRO -->
+  <div id="crono-wrap" class="hidden">
+    <div class="crono-label-txt" id="crono-label">Tiempo de Ejecución</div>
+    <div class="crono-display" id="crono-display">1:30</div>
+  </div>
+
   <!-- JUECES STATUS -->
   <div class="jueces-bar" id="jueces-bar"></div>
 
   <!-- 1V1 -->
   <div id="vista-1v1">
-    <div class="lado lado-izq" id="panel-A">
-      <div class="comp-etiqueta">Competidor A</div>
+    <div class="lado lado-rojo" id="panel-A">
+      <div class="comp-etiqueta" style="color:#dc262655">Competidor Rojo</div>
       <div class="comp-nombre-g" id="nombre-A">—</div>
+      <div class="notas-progresivas" id="notas-A"></div>
       <div class="comp-score-g" id="score-A">—</div>
       <div class="comp-badge" id="badge-A"></div>
     </div>
     <div class="centro-vs"><div class="vs-txt">VS</div></div>
-    <div class="lado lado-der" id="panel-B">
-      <div class="comp-etiqueta">Competidor B</div>
+    <div class="lado lado-azul" id="panel-B">
+      <div class="comp-etiqueta" style="color:#3b82f655">Competidor Azul</div>
       <div class="comp-nombre-g" id="nombre-B">—</div>
+      <div class="notas-progresivas" id="notas-B"></div>
       <div class="comp-score-g" id="score-B">—</div>
       <div class="comp-badge" id="badge-B"></div>
     </div>
   </div>
 
-  <!-- CUTOFF / FREESTYLE -->
+  <!-- CUTOFF -->
   <div id="vista-cutoff">
     <div class="panel-turno">
       <div class="turno-etiqueta" id="turno-etiqueta">—</div>
@@ -332,164 +370,153 @@
 <div class="footer hidden" id="footer">
   <div class="footer-txt">Poomsae Scoring System</div>
   <div class="footer-txt" id="footer-modo">—</div>
-  <div class="footer-txt">⬤ En vivo</div>
+  <div class="footer-txt" id="footer-estado">⬤ En vivo</div>
 </div>
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  const socket = io();
+  const socket = io({
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000
+  });
+
+  // ── ESTADO LOCAL ──
   let salaInfo = {};
   let numJueces = 3;
-  let puntajesRecibidos = {};
+  let juecesConectados = [];
   let topNActual = null;
-  let turnoIndexActual = 0;
+  let poomsaeActiva = null; // '1' | '2' | 'ambas'
 
+  // Notas recibidas: { A: {1: score, 2: score...}, B: {...} }
+  let notasRecibidas = { A: {}, B: {} };
+  let compIdA = null, compIdB = null; // IDs del servidor
+
+  // Poomsaes sorteadas
+  let poomsae1 = null, poomsae2 = null;
+
+  // Lista de poomsaes para animación (hardcoded igual que server/mesa)
+  const POOMSAES_TODAS = ['Taegeuk 4','Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8',
+    'Koryo','Keumgang','Taebaek','Pyongwon','Sipjin','Jitae','Cheonkwon','Hansu','Ilyeo'];
+
+  // ── CONECTAR ──
   function conectar() {
     const codigo = document.getElementById('input-sala').value.trim().toUpperCase();
     if (!codigo) return;
     socket.emit('juez-unirse', { codigo, nombre: 'Pantalla', numJuez: 0 });
   }
 
-  socket.on('cronometro-update', (data) => {
-  const el = document.getElementById('crono-pantalla');
-  const label = document.getElementById('crono-label-pantalla');
-  const wrap = document.getElementById('crono-wrap');
-  if (!el || !wrap) return;
+  // ── ANIMACIÓN DE SORTEO ──
+  let sorteoP1 = null, sorteoP2 = null;
+  let sorteoTimer = null;
 
-  if (data.accion === 'fin' || (data.accion === 'detener' && data.duracion === 0)) {
-    wrap.classList.add('hidden');
-    return;
-  }
+  function animarSorteo(p1final, p2final) {
+    poomsae1 = p1final;
+    poomsae2 = p2final;
 
-  wrap.classList.remove('hidden');
-  const min = Math.floor(data.duracion / 60);
-  const seg = data.duracion % 60;
-  el.textContent = `${min}:${seg.toString().padStart(2,'0')}`;
-  el.className = 'crono-pantalla-display';
-  if (data.duracion <= 10) el.classList.add('urgente');
-});
+    // Mostrar overlay de sorteo
+    document.getElementById('overlay-sorteo').classList.remove('hidden');
+    document.getElementById('sorteo-resultado').classList.add('hidden');
+    document.getElementById('sorteo-ruleta').textContent = '—';
 
-socket.on('poomsae-sorteada', (data) => {
-  const el = document.getElementById(`pantalla-p${data.numero}`);
-  if (el) {
-    el.textContent = data.poomsae;
-    el.style.opacity = '1';
-  }
-});
+    const ruleta = document.getElementById('sorteo-ruleta');
+    let count = 0;
+    const totalFrames = 30;
+    const intervalo = setInterval(() => {
+      ruleta.textContent = POOMSAES_TODAS[Math.floor(Math.random() * POOMSAES_TODAS.length)];
+      count++;
+      if (count >= totalFrames) {
+        clearInterval(intervalo);
+        // Mostrar resultado final
+        document.getElementById('sorteo-p1').textContent = p1final;
+        document.getElementById('sorteo-p2').textContent = p2final;
+        document.getElementById('sorteo-resultado').classList.remove('hidden');
+        document.getElementById('sorteo-resultado').classList.add('fade-in');
+        document.getElementById('sorteo-card-1').classList.add('activa');
+        ruleta.textContent = '';
 
-  socket.on('juez-ok', (data) => {
-    salaInfo = data.sala;
-    numJueces = salaInfo.numJueces;
-    document.getElementById('overlay-login').classList.add('hidden');
-    document.getElementById('header').classList.remove('hidden');
-    document.getElementById('estado-espera').classList.remove('hidden');
-    document.getElementById('footer').classList.remove('hidden');
-    document.getElementById('header-sala').textContent = salaInfo.codigo;
-    document.getElementById('header-centro').textContent =
-      `${salaInfo.tipo.toUpperCase()} · ${salaInfo.modo}`;
-    document.getElementById('footer-modo').textContent =
-      `${salaInfo.tipo.toUpperCase()} · ${salaInfo.modo} · ${numJueces} jueces`;
-    document.getElementById('espera-sub').textContent =
-      `${salaInfo.tipo.toUpperCase()} · ${salaInfo.modo}`;
-    renderDots([]);
-    renderJuecesBar({});
-  });
-
-  socket.on('juez-conectado', (data) => { renderDots(data.jueces); });
-  socket.on('juez-desconectado', (data) => { renderDots(data.jueces); });
-
-  socket.on('competencia-iniciada', (data) => {
-    salaInfo.tipo = data.tipo;
-    salaInfo.modo = data.modo;
-    document.getElementById('estado-espera').classList.add('hidden');
-    document.getElementById('cuerpo').classList.remove('hidden');
-    configurarVista(data.modo);
-  });
-
-  socket.on('turno-actualizado', (data) => {
-    const turno = data.turno;
-    puntajesRecibidos = {};
-    renderJuecesBar({});
-    turnoIndexActual = turno.numero ? turno.numero - 1 : 0;
-
-    if (turno.tipo === '1v1-simultaneo' || turno.tipo === '1v1-secuencial') {
-      document.getElementById('nombre-A').textContent = turno.competidorA?.nombre || '—';
-      document.getElementById('nombre-B').textContent = turno.competidorB?.nombre || '—';
-      document.getElementById('score-A').textContent = '—';
-      document.getElementById('score-B').textContent = '—';
-      document.getElementById('badge-A').innerHTML = '';
-      document.getElementById('badge-B').innerHTML = '';
-      document.getElementById('panel-A').className = 'lado lado-izq';
-      document.getElementById('panel-B').className = 'lado lado-der';
-    } else {
-      document.getElementById('turno-etiqueta').textContent =
-        `Competidor ${turno.numero} de ${turno.total}`;
-      document.getElementById('turno-nombre').textContent = turno.competidor?.nombre || '—';
-      document.getElementById('turno-score').textContent = '—';
-      renderRankingActivo(turnoIndexActual);
-    }
-  });
-
-  socket.on('puntaje-recibido', (data) => {
-    puntajesRecibidos[data.juezNum] = true;
-    renderJuecesBar(puntajesRecibidos);
-  });
-
-  socket.on('puntaje-revelado', (data) => {
-    if (data.tipo === '1v1') {
-      const ta = data.competidorA?.total;
-      const tb = data.competidorB?.total;
-      const sa = document.getElementById('score-A');
-      const sb = document.getElementById('score-B');
-      sa.textContent = ta != null ? ta.toFixed(2) : '—';
-      sb.textContent = tb != null ? tb.toFixed(2) : '—';
-      sa.classList.add('revelar-anim');
-      sb.classList.add('revelar-anim');
-      setTimeout(() => { sa.classList.remove('revelar-anim'); sb.classList.remove('revelar-anim'); }, 600);
-
-      if (ta != null && tb != null) {
-        if (ta > tb) {
-          document.getElementById('panel-A').className = 'lado lado-izq ganador';
-          document.getElementById('panel-B').className = 'lado lado-der perdedor';
-          document.getElementById('badge-A').innerHTML = '<span class="ganador-tag">🏆 GANADOR</span>';
-        } else if (tb > ta) {
-          document.getElementById('panel-B').className = 'lado lado-der ganador';
-          document.getElementById('panel-A').className = 'lado lado-izq perdedor';
-          document.getElementById('badge-B').innerHTML = '<span class="ganador-tag">🏆 GANADOR</span>';
-        } else {
-          document.getElementById('badge-A').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:3px;color:#888;font-size:16px">EMPATE</span>';
-          document.getElementById('badge-B').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:3px;color:#888;font-size:16px">EMPATE</span>';
-        }
+        // Ocultar después de 4 segundos y mostrar banner
+        sorteoTimer = setTimeout(() => {
+          document.getElementById('overlay-sorteo').classList.add('hidden');
+          mostrarBannerAmbas();
+        }, 4000);
       }
-    } else {
-      const score = document.getElementById('turno-score');
-      score.textContent = data.competidor?.total != null ? data.competidor.total.toFixed(2) : '—';
-      score.classList.add('revelar-anim');
-      setTimeout(() => score.classList.remove('revelar-anim'), 600);
-      if (data.ranking) renderRanking(data.ranking, topNActual);
+    }, 80);
+  }
+
+  function mostrarBannerAmbas() {
+    const banner = document.getElementById('overlay-poomsae');
+    const inner = document.getElementById('poomsae-banner-inner');
+    inner.innerHTML = `
+      <div class="poomsae-banner-label">Poomsaes del enfrentamiento</div>
+      <div class="poomsae-banner-ambas">
+        1ra: ${poomsae1 || '—'} &nbsp;·&nbsp; 2da: ${poomsae2 || '—'}
+      </div>`;
+    banner.classList.remove('hidden');
+    poomsaeActiva = 'ambas';
+  }
+
+  function mostrarBannerUna(num, nombre) {
+    const banner = document.getElementById('overlay-poomsae');
+    const inner = document.getElementById('poomsae-banner-inner');
+    inner.innerHTML = `
+      <div class="poomsae-banner-label">${num === 1 ? '1ra' : '2da'} Poomsae</div>
+      <div class="poomsae-banner-nombre">${nombre}</div>`;
+    banner.classList.remove('hidden');
+    poomsaeActiva = String(num);
+  }
+
+  function ocultarBanner() {
+    document.getElementById('overlay-poomsae').classList.add('hidden');
+  }
+
+  // ── NOTAS PROGRESIVAS ──
+  function initNotasGrid(suffix) {
+    const div = document.getElementById(`notas-${suffix}`);
+    if (!div) return;
+    let html = '';
+    for (let i = 1; i <= numJueces; i++) {
+      html += `<div class="nota-fila" id="nota-${suffix}-${i}">
+        <span class="nota-juez-id" id="nota-id-${suffix}-${i}">J${i}</span>
+        <span class="nota-juez-detalle" id="nota-det-${suffix}-${i}"></span>
+        <span class="nota-juez-score" id="nota-score-${suffix}-${i}">—</span>
+      </div>`;
     }
-  });
+    div.innerHTML = html;
+    notasRecibidas[suffix] = {};
+  }
 
-  socket.on('ranking-actualizado', (data) => {
-    renderRanking(data.ranking, topNActual);
-  });
+  function actualizarNotaGrid(suffix, juezNum, desglose, totalComp) {
+    const fila = document.getElementById(`nota-${suffix}-${juezNum}`);
+    const idEl = document.getElementById(`nota-id-${suffix}-${juezNum}`);
+    const detEl = document.getElementById(`nota-det-${suffix}-${juezNum}`);
+    const scoreEl = document.getElementById(`nota-score-${suffix}-${juezNum}`);
+    if (!fila || !scoreEl) return;
 
-  socket.on('corte-aplicado', (data) => {
-    topNActual = data.topN;
-    renderRanking(data.ranking, data.topN);
-  });
+    const prec = (desglose?.prec || 0).toFixed(1);
+    const vel  = (desglose?.vel  || 0).toFixed(1);
+    const rit  = (desglose?.rit  || 0).toFixed(1);
+    const exp  = (desglose?.exp  || 0).toFixed(1);
+    const subtot = ((desglose?.prec||0)+(desglose?.vel||0)+(desglose?.rit||0)+(desglose?.exp||0)).toFixed(2);
 
-  // ── HELPERS ──
-  function configurarVista(modo) {
-    if (modo === '1v1-simultaneo' || modo === '1v1-secuencial') {
-      document.getElementById('vista-1v1').classList.add('visible');
-      document.getElementById('vista-cutoff').classList.remove('visible');
-    } else {
-      document.getElementById('vista-cutoff').classList.add('visible');
-      document.getElementById('vista-1v1').classList.remove('visible');
+    fila.classList.add('recibida');
+    if (idEl) idEl.classList.add('recibida');
+    if (detEl) detEl.textContent = `${prec} / ${vel} ${rit} ${exp}`;
+    scoreEl.textContent = subtot;
+    notasRecibidas[suffix][juezNum] = parseFloat(subtot);
+
+    // Actualizar score total si llegó
+    if (totalComp !== null && totalComp !== undefined) {
+      const scoreG = document.getElementById(`score-${suffix}`);
+      if (scoreG) {
+        scoreG.textContent = totalComp.toFixed(2);
+        scoreG.classList.add('revelar-anim');
+        setTimeout(() => scoreG.classList.remove('revelar-anim'), 500);
+      }
     }
   }
 
+  // ── HELPERS ── 
   function renderDots(jueces) {
     let html = '';
     for (let i = 1; i <= numJueces; i++) {
@@ -513,24 +540,249 @@ socket.on('poomsae-sorteada', (data) => {
     ranking.forEach((c, i) => {
       let clase = '';
       if (topN != null) clase = i < topN ? 'pasa' : 'fuera';
-      if (topN != null && i === topN) {
-        html += `<div class="linea-corte"></div><div class="corte-label">— CORTE —</div>`;
-      }
-      html += `
-        <div class="rank-item ${clase}">
-          <span class="rank-pos">${i + 1}</span>
-          <span class="rank-nombre">${c.nombre}</span>
-          <span class="rank-total">${c.total != null ? c.total.toFixed(2) : '—'}</span>
-        </div>`;
+      if (topN != null && i === topN) html += `<div style="border-top:1px dashed #c9a84c;margin:6px 0"></div>`;
+      html += `<div class="rank-item ${clase}">
+        <span class="rank-pos">${i+1}</span>
+        <span class="rank-nombre">${c.nombre}</span>
+        <span class="rank-total">${c.total != null ? c.total.toFixed(2) : '—'}</span>
+      </div>`;
     });
     lista.innerHTML = html;
   }
 
-  function renderRankingActivo(turnoIdx) {
-    // Resalta el competidor activo en el ranking
-    const items = document.querySelectorAll('.rank-item');
-    items.forEach(el => el.classList.remove('activo-ahora'));
+  function resetVista1v1() {
+    document.getElementById('score-A').textContent = '—';
+    document.getElementById('score-B').textContent = '—';
+    document.getElementById('badge-A').innerHTML = '';
+    document.getElementById('badge-B').innerHTML = '';
+    document.getElementById('panel-A').className = 'lado lado-rojo';
+    document.getElementById('panel-B').className = 'lado lado-azul';
+    initNotasGrid('A');
+    initNotasGrid('B');
   }
+
+  // ── SOCKET EVENTS ──
+
+  socket.on('juez-ok', (data) => {
+    salaInfo = data.sala;
+    numJueces = salaInfo.numJueces;
+    document.getElementById('overlay-login').classList.add('hidden');
+    document.getElementById('header').classList.remove('hidden');
+    document.getElementById('estado-espera').classList.remove('hidden');
+    document.getElementById('footer').classList.remove('hidden');
+    document.getElementById('header-sala').textContent = salaInfo.codigo;
+    document.getElementById('header-centro').textContent =
+      `${salaInfo.categoria || ''} · ${salaInfo.ronda || ''} · ${salaInfo.tipo?.toUpperCase()}`;
+    document.getElementById('footer-modo').textContent =
+      `${salaInfo.tipo?.toUpperCase()} · ${salaInfo.modo} · ${numJueces} jueces`;
+    document.getElementById('espera-sub').textContent =
+      `${salaInfo.tipo?.toUpperCase()} · ${salaInfo.modo}`;
+    renderDots([]);
+    renderJuecesBar({});
+  });
+
+  socket.on('juez-conectado', (data) => {
+    juecesConectados = data.jueces;
+    renderDots(data.jueces);
+  });
+  socket.on('juez-desconectado', (data) => {
+    juecesConectados = data.jueces;
+    renderDots(data.jueces);
+  });
+
+  socket.on('competencia-iniciada', (data) => {
+    salaInfo.tipo = data.tipo;
+    salaInfo.modo = data.modo;
+    document.getElementById('estado-espera').classList.add('hidden');
+    document.getElementById('cuerpo').classList.remove('hidden');
+    if (data.modo === '1v1-simultaneo' || data.modo === '1v1-secuencial') {
+      document.getElementById('vista-1v1').classList.add('visible');
+      document.getElementById('vista-cutoff').classList.remove('visible');
+    } else {
+      document.getElementById('vista-cutoff').classList.add('visible');
+      document.getElementById('vista-1v1').classList.remove('visible');
+    }
+  });
+
+  socket.on('turno-actualizado', (data) => {
+    const turno = data.turno;
+    renderJuecesBar({});
+
+    if (turno.tipo === '1v1-simultaneo' || turno.tipo === '1v1-secuencial') {
+      // Guardar IDs para mapear puntajes
+      compIdA = turno.competidorA?.id;
+      compIdB = turno.competidorB?.id;
+      document.getElementById('nombre-A').textContent = turno.competidorA?.nombre || '—';
+      document.getElementById('nombre-B').textContent = turno.competidorB?.nombre || '—';
+      resetVista1v1();
+    } else {
+      document.getElementById('turno-etiqueta').textContent = `Competidor ${turno.numero} de ${turno.total}`;
+      document.getElementById('turno-nombre').textContent = turno.competidor?.nombre || '—';
+      document.getElementById('turno-score').textContent = '—';
+    }
+  });
+
+  // ── SORTEO ── animación cuando llegan ambas poomsaes
+  let poomsaeBuffer = {};
+  socket.on('poomsae-sorteada', (data) => {
+    poomsaeBuffer[data.numero] = data.poomsae;
+    if (poomsaeBuffer[1] && poomsaeBuffer[2]) {
+      animarSorteo(poomsaeBuffer[1], poomsaeBuffer[2]);
+      poomsaeBuffer = {};
+    }
+  });
+
+  // ── CONTROL DE MESA ── maneja fase y banner
+  socket.on('control-actualizado', (data) => {
+    const { accion, fase, poomsae, esReconexion } = data;
+
+    if (accion === 'iniciar') {
+      // Ocultar banner de ambas poomsaes, mostrar solo la activa
+      if (fase === 'p1_corriendo') {
+        mostrarBannerUna(1, poomsae1);
+      } else if (fase === 'p2_corriendo') {
+        mostrarBannerUna(2, poomsae2);
+      }
+      document.getElementById('footer-estado').textContent = '▶ En ejecución';
+
+    } else if (accion === 'detener') {
+      document.getElementById('crono-wrap').classList.add('hidden');
+      document.getElementById('footer-estado').textContent = '⏸ Jueces califican';
+
+    } else if (accion === 'restablecer') {
+      document.getElementById('footer-estado').textContent = '⬤ En vivo';
+
+    } else if (accion === 'nueva-poomsae') {
+      // Poomsae 2
+      poomsae2 = poomsae || poomsae2;
+      resetVista1v1();
+      mostrarBannerAmbas();
+      document.getElementById('crono-wrap').classList.add('hidden');
+      document.getElementById('footer-estado').textContent = '⬤ En vivo';
+
+    } else if (accion === 'nueva-competencia') {
+      // Nuevo enfrentamiento
+      poomsae1 = null; poomsae2 = null;
+      poomsaeBuffer = {};
+      resetVista1v1();
+      ocultarBanner();
+      document.getElementById('crono-wrap').classList.add('hidden');
+      document.getElementById('footer-estado').textContent = '⬤ En vivo';
+    }
+
+    // Reconexión: restaurar estado visual
+    if (esReconexion && data.poomsae1) {
+      poomsae1 = data.poomsae1;
+      poomsae2 = data.poomsae2;
+      if (fase && fase.startsWith('p1')) mostrarBannerUna(1, poomsae1);
+      else if (fase && fase.startsWith('p2')) mostrarBannerUna(2, poomsae2);
+    }
+  });
+
+  // ── CRONÓMETRO ──
+  socket.on('cronometro-update', (data) => {
+    const wrap = document.getElementById('crono-wrap');
+    const el = document.getElementById('crono-display');
+    const label = document.getElementById('crono-label');
+    if (!el || !wrap) return;
+
+    if (data.accion === 'fin' || data.accion === 'detener') {
+      wrap.classList.add('hidden');
+      return;
+    }
+    if (data.accion === 'restablecer') {
+      wrap.classList.add('hidden');
+      return;
+    }
+
+    wrap.classList.remove('hidden');
+    const min = Math.floor(data.duracion / 60);
+    const seg = data.duracion % 60;
+    el.textContent = `${min}:${seg.toString().padStart(2,'0')}`;
+    el.className = 'crono-display';
+    if (data.duracion <= 10 && data.duracion > 0) el.classList.add('urgente');
+
+    // Label según fase
+    if (salaInfo.modo === '1v1-simultaneo') {
+      label.textContent = poomsaeActiva === '2' ? '2da Poomsae' : '1ra Poomsae';
+    }
+  });
+
+  // ── PUNTAJE RECIBIDO — notas progresivas ──
+  socket.on('puntaje-recibido', (data) => {
+    if (!data.desglose) return;
+
+    const suffix = data.competidorId === compIdA ? 'A' : 'B';
+    actualizarNotaGrid(suffix, data.juezNum, data.desglose, data.totalComp);
+
+    // Actualizar círculos de jueces
+    const received = {};
+    Object.keys(notasRecibidas.A).forEach(j => received[j] = true);
+    Object.keys(notasRecibidas.B).forEach(j => received[j] = true);
+    renderJuecesBar(received);
+  });
+
+  // ── PUNTAJE REVELADO (para cutoff/secuencial o si mesa aún lo usa) ──
+  socket.on('puntaje-revelado', (data) => {
+    if (data.tipo === '1v1') {
+      const ta = data.competidorA?.total;
+      const tb = data.competidorB?.total;
+      if (ta != null) {
+        const sa = document.getElementById('score-A');
+        sa.textContent = ta.toFixed(2);
+        sa.classList.add('revelar-anim');
+        setTimeout(() => sa.classList.remove('revelar-anim'), 500);
+      }
+      if (tb != null) {
+        const sb = document.getElementById('score-B');
+        sb.textContent = tb.toFixed(2);
+        sb.classList.add('revelar-anim');
+        setTimeout(() => sb.classList.remove('revelar-anim'), 500);
+      }
+      if (ta != null && tb != null) {
+        if (ta > tb) {
+          document.getElementById('panel-A').className = 'lado lado-rojo ganador';
+          document.getElementById('panel-B').className = 'lado lado-azul perdedor';
+          document.getElementById('badge-A').innerHTML = '<span class="ganador-tag">🏆 GANADOR</span>';
+        } else if (tb > ta) {
+          document.getElementById('panel-B').className = 'lado lado-azul ganador';
+          document.getElementById('panel-A').className = 'lado lado-rojo perdedor';
+          document.getElementById('badge-B').innerHTML = '<span class="ganador-tag">🏆 GANADOR</span>';
+        } else {
+          document.getElementById('badge-A').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:3px;color:#888">EMPATE</span>';
+          document.getElementById('badge-B').innerHTML = '<span style="font-family:\'Bebas Neue\',sans-serif;letter-spacing:3px;color:#888">EMPATE</span>';
+        }
+      }
+    } else {
+      const score = document.getElementById('turno-score');
+      score.textContent = data.competidor?.total != null ? data.competidor.total.toFixed(2) : '—';
+      score.classList.add('revelar-anim');
+      setTimeout(() => score.classList.remove('revelar-anim'), 600);
+      if (data.ranking) renderRanking(data.ranking, topNActual);
+    }
+  });
+
+  socket.on('ranking-actualizado', (data) => { renderRanking(data.ranking, topNActual); });
+  socket.on('corte-aplicado', (data) => { topNActual = data.topN; renderRanking(data.ranking, data.topN); });
+
+  socket.on('sala-finalizada', () => {
+    document.getElementById('cuerpo').classList.add('hidden');
+    document.getElementById('header').classList.add('hidden');
+    document.getElementById('footer').classList.add('hidden');
+    document.getElementById('estado-espera').classList.add('hidden');
+    document.getElementById('overlay-login').classList.remove('hidden');
+    salaInfo = {};
+  });
+
+  socket.on('disconnect', () => {
+    document.getElementById('footer-estado').textContent = '● Reconectando...';
+  });
+  socket.on('reconnect', () => {
+    document.getElementById('footer-estado').textContent = '⬤ En vivo';
+    if (salaInfo.codigo) {
+      socket.emit('juez-unirse', { codigo: salaInfo.codigo, nombre: 'Pantalla', numJuez: 0 });
+    }
+  });
 </script>
 </body>
 </html>
