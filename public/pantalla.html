@@ -394,6 +394,93 @@
 }
 
     .hidden { display: none !important; }
+  /* ── MODO CLARO ── */
+body.tema-claro { background: #f0f0f8; color: #111; }
+
+body.tema-claro .header {
+  background: linear-gradient(90deg, #e8e8f0, #f0f0f8, #e8e8f0);
+  border-bottom-color: #b8860b;
+}
+body.tema-claro .header-logo { color: #b8860b; }
+body.tema-claro .header-centro { color: #888; }
+body.tema-claro .header-sala { color: #b8860b; }
+
+body.tema-claro #estado-espera { background: #f0f0f8; }
+body.tema-claro .espera-logo { color: #ddd; }
+body.tema-claro .espera-sub { color: #bbb; }
+
+body.tema-claro .lado-rojo { background: linear-gradient(135deg, #fff0f0, #ffe8e8); border-right-color: #ffcccc; }
+body.tema-claro .lado-azul { background: linear-gradient(225deg, #f0f0ff, #e8e8ff); border-left-color: #ccccff; }
+body.tema-claro .lado-rojo.ganador { background: linear-gradient(135deg, #ffe0e0, #ffd0d0); }
+body.tema-claro .lado-azul.ganador { background: linear-gradient(225deg, #e0e0ff, #d0d0ff); }
+body.tema-claro .lado-rojo.perdedor { opacity: 0.3; }
+body.tema-claro .lado-azul.perdedor { opacity: 0.3; }
+
+body.tema-claro .centro-vs { background: #e8e8f0; border-color: #ccc; }
+body.tema-claro .vs-txt { color: #ccc; }
+
+body.tema-claro .comp-etiqueta { color: #aaa; }
+body.tema-claro .comp-nombre-g { color: #222; }
+body.tema-claro .lado-rojo .comp-nombre-g { color: #cc2222; }
+body.tema-claro .lado-azul .comp-nombre-g { color: #2244cc; }
+
+body.tema-claro .nota-fila { background: rgba(0,0,0,0.05); }
+body.tema-claro .nota-fila.recibida { background: rgba(0,0,0,0.10); }
+body.tema-claro .nota-juez-id { color: #aaa; }
+body.tema-claro .nota-juez-id.recibida { color: #666; }
+body.tema-claro .nota-juez-score { color: #b8860b; }
+body.tema-claro .nota-juez-detalle { color: #999; }
+
+body.tema-claro .comp-score-g { color: #b8860b; text-shadow: none; }
+
+body.tema-claro .poomsae-banner { background: rgba(240,240,240,0.95); border-bottom-color: #b8860b; }
+body.tema-claro .poomsae-banner-label { color: #aaa; }
+body.tema-claro .poomsae-banner-nombre { color: #b8860b; text-shadow: none; }
+body.tema-claro .poomsae-banner-ambas { color: #b8860b; }
+
+body.tema-claro .crono-display { color: #b8860b; background: rgba(240,240,240,0.9); text-shadow: none; }
+body.tema-claro .crono-display.urgente { color: #cc0000; text-shadow: none; }
+body.tema-claro .crono-label-txt { color: #999; }
+
+body.tema-claro .ronda-badge { background: rgba(240,240,240,0.95); border-color: #b8860b; }
+body.tema-claro .ronda-badge-label { color: #aaa; }
+body.tema-claro .ronda-badge-num { color: #b8860b; }
+
+body.tema-claro .score-p1-chip { background: rgba(240,240,240,0.95); border-color: #ccc; }
+body.tema-claro .score-p1-chip-label { color: #aaa; }
+body.tema-claro .score-p1-chip-val { color: #b8860b; }
+
+body.tema-claro #overlay-resumen { background: rgba(240,240,240,0.97); }
+body.tema-claro .resumen-titulo-txt { color: #aaa; }
+body.tema-claro .resumen-comp-card.rojo-card { background: linear-gradient(135deg,#ffe0e0,#ffd0d0); border-color: #cc2222; }
+body.tema-claro .resumen-comp-card.azul-card { background: linear-gradient(135deg,#e0e0ff,#d0d0ff); border-color: #2244cc; }
+body.tema-claro .resumen-comp-card.perdedor-card { opacity: 0.35; }
+body.tema-claro .resumen-comp-nombre { color: #111; }
+body.tema-claro .resumen-comp-card.rojo-card .resumen-comp-nombre { color: #cc2222; }
+body.tema-claro .resumen-comp-card.azul-card .resumen-comp-nombre { color: #2244cc; }
+body.tema-claro .resumen-fila-label { color: #888; }
+body.tema-claro .resumen-fila-val { color: #b8860b; }
+body.tema-claro .resumen-promedio-label { color: #888; }
+body.tema-claro .resumen-promedio-val { color: #111; }
+body.tema-claro .resumen-vs { color: #ccc; }
+body.tema-claro .resumen-ganador-banner { color: #b8860b; }
+
+body.tema-claro .sorteo-titulo { color: #aaa; }
+body.tema-claro .sorteo-ruleta { color: #b8860b; text-shadow: none; }
+body.tema-claro .sorteo-card { background: #fff; border-color: #ddd; }
+body.tema-claro .sorteo-card.activa { border-color: #b8860b; box-shadow: none; }
+body.tema-claro .sorteo-card-label { color: #aaa; }
+body.tema-claro .sorteo-card-nombre { color: #b8860b; }
+
+body.tema-claro .footer { background: #e8e8f0; border-top-color: #ccc; }
+body.tema-claro .footer-txt { color: #bbb; }
+
+body.tema-claro .jdot { background: #ddd; border-color: #ccc; }
+body.tema-claro .jcircle { background: #e0e0e0; border-color: #ccc; color: #aaa; }
+body.tema-claro .jcircle.listo { background: #16a34a; border-color: #22c55e; color: #fff; }
+
+body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111; }
+body.tema-claro #overlay-login { background: #f0f0f8; }
   </style>
 </head>
 <body>
@@ -999,6 +1086,24 @@
       if (sA > 0 && sB > 0) {
         setTimeout(() => mostrarResumenFinal(), 1500);
       }
+      <button onclick="toggleTema()" id="btn-tema" style="
+  position:fixed; bottom:16px; right:16px; z-index:9999;
+  background:#1a1a1a; color:#c9a84c; border:1px solid #333;
+  padding:8px 16px; border-radius:20px; font-size:11px;
+  letter-spacing:2px; cursor:pointer;
+  font-family:'Bebas Neue',sans-serif">☀ TEMA</button>
+
+<script>
+function toggleTema() {
+  const claro = document.body.classList.toggle('tema-claro');
+  localStorage.setItem('tema-pantalla', claro ? 'claro' : 'oscuro');
+  document.getElementById('btn-tema').textContent = claro ? '🌙 TEMA' : '☀ TEMA';
+}
+if (localStorage.getItem('tema-pantalla') === 'claro') {
+  document.body.classList.add('tema-claro');
+  document.getElementById('btn-tema').textContent = '🌙 TEMA';
+}
+</script>
     }
 
     // Actualizar círculos de jueces
