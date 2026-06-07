@@ -1059,12 +1059,32 @@
   socket.on('disconnect', () => {
     document.getElementById('footer-estado').textContent = '● Reconectando...';
   });
-  socket.on('reconnect', () => {
+
+  // Socket.io v4+: usar 'connect' no 'reconnect'
+  socket.on('connect', () => {
     document.getElementById('footer-estado').textContent = '⬤ En vivo';
     if (salaInfo.codigo) {
       socket.emit('juez-unirse', { codigo: salaInfo.codigo, nombre: 'Pantalla', numJuez: 0 });
     }
   });
+
+  socket.on('sala-eliminada', () => {
+    ocultarResumenFinal?.();
+    ocultarRonda?.();
+    ocultarScoresP1?.();
+    poomsae1 = null; poomsae2 = null;
+    document.getElementById('cuerpo').classList.add('hidden');
+    document.getElementById('header').classList.add('hidden');
+    document.getElementById('footer').classList.add('hidden');
+    document.getElementById('crono-wrap').classList.add('hidden');
+    document.getElementById('ronda-badge')?.classList.add('hidden');
+    document.getElementById('scores-p1-fijos')?.classList.add('hidden');
+    document.getElementById('overlay-resumen')?.classList.add('hidden');
+    document.getElementById('estado-espera').classList.add('hidden');
+    document.getElementById('overlay-login').classList.remove('hidden');
+    salaInfo = {};
+  });
+
 </script>
 </body>
 </html>
