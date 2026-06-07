@@ -45,6 +45,18 @@
     .comp-nombre { font-size: 13px; font-weight: 700; letter-spacing: 1px; flex: 1; }
     .btn-del { background: none; border: none; color: #444; font-size: 16px; cursor: pointer; padding: 4px 8px; }
     .btn-del:active { color: #dc2626; }
+    .btn-edit { background: none; border: none; color: #444; font-size: 14px; cursor: pointer; padding: 4px 6px; }
+    .btn-edit:active { color: #c9a84c; }
+    .comp-edit-input { background: #0a0a0a; border: 1px solid #c9a84c; border-radius: 6px; color: #fff; padding: 6px 10px; font-size: 13px; font-family: 'Inter', sans-serif; font-weight: 700; letter-spacing: 1px; outline: none; flex: 1; text-transform: uppercase; }
+    .btn-edit-ok { background: #c9a84c; border: none; color: #000; padding: 6px 12px; border-radius: 6px; font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; cursor: pointer; }
+    .btn-edit-ok:active { filter: brightness(0.85); }
+    .btn-edit-cancel { background: #1a1a1a; border: 1px solid #2a2a2a; color: #666; padding: 6px 10px; border-radius: 6px; font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 1px; cursor: pointer; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.hidden { display: none; }
+    .modal-box { background: #141414; border: 1px solid #333; border-radius: 14px; padding: 24px; width: 100%; max-width: 340px; }
+    .modal-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: #c9a84c; margin-bottom: 6px; }
+    .modal-sub { font-size: 10px; color: #555; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+    .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
     .cronometro-card { background: #0a0a0a; border: 1px solid #333; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 10px; }
     .cronometro-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 6px; }
     .cronometro-display { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 4px; color: #c9a84c; line-height: 1; text-shadow: 0 0 20px rgba(201,168,76,0.4); }
@@ -149,6 +161,22 @@
       <option value="7">7 Jueces</option>
     </select>
     <button class="btn-gold" onclick="crearSala()">CREAR SALA</button>
+    <button class="btn-dark" onclick="pedirResetearPorCodigo()" style="color:#dc2626;border-color:#3a0000;font-size:11px;padding:8px;margin-top:2px">
+      ✕ ELIMINAR SALA EXISTENTE
+    </button>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal-overlay hidden" id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-titulo" id="modal-titulo">Confirmar</div>
+    <div class="modal-sub" id="modal-sub">Esta acción no se puede deshacer</div>
+    <div id="modal-body"></div>
+    <div class="modal-btns">
+      <button class="btn-edit-cancel" onclick="cerrarModal()">CANCELAR</button>
+      <button class="btn-edit-ok" id="modal-ok-btn" onclick="ejecutarAccionModal()">CONFIRMAR</button>
+    </div>
   </div>
 </div>
 
@@ -162,9 +190,14 @@
     <div class="sala-ronda" id="display-ronda">—</div>
     <div class="jueces-grid" id="display-jueces"></div>
     <div id="log"></div>
-    <button class="btn-dark" onclick="restaurarSistema()" style="margin-top:10px;color:#dc2626;border-color:#3a0000;font-size:11px;padding:8px">
-      ↺ RESTAURAR SISTEMA
-    </button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px">
+      <button class="btn-dark" onclick="confirmarRestaurar()" style="color:#f59e0b;border-color:#3a2800;font-size:10px;padding:8px">
+        ↺ RESTAURAR
+      </button>
+      <button class="btn-dark" onclick="confirmarResetearMesa()" style="color:#dc2626;border-color:#3a0000;font-size:10px;padding:8px">
+        ✕ RESETEAR MESA
+      </button>
+    </div>
   </div>
 
   <!-- COMPETIDORES -->
@@ -346,13 +379,18 @@
   }
 
   function renderCompetidoresSetup() {
+    const colorClases = ['azul', 'rojo']; // índice 0=azul, 1=rojo, resto neutro
     document.getElementById('lista-competidores').innerHTML =
-      competidoresSetup.map((c, i) => `
-        <div class="comp-item">
-          <span class="comp-num">${i + 1}</span>
-          <span class="comp-nombre">${c.nombre}</span>
-          <button class="btn-del" onclick="eliminarCompetidor(${i})">✕</button>
-        </div>`).join('');
+      competidoresSetup.map((c, i) => {
+        const colorLabel = i === 0 ? 'color:#6699ff' : i === 1 ? 'color:#ff6666' : 'color:#888';
+        return `
+          <div class="comp-item" id="comp-item-${i}">
+            <span class="comp-num" style="${colorLabel}">${i + 1}</span>
+            <span class="comp-nombre">${c.nombre}</span>
+            <button class="btn-edit" onclick="iniciarEdicion(${i})" title="Editar nombre">✏️</button>
+            <button class="btn-del" onclick="eliminarCompetidor(${i})">✕</button>
+          </div>`;
+      }).join('');
   }
 
   function eliminarCompetidor(i) {
@@ -872,10 +910,157 @@
     socket.emit('mesa-corte', { codigo: salaActual, topN });
   }
 
-  // ── RESTAURAR ──
-  function restaurarSistema() {
-    if (!confirm('¿Restaurar el sistema? Se borrará la competencia actual.')) return;
-    socket.emit('mesa-restaurar', { codigo: salaActual });
+  // ── MODAL GENÉRICO ──
+  let _modalAccion = null;
+
+  function mostrarModal(titulo, sub, bodyHTML, labelOk = 'CONFIRMAR', colorOk = '#c9a84c', colorOkTxt = '#000') {
+    document.getElementById('modal-titulo').textContent = titulo;
+    document.getElementById('modal-sub').textContent = sub;
+    document.getElementById('modal-body').innerHTML = bodyHTML;
+    const okBtn = document.getElementById('modal-ok-btn');
+    okBtn.textContent = labelOk;
+    okBtn.style.background = colorOk;
+    okBtn.style.color = colorOkTxt;
+    document.getElementById('modal-overlay').classList.remove('hidden');
+  }
+
+  function cerrarModal() {
+    document.getElementById('modal-overlay').classList.add('hidden');
+    _modalAccion = null;
+  }
+
+  function ejecutarAccionModal() {
+    cerrarModal();
+    if (typeof _modalAccion === 'function') _modalAccion();
+  }
+
+  // ── RESTAURAR SISTEMA (resetea competencia, mantiene sala y jueces) ──
+  function confirmarRestaurar() {
+    _modalAccion = () => socket.emit('mesa-restaurar', { codigo: salaActual });
+    mostrarModal(
+      'RESTAURAR SISTEMA',
+      'Se borra la competencia pero la sala queda activa',
+      `<p style="font-size:12px;color:#aaa;line-height:1.6">
+        Se limpiarán los competidores, sorteos, cronómetros y calificaciones.<br>
+        Los jueces conectados permanecerán en la sala.
+      </p>`,
+      'RESTAURAR', '#f59e0b', '#000'
+    );
+  }
+
+  // Alias para compatibilidad con el botón original (por si queda alguna referencia)
+  function restaurarSistema() { confirmarRestaurar(); }
+
+  // ── RESETEAR MESA (elimina la sala completamente del servidor) ──
+  // Puede usarse tanto desde la sala activa como desde el setup (para liberar un código)
+  function confirmarResetearMesa() {
+    if (!salaActual) return;
+    _modalAccion = () => {
+      socket.emit('mesa-eliminar-sala', { codigo: salaActual });
+    };
+    mostrarModal(
+      'RESETEAR MESA',
+      'Elimina completamente esta sesión del servidor',
+      `<p style="font-size:12px;color:#aaa;line-height:1.6">
+        Se eliminará la sala <strong style="color:#c9a84c">${salaActual}</strong> y todos sus datos.<br>
+        Los jueces conectados serán desconectados.<br>
+        El código quedará disponible para reutilizarse.
+      </p>`,
+      'ELIMINAR', '#dc2626', '#fff'
+    );
+  }
+
+  // ── ELIMINAR SALA DESDE EL SETUP (por código) ──
+  function pedirResetearPorCodigo() {
+    const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
+    if (!codigo) return alert('Escribe el código de sala que quieres eliminar');
+    _modalAccion = () => {
+      socket.emit('mesa-eliminar-sala', { codigo });
+    };
+    mostrarModal(
+      'ELIMINAR SALA',
+      'Libera el código para reutilizarlo',
+      `<p style="font-size:12px;color:#aaa;line-height:1.6">
+        Se eliminará la sala <strong style="color:#c9a84c">${codigo}</strong> del servidor.<br>
+        Cualquier juez conectado a esa sala será desconectado.
+      </p>`,
+      'ELIMINAR', '#dc2626', '#fff'
+    );
+  }
+
+  // ── EDITAR NOMBRE DE COMPETIDOR (antes de iniciar) ──
+  let _editandoIdx = -1;
+
+  function iniciarEdicion(i) {
+    if (_editandoIdx === i) { cancelarEdicion(); return; }
+    // Cancelar edición previa si la había
+    if (_editandoIdx >= 0) cancelarEdicion();
+    _editandoIdx = i;
+    const item = document.getElementById(`comp-item-${i}`);
+    if (!item) return;
+    const nombreActual = competidoresSetup[i].nombre;
+    const colorLabel = i === 0 ? 'color:#6699ff' : i === 1 ? 'color:#ff6666' : 'color:#888';
+    item.innerHTML = `
+      <span class="comp-num" style="${colorLabel}">${i + 1}</span>
+      <input class="comp-edit-input" id="edit-input-${i}" value="${nombreActual}" maxlength="40"
+        onkeydown="if(event.key==='Enter')confirmarEdicion(${i});if(event.key==='Escape')cancelarEdicion()">
+      <button class="btn-edit-ok" onclick="confirmarEdicion(${i})">✓</button>
+      <button class="btn-edit-cancel" onclick="cancelarEdicion()" style="padding:6px 8px">✕</button>
+    `;
+    setTimeout(() => {
+      const inp = document.getElementById(`edit-input-${i}`);
+      if (inp) { inp.focus(); inp.select(); }
+    }, 50);
+  }
+
+  function confirmarEdicion(i) {
+    const inp = document.getElementById(`edit-input-${i}`);
+    if (!inp) return;
+    const nuevoNombre = inp.value.trim().toUpperCase();
+    if (!nuevoNombre) return alert('El nombre no puede estar vacío');
+    const nombreAnterior = competidoresSetup[i].nombre;
+    if (nuevoNombre === nombreAnterior) { cancelarEdicion(); return; }
+
+    _modalAccion = () => {
+      competidoresSetup[i].nombre = nuevoNombre;
+      _editandoIdx = -1;
+      renderCompetidoresSetup();
+      // Si la competencia ya inició y el competidor tiene ID, notificar al servidor
+      if (competidores.length > 0 && competidores[i]) {
+        socket.emit('mesa-renombrar-competidor', {
+          codigo: salaActual,
+          competidorId: competidores[i].id,
+          nombre: nuevoNombre
+        });
+        // Actualizar array local
+        competidores[i].nombre = nuevoNombre;
+        // Actualizar panel de notas si está visible
+        const elA = document.getElementById('nombre-comp-A');
+        const elB = document.getElementById('nombre-comp-B');
+        const a = competidores[turnoIndex];
+        const b = competidores[turnoIndex + 1];
+        if (elA && a) elA.textContent = a.nombre;
+        if (elB && b) elB.textContent = b.nombre;
+        mostrarTurnoSimultaneo();
+        log(`✏️ Renombrado: "${nombreAnterior}" → "${nuevoNombre}"`);
+      }
+    };
+    mostrarModal(
+      'CONFIRMAR CAMBIO',
+      'Corrección de nombre de competidor',
+      `<p style="font-size:12px;color:#aaa;line-height:1.8">
+        Cambiar:<br>
+        <strong style="color:#fff">${nombreAnterior}</strong><br>
+        por:<br>
+        <strong style="color:#c9a84c">${nuevoNombre}</strong>
+      </p>`,
+      'GUARDAR', '#c9a84c', '#000'
+    );
+  }
+
+  function cancelarEdicion() {
+    _editandoIdx = -1;
+    renderCompetidoresSetup();
   }
 
   // ── RENDER HELPERS ──
@@ -1096,6 +1281,13 @@
   // SOCKET EVENTS
   // ════════════════════════════════════════
 
+  // ── LIBERAR SALA FANTASMA AL CERRAR/RECARGAR ──
+  window.addEventListener('beforeunload', () => {
+    if (salaActual) {
+      socket.emit('mesa-eliminar-sala', { codigo: salaActual });
+    }
+  });
+
   socket.on('sala-creada', (data) => {
     document.getElementById('seccion-setup').classList.add('hidden');
     document.getElementById('seccion-sala').classList.remove('hidden');
@@ -1173,7 +1365,46 @@
     log('Sistema restaurado');
   });
 
-  socket.on('sala-finalizada', () => {
+  // ── SALA ELIMINADA (respuesta a mesa-eliminar-sala) ──
+  socket.on('sala-eliminada', (data) => {
+    // Limpiar todo el estado local
+    competidores = [];
+    competidoresSetup = [];
+    historialEnfrentamientos = [];
+    turnoIndex = 0;
+    salaActual = null;
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    // Volver al setup
+    document.getElementById('seccion-sala').classList.add('hidden');
+    document.getElementById('seccion-setup').classList.remove('hidden');
+    document.getElementById('panel-control-simultaneo').classList.add('hidden');
+    document.getElementById('panel-control').classList.add('hidden');
+    document.getElementById('panel-ranking').classList.add('hidden');
+    document.getElementById('panel-competidores').classList.remove('hidden');
+    document.getElementById('lista-competidores').innerHTML = '';
+    document.getElementById('header-badge').textContent = 'Mesa Central';
+    log(`Sala ${data.codigo} eliminada — código disponible`);
+  });
+
+  // ── COMPETIDOR RENOMBRADO (broadcast del servidor a todos) ──
+  socket.on('competidor-renombrado', (data) => {
+    // Actualizar array local de competidores
+    const comp = competidores.find(c => c.id === data.competidorId);
+    if (comp) comp.nombre = data.nombre;
+    // Actualizar setup también por si acaso
+    if (competidoresSetup[data.competidorId]) competidoresSetup[data.competidorId].nombre = data.nombre;
+    // Refrescar UI si aplica
+    if (modo === '1v1-simultaneo') {
+      const a = competidores[turnoIndex];
+      const b = competidores[turnoIndex + 1];
+      const elA = document.getElementById('nombre-comp-A');
+      const elB = document.getElementById('nombre-comp-B');
+      if (elA && a) elA.textContent = a.nombre;
+      if (elB && b) elB.textContent = b.nombre;
+      mostrarTurnoSimultaneo();
+    }
+    log(`✏️ Competidor actualizado: id=${data.competidorId} → "${data.nombre}"`);
+  });
     document.getElementById('seccion-sala').classList.add('hidden');
     document.getElementById('seccion-setup').classList.remove('hidden');
     document.getElementById('panel-control-simultaneo').classList.add('hidden');
