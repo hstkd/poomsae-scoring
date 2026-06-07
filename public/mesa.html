@@ -164,11 +164,8 @@
     <button class="btn-gold" onclick="crearSala()">CREAR SALA</button>
     <div id="error-sala-msg" class="hidden" style="background:#1a0505;border:1px solid #7f1d1d;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:11px;color:#ff8888;line-height:1.5">
       ⚠️ <strong>Esta sala ya existe.</strong><br>
-      Si es tuya, puedes eliminarla para liberar el código.
+      Contacta al administrador o reinicia el servidor.
     </div>
-    <button class="btn-dark hidden" id="btn-eliminar-setup" onclick="pedirResetearPorCodigo()" style="color:#dc2626;border-color:#3a0000;font-size:11px;padding:8px">
-      ✕ ELIMINAR SALA EXISTENTE
-    </button>
   </div>
 </div>
 
@@ -360,7 +357,6 @@
 
   function limpiarErrorSala() {
     document.getElementById('error-sala-msg').classList.add('hidden');
-    document.getElementById('btn-eliminar-setup').classList.add('hidden');
   }
 
   // ── CREAR SALA ──
@@ -922,7 +918,8 @@
   }
 
   // ── MODAL GENÉRICO ──
-  let _modalAccion = null;
+  // window._modalAccion para que los onclick del HTML puedan accederla
+  window._modalAccion = null;
 
   function mostrarModal(titulo, sub, bodyHTML, labelOk = 'CONFIRMAR', colorOk = '#c9a84c', colorOkTxt = '#000') {
     document.getElementById('modal-titulo').textContent = titulo;
@@ -937,17 +934,18 @@
 
   function cerrarModal() {
     document.getElementById('modal-overlay').classList.add('hidden');
-    _modalAccion = null;
+    window._modalAccion = null;
   }
 
   function ejecutarAccionModal() {
+    const accion = window._modalAccion;
     cerrarModal();
-    if (typeof _modalAccion === 'function') _modalAccion();
+    if (typeof accion === 'function') accion();
   }
 
   // ── RESTAURAR SISTEMA (resetea competencia, mantiene sala y jueces) ──
   function confirmarRestaurar() {
-    _modalAccion = () => socket.emit('mesa-restaurar', { codigo: salaActual });
+    window._modalAccion = () => socket.emit('mesa-restaurar', { codigo: salaActual });
     mostrarModal(
       'RESTAURAR SISTEMA',
       'Se borra la competencia pero la sala queda activa',
@@ -966,7 +964,7 @@
   // Puede usarse tanto desde la sala activa como desde el setup (para liberar un código)
   function confirmarResetearMesa() {
     if (!salaActual) return;
-    _modalAccion = () => {
+    window._modalAccion = () => {
       socket.emit('mesa-eliminar-sala', { codigo: salaActual });
     };
     mostrarModal(
@@ -976,24 +974,6 @@
         Se eliminará la sala <strong style="color:#c9a84c">${salaActual}</strong> y todos sus datos.<br>
         Los jueces conectados serán desconectados.<br>
         El código quedará disponible para reutilizarse.
-      </p>`,
-      'ELIMINAR', '#dc2626', '#fff'
-    );
-  }
-
-  // ── ELIMINAR SALA DESDE EL SETUP (por código) ──
-  function pedirResetearPorCodigo() {
-    const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
-    if (!codigo) return alert('Escribe el código de sala que quieres eliminar');
-    _modalAccion = () => {
-      socket.emit('mesa-eliminar-sala', { codigo });
-    };
-    mostrarModal(
-      'ELIMINAR SALA',
-      'Libera el código para reutilizarlo',
-      `<p style="font-size:12px;color:#aaa;line-height:1.6">
-        Se eliminará la sala <strong style="color:#c9a84c">${codigo}</strong> del servidor.<br>
-        Cualquier juez conectado a esa sala será desconectado.
       </p>`,
       'ELIMINAR', '#dc2626', '#fff'
     );
@@ -1032,7 +1012,7 @@
     const nombreAnterior = competidoresSetup[i].nombre;
     if (nuevoNombre === nombreAnterior) { cancelarEdicion(); return; }
 
-    _modalAccion = () => {
+    window._modalAccion = () => {
       competidoresSetup[i].nombre = nuevoNombre;
       _editandoIdx = -1;
       renderCompetidoresSetup();
@@ -1299,11 +1279,10 @@
     }
   });
 
-  // ── ERROR: sala ya existe — mostrar botón de eliminar ──
+  // ── ERROR: sala ya existe ──
   socket.on('error-sala', (data) => {
-    salaActual = null; // limpiar para no dejar estado sucio
+    salaActual = null;
     document.getElementById('error-sala-msg').classList.remove('hidden');
-    document.getElementById('btn-eliminar-setup').classList.remove('hidden');
   });
 
   socket.on('sala-creada', (data) => {
