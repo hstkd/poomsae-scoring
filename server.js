@@ -318,6 +318,30 @@ io.on('connection', (socket) => {
     io.to(codigo).emit('corte-aplicado', { ranking, topN });
   });
 
+  // ── ELIMINAR SALA (reset completo — libera el código para reutilizar) ──
+  socket.on('mesa-eliminar-sala', ({ codigo }) => {
+    const sala = salas[codigo];
+    if (!sala) {
+      // Sala no existe — notificar igual para que Mesa limpie su estado
+      socket.emit('sala-eliminada', { codigo });
+      return;
+    }
+    io.to(codigo).emit('sala-eliminada', { codigo });
+    delete salas[codigo];
+    console.log(`Sala eliminada: ${codigo}`);
+  });
+
+  // ── RENOMBRAR COMPETIDOR (broadcast a todos en la sala) ──
+  socket.on('mesa-renombrar-competidor', ({ codigo, competidorId, nombre }) => {
+    const sala = salas[codigo];
+    if (!sala) return;
+    const comp = sala.competidores.find(c => c.id === competidorId);
+    if (!comp) return;
+    comp.nombre = nombre;
+    io.to(codigo).emit('competidor-renombrado', { competidorId, nombre });
+    console.log(`Renombrado id=${competidorId} → "${nombre}" en sala ${codigo}`);
+  });
+
   // ── FIN DE SALA ──
   socket.on('mesa-fin-sala', ({ codigo }) => {
     const sala = salas[codigo];
