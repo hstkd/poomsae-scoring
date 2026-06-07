@@ -141,7 +141,14 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // Reemplazar sesión anterior del mismo número
+    // Bloquear posición ya ocupada por OTRO socket activo
+    const ocupado = sala.jueces.find(j => j.num === numJuez);
+    if (ocupado && ocupado.id !== socket.id) {
+      socket.emit('error-sala', { msg: `Juez ${numJuez} ya está conectado en esta sala` });
+      return;
+    }
+
+    // Reemplazar sesión anterior del mismo número (reconexión del mismo juez)
     sala.jueces = sala.jueces.filter(j => j.num !== numJuez);
     sala.jueces.push({ id: socket.id, num: numJuez, nombre });
     socket.join(codigo);
@@ -149,21 +156,28 @@ io.on('connection', (socket) => {
     socket.data.numJuez = numJuez;
     socket.data.nombre = nombre;
 
+    // Snapshot completo para sincronización inmediata (items 1 y 3)
     socket.emit('juez-ok', {
       sala: {
         codigo: sala.codigo, tipo: sala.tipo, modo: sala.modo,
         numJueces: sala.numJueces, categoria: sala.categoria,
         ronda: sala.ronda, estado: sala.estado,
         competidores: sala.competidores, turnoIndex: sala.turnoIndex,
+        // Estado completo para restaurar pantalla
+        faseActual: sala.faseActual,
+        poomsae1: sala.poomsae1,
+        poomsae2: sala.poomsae2,
+        cronoActivo: sala.cronoActivo,
+        cronoSegundos: sala.cronoSegundos || 0,
+        // Lista de posiciones ocupadas para bloquear el select de login
+        juecesOcupados: sala.jueces.map(j => j.num),
       },
     });
 
-    // Si hay competencia activa, reenviar turno Y estado completo (fix #8)
+    // Si hay competencia activa, reenviar turno + estado de fase
     if (sala.estado === 'activo' && sala.competidores.length > 0) {
       const turno = buildTurno(sala, sala.turnoIndex);
       socket.emit('turno-actualizado', { turno, salaInfo: { tipo: sala.tipo } });
-
-      // FIX #8: reenviar fase y poomsae activa para que el juez se reubique correctamente
       socket.emit('control-actualizado', {
         accion: sala.cronoActivo ? 'iniciar' : 'detener',
         fase: sala.faseActual,
@@ -173,7 +187,11 @@ io.on('connection', (socket) => {
       });
     }
 
-    io.to(codigo).emit('juez-conectado', { jueces: sala.jueces, nombre, numJuez });
+    io.to(codigo).emit('juez-conectado', {
+      jueces: sala.jueces,
+      nombre, numJuez,
+      juecesOcupados: sala.jueces.map(j => j.num),
+    });
     console.log(`Juez ${numJuez} (${nombre}) en sala ${codigo}`);
   });
 
@@ -307,6 +325,8 @@ io.on('connection', (socket) => {
     if (!sala) return;
     if (accion === 'iniciar') sala.cronoActivo = true;
     if (accion === 'detener' || accion === 'restablecer') sala.cronoActivo = false;
+    // Guardar tiempo restante para sincronizar jueces que se reconecten
+    if (duracion !== undefined) sala.cronoSegundos = duracion;
     io.to(codigo).emit('cronometro-update', { accion, duracion, tipo });
   });
 
@@ -407,7 +427,7 @@ io.on('connection', (socket) => {
       // Solo remover si el socket actual es el registrado para ese número
       if (juezActual && juezActual.id === socket.id) {
         sala.jueces = sala.jueces.filter(j => j.id !== socket.id);
-        io.to(codigo).emit('juez-desconectado', { jueces: sala.jueces, numJuez });
+        io.to(codigo).emit('juez-desconectado', { jueces: sala.jueces, numJuez, juecesOcupados: sala.jueces.map(j => j.num) });
       }
     }
   });
