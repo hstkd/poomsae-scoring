@@ -468,6 +468,23 @@
     .resumen-sub { font-size: 9px; color: #555; letter-spacing: 1px; margin-top: 2px; }
 
     .hidden { display: none; }
+
+    /* ── CONTROLES BLOQUEADOS ── */
+    .controles-bloqueados .btn-ded,
+    .controles-bloqueados .btn-ded-normal,
+    .controles-bloqueados .btn-confirmar,
+    .controles-bloqueados .btn-enviar {
+      opacity: 0.25 !important;
+      pointer-events: none !important;
+    }
+    .overlay-espera-info {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px; letter-spacing: 3px; color: #333;
+      text-align: center; padding: 6px 12px;
+      background: #111; border: 1px solid #1a1a1a;
+      border-radius: 8px; max-width: 280px;
+    }
+    option:disabled { color: #555; }
   </style>
 </head>
 <body>
@@ -488,6 +505,7 @@
       <option value="5">JUEZ 5</option><option value="6">JUEZ 6</option>
       <option value="7">JUEZ 7</option>
     </select>
+    <div id="login-error" style="display:none;background:#1a0505;border:1px solid #7f1d1d;border-radius:8px;padding:8px 12px;font-size:11px;color:#ff8888;text-align:center"></div>
     <button class="btn-gold" onclick="conectarse()">CONECTAR</button>
   </div>
 </div>
@@ -875,76 +893,6 @@
     };
   }
 
-    function enviarAmbos() {
-    const vA = getValores('A'), vB = getValores('B');
-    const mA = modulosVal['A'], mB = modulosVal['B'];
-
-    const compA = turnoActual.competidorA;
-    const compB = turnoActual.competidorB;
-
-    if (!compA || compA.id === undefined) {
-      console.error('CompA inválido:', compA);
-      return;
-    }
-    if (!compB || compB.id === undefined) {
-      console.error('CompB inválido:', compB);
-      return;
-    }
-
-    console.log(`Enviando A id=${compA.id} prec=${vA.precision} pres=${vA.presentacion}`);
-    console.log(`Enviando B id=${compB.id} prec=${vB.precision} pres=${vB.presentacion}`);
-
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo,
-      competidorId: compA.id,
-      precision: vA.precision,
-      presentacion: vA.presentacion,
-      desglose: { prec: vA.precision, vel: mA.vel, rit: mA.rit, exp: mA.exp },
-      poomsae: poomsaeActiva
-    });
-
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo,
-      competidorId: compB.id,
-      precision: vB.precision,
-      presentacion: vB.presentacion,
-      desglose: { prec: vB.precision, vel: mB.vel, rit: mB.rit, exp: mB.exp },
-      poomsae: poomsaeActiva
-    });
-
-    mostrarResumen([
-      { nombre: compA.nombre, ...vA },
-      { nombre: compB.nombre, ...vB }
-    ]);
-  }
-
-  function enviarUno(key, fase) {
-    let comp;
-    if (fase === 'A') comp = turnoActual.competidorA;
-    else if (fase === 'B') comp = turnoActual.competidorB;
-    else comp = turnoActual.competidor;
-
-    if (!comp || comp.id === undefined) {
-      console.error('Comp inválido:', comp);
-      return;
-    }
-
-    const v = getValores(key);
-    const m = modulosVal[key];
-
-    console.log(`Enviando ${comp.nombre} id=${comp.id} prec=${v.precision} pres=${v.presentacion}`);
-
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo,
-      competidorId: comp.id,
-      precision: v.precision,
-      presentacion: v.presentacion,
-      desglose: { prec: v.precision, vel: m.vel, rit: m.rit, exp: m.exp },
-      poomsae: poomsaeActiva
-    });
-
-    mostrarResumen([{ nombre: comp.nombre, ...v }]);
-  }
 
   function mostrarResumen(resultados) {
     document.getElementById('panel-calificacion').style.display = 'none';
@@ -969,201 +917,303 @@
     document.getElementById('overlay-espera').classList.remove('hidden');
   }
 
-  // ── ENVIAR con desglose ──
-  function enviarAmbos() {
-    const vA = getValores('A');
-    const vB = getValores('B');
-    const modA = modulosVal['A'];
-    const modB = modulosVal['B'];
 
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo,
-      competidorId: turnoActual.competidorA.id,
-      precision: vA.precision,
-      presentacion: vA.presentacion,
-      desglose: { precision: vA.precision, vel: modA.vel, rit: modA.rit, exp: modA.exp }
-    });
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo,
-      competidorId: turnoActual.competidorB.id,
-      precision: vB.precision,
-      presentacion: vB.presentacion,
-      desglose: { precision: vB.precision, vel: modB.vel, rit: modB.rit, exp: modB.exp }
-    });
-    mostrarResumen([
-      { nombre: turnoActual.competidorA?.nombre, ...vA },
-      { nombre: turnoActual.competidorB?.nombre, ...vB }
-    ]);
-  }
-
-  function enviarUno(key, fase) {
-    let comp = fase === 'A' ? turnoActual.competidorA : fase === 'B' ? turnoActual.competidorB : turnoActual.competidor;
-    const v = getValores(key);
-    const mods = modulosVal[key];
-    socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo,
-      competidorId: comp.id,
-      precision: v.precision,
-      presentacion: v.presentacion,
-      desglose: { precision: v.precision, vel: mods.vel, rit: mods.rit, exp: mods.exp }
-    });
-    mostrarResumen([{ nombre: comp?.nombre, ...v }]);
-  }
-
-  // ── SOCKET ──
-  // ── ESTADO DE CALIFICACIÓN ──
-  let precisonBloqueada = true;
-  let poomsaeActiva = 1; // 1 o 2
-  let precisionConfirmada = { A: false, B: false, C: false };
-
-  // ── ENVIAR PRECISIÓN (al confirmar) ──
-    function enviarPrecision(key, comp) {
+  // ── ENVIAR PRECISIÓN (al confirmar paso 1) ──
+  function enviarPrecision(key, comp) {
     if (!comp) return;
-    const prec = precisionVal[key] || 0;
     socket.emit('juez-precision', {
       codigo: salaInfo.codigo,
       competidorId: comp.id,
-      precision: prec,
+      precision: precisionVal[key] || 0,
       poomsae: poomsaeActiva
     });
     precisionConfirmada[key] = true;
   }
 
-  
-  // ── ENVIAR PRESENTACIÓN con desglose ──
+  // ── ENVIAR PUNTAJE COMPLETO (precisión + presentación) — simultáneo ──
   function enviarAmbos() {
     const vA = getValores('A'), vB = getValores('B');
     const mA = modulosVal['A'], mB = modulosVal['B'];
+    const compA = turnoActual.competidorA;
+    const compB = turnoActual.competidorB;
+    if (!compA || compA.id === undefined || !compB || compB.id === undefined) {
+      console.error('Competidores inválidos:', compA, compB); return;
+    }
     socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo, competidorId: turnoActual.competidorA.id,
+      codigo: salaInfo.codigo, competidorId: compA.id,
       precision: vA.precision, presentacion: vA.presentacion,
       desglose: { prec: vA.precision, vel: mA.vel, rit: mA.rit, exp: mA.exp },
       poomsae: poomsaeActiva
     });
     socket.emit('juez-puntaje', {
-      codigo: salaInfo.codigo, competidorId: turnoActual.competidorB.id,
+      codigo: salaInfo.codigo, competidorId: compB.id,
       precision: vB.precision, presentacion: vB.presentacion,
       desglose: { prec: vB.precision, vel: mB.vel, rit: mB.rit, exp: mB.exp },
       poomsae: poomsaeActiva
     });
     mostrarResumen([
-      { nombre: turnoActual.competidorA?.nombre, ...vA },
-      { nombre: turnoActual.competidorB?.nombre, ...vB }
+      { nombre: compA.nombre, ...vA },
+      { nombre: compB.nombre, ...vB }
     ]);
   }
 
+  // ── ENVIAR PUNTAJE COMPLETO — individual (cutoff / secuencial) ──
   function enviarUno(key, fase) {
-    const comp = fase === 'A' ? turnoActual.competidorA : fase === 'B' ? turnoActual.competidorB : turnoActual.competidor;
-    const v = getValores(key);
-    const m = modulosVal[key];
+    const comp = fase === 'A' ? turnoActual.competidorA
+               : fase === 'B' ? turnoActual.competidorB
+               : turnoActual.competidor;
+    if (!comp || comp.id === undefined) { console.error('Comp inválido:', comp); return; }
+    const v = getValores(key), m = modulosVal[key];
     socket.emit('juez-puntaje', {
       codigo: salaInfo.codigo, competidorId: comp.id,
       precision: v.precision, presentacion: v.presentacion,
       desglose: { prec: v.precision, vel: m.vel, rit: m.rit, exp: m.exp },
       poomsae: poomsaeActiva
     });
-    mostrarResumen([{ nombre: comp?.nombre, ...v }]);
+    mostrarResumen([{ nombre: comp.nombre, ...v }]);
+  }
+
+  // ── ESTADO DE CALIFICACIÓN ──
+  let precisionBloqueada = true;
+  let controlesHabilitados = false; // solo true después de competencia-iniciada + iniciar crono
+  let poomsaeActiva = 1;
+  let precisionConfirmada = { A: false, B: false, C: false };
+
+  // ── BLOQUEAR / HABILITAR CONTROLES ──
+  function bloquearControles() {
+    controlesHabilitados = false;
+    document.getElementById('panel-calificacion').classList.add('controles-bloqueados');
+    document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
+      btn.style.opacity = '0.25';
+      btn.style.pointerEvents = 'none';
+    });
+  }
+
+  function habilitarControlesPrecision() {
+    controlesHabilitados = true;
+    precisionBloqueada = false;
+    document.getElementById('panel-calificacion').classList.remove('controles-bloqueados');
+    document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    });
+    document.querySelectorAll('.btn-confirmar').forEach(btn => {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    });
+  }
+
+  function bloquearSoloPrecision() {
+    precisionBloqueada = true;
+    document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
+      btn.style.opacity = '0.25';
+      btn.style.pointerEvents = 'none';
+    });
+    document.querySelectorAll('.btn-confirmar').forEach(btn => {
+      btn.style.opacity = '1';
+      btn.style.pointerEvents = 'auto';
+    });
+  }
+
+  // ── ACTUALIZAR SELECT DE POSICIONES ──
+  function actualizarSelectJueces(ocupados) {
+    const sel = document.getElementById('input-numjuez');
+    if (!sel) return;
+    Array.from(sel.options).forEach(opt => {
+      const num = parseInt(opt.value);
+      if (ocupados.includes(num)) {
+        opt.disabled = true;
+        opt.textContent = `JUEZ ${num} — Conectado`;
+      } else {
+        opt.disabled = false;
+        opt.textContent = `JUEZ ${num}`;
+      }
+    });
+  }
+
+  // ── RESTAURAR PANTALLA SEGÚN FASE (al reconectar) ──
+  function restaurarEstadoPorFase(sala) {
+    const fase = sala.faseActual || 'sorteo';
+    const panel = document.getElementById('panel-calificacion');
+
+    // Si no hay competencia activa, mostrar espera informativa
+    if (sala.estado !== 'activo' || !sala.competidores.length) {
+      mostrarEsperaConInfo(sala.categoria, sala.ronda, null);
+      return;
+    }
+
+    const turno = buildTurnoLocal(sala);
+    if (!turno) { mostrarEsperaConInfo(sala.categoria, sala.ronda, null); return; }
+
+    if (['p1_corriendo', 'p1_detenido', 'p2_corriendo', 'p2_detenido'].includes(fase)) {
+      // Renderizar panel de calificación
+      poomsaeActiva = fase.startsWith('p2') ? 2 : 1;
+      turnoActual = turno;
+      resetEstado();
+      panel.innerHTML = '';
+      renderSimultaneo(panel);
+      document.getElementById('overlay-espera').classList.add('hidden');
+      panel.classList.add('visible');
+      panel.style.display = 'flex';
+
+      if (fase === 'p1_corriendo' || fase === 'p2_corriendo') {
+        habilitarControlesPrecision();
+      } else {
+        // detenido: bloquear solo botones de deducción
+        bloquearSoloPrecision();
+      }
+    } else if (fase === 'p2_listo') {
+      poomsaeActiva = 2;
+      mostrarEsperaConInfo(sala.categoria, sala.ronda, sala.poomsae2, '2DA POOMSAE');
+    } else {
+      // sorteo, p1_listo, resultado
+      mostrarEsperaConInfo(sala.categoria, sala.ronda,
+        fase === 'p1_listo' ? sala.poomsae1 : null,
+        fase === 'p1_listo' ? '1RA POOMSAE · LISTA' : 'ESPERANDO TURNO');
+    }
+  }
+
+  function mostrarEsperaConInfo(categoria, ronda, poomsae, titulo) {
+    const espera = document.getElementById('overlay-espera');
+    const tit = titulo || 'ESPERANDO TURNO';
+    espera.innerHTML = `
+      <div style="font-size:36px">⏸</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#c9a84c">${tit}</div>
+      ${poomsae ? `<div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:#fff">${poomsae}</div>` : ''}
+      <div style="font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase;margin-top:4px">${categoria || ''} · ${ronda || ''}</div>`;
+    espera.classList.remove('hidden');
+  }
+
+  // Construir objeto turno localmente desde sala info (para reconexión)
+  function buildTurnoLocal(sala) {
+    const ti = sala.turnoIndex || 0;
+    const modo = sala.modo;
+    if (modo === '1v1-simultaneo') {
+      return {
+        tipo: '1v1-simultaneo',
+        competidorA: sala.competidores[ti] || null,
+        competidorB: sala.competidores[ti + 1] || null,
+      };
+    }
+    return null;
   }
 
   // ── SOCKET ──
   socket.on('juez-ok', (data) => {
     salaInfo = data.sala;
     document.getElementById('overlay-login').classList.add('hidden');
+    document.getElementById('login-error').style.display = 'none';
     document.getElementById('juez-badge').textContent = 'JUEZ ' + numJuez;
-    document.getElementById('overlay-espera').classList.remove('hidden');
+
+    // Bloquear controles hasta que Mesa inicie (item 3)
+    bloquearControles();
+
+    // Restaurar pantalla según estado actual de la sala (item 1)
+    restaurarEstadoPorFase(data.sala);
   });
 
-  socket.on('error-sala', (d) => alert(d.msg));
-  socket.on('competencia-iniciada', (d) => { salaInfo.tipo = d.tipo; salaInfo.modo = d.modo; });
-  socket.on('turno-actualizado', (d) => renderCalificacion(d.turno));
+  socket.on('error-sala', (d) => {
+    const err = document.getElementById('login-error');
+    if (err) {
+      err.textContent = d.msg;
+      err.style.display = 'block';
+    } else {
+      alert(d.msg);
+    }
+  });
+
+  // Actualizar opciones del select cuando otro juez se conecta/desconecta (item 2)
+  socket.on('juez-conectado', (d) => {
+    if (d.juecesOcupados) actualizarSelectJueces(d.juecesOcupados);
+  });
+  socket.on('juez-desconectado', (d) => {
+    if (d.juecesOcupados) actualizarSelectJueces(d.juecesOcupados);
+  });
+
+  socket.on('competencia-iniciada', (d) => {
+    salaInfo.tipo = d.tipo;
+    salaInfo.modo = d.modo;
+    salaInfo.competidores = d.competidores;
+    salaInfo.estado = 'activo';
+    // Controles siguen bloqueados hasta que Mesa presione INICIAR crono
+  });
+
+  socket.on('turno-actualizado', (d) => {
+    renderCalificacion(d.turno);
+    // Aplicar bloqueo inicial al renderizar
+    if (!controlesHabilitados) bloquearControles();
+  });
 
   socket.on('control-actualizado', (data) => {
     if (data.accion === 'iniciar') {
-      // Habilitar precisión
-      precisonBloqueada = false;
       precisionConfirmada = { A: false, B: false, C: false };
-      // Si hay panel visible, habilitar botones de deducción visualmente
-      document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-      });
+      habilitarControlesPrecision();
 
-      } else if (data.accion === 'detener') {
-      // Bloquear deducción pero NO bloquear el botón confirmar
-      precisonBloqueada = true;
-      document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
-        btn.style.opacity = '0.3';
-        btn.style.pointerEvents = 'none';
-      });
-      // El botón CONFIRMAR PRECISIÓN debe seguir activo
-      document.querySelectorAll('.btn-confirmar').forEach(btn => {
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-      });
-
+    } else if (data.accion === 'detener') {
+      bloquearSoloPrecision();
 
     } else if (data.accion === 'nueva-poomsae') {
-      // Poomsae 2: reactivar sin recargar
       poomsaeActiva = 2;
-      precisonBloqueada = true;
+      precisionBloqueada = true;
+      controlesHabilitados = false;
       precisionConfirmada = { A: false, B: false, C: false };
-      // Mostrar overlay de espera con info de nueva poomsae
       document.getElementById('overlay-enviado').classList.add('hidden');
       document.getElementById('panel-calificacion').style.display = 'none';
       document.getElementById('panel-calificacion').classList.remove('visible');
-      const espera = document.getElementById('overlay-espera');
-      espera.innerHTML = `
-        <div style="font-size:44px">⏸</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;color:#c9a84c">2DA POOMSAE</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:#fff">${data.poomsae || ''}</div>
-        <div style="font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase;margin-top:4px">Espera que mesa inicie</div>`;
-      espera.classList.remove('hidden');
+      mostrarEsperaConInfo(salaInfo.categoria, salaInfo.ronda, data.poomsae || salaInfo.poomsae2, '2DA POOMSAE');
 
     } else if (data.accion === 'nueva-competencia') {
-      // Nueva competencia: volver a espera
       poomsaeActiva = 1;
-      precisonBloqueada = true;
+      precisionBloqueada = true;
+      controlesHabilitados = false;
       precisionConfirmada = { A: false, B: false, C: false };
       turnoActual = null;
       document.getElementById('overlay-enviado').classList.add('hidden');
       document.getElementById('panel-calificacion').style.display = 'none';
       document.getElementById('panel-calificacion').classList.remove('visible');
-      document.getElementById('overlay-espera').innerHTML = `
-        <div style="font-size:44px">⏸</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:#c9a84c">ESPERANDO TURNO</div>
-        <div style="font-size:9px;letter-spacing:3px;color:#444;text-transform:uppercase">Espera la señal de la mesa</div>`;
-      document.getElementById('overlay-espera').classList.remove('hidden');
+      bloquearControles();
+      mostrarEsperaConInfo(salaInfo.categoria, salaInfo.ronda, null, 'ESPERANDO TURNO');
 
     } else if (data.accion === 'restablecer') {
-      // Reactivar botones si corresponde
-      precisonBloqueada = false;
-      document.querySelectorAll('.btn-ded, .btn-ded-normal').forEach(btn => {
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
-      });
+      habilitarControlesPrecision();
     }
   });
 
   socket.on('sala-finalizada', () => {
-    // Volver a login
+    bloquearControles();
     document.getElementById('overlay-espera').classList.add('hidden');
     document.getElementById('panel-calificacion').style.display = 'none';
+    document.getElementById('panel-calificacion').classList.remove('visible');
     document.getElementById('overlay-login').classList.remove('hidden');
+    // Limpiar el select de posiciones al salir
+    actualizarSelectJueces([]);
+    salaInfo = {}; turnoActual = null;
+  });
+
+  socket.on('sala-eliminada', () => {
+    bloquearControles();
+    document.getElementById('overlay-espera').classList.add('hidden');
+    document.getElementById('panel-calificacion').style.display = 'none';
+    document.getElementById('panel-calificacion').classList.remove('visible');
+    document.getElementById('overlay-login').classList.remove('hidden');
+    actualizarSelectJueces([]);
     salaInfo = {}; turnoActual = null;
   });
 
   socket.on('puntaje-confirmado', (data) => {
-    console.log(`✓ Confirmado comp ${data.competidorId}`);
+    console.log(`✓ Confirmado comp ${data.competidorId} P${data.poomsae}`);
   });
 
   socket.on('disconnect', () => console.log('Desconectado'));
   socket.on('reconnect', () => {
     if (salaInfo.codigo) {
-      socket.emit('juez-unirse', { codigo: salaInfo.codigo, nombre: 'Juez', numJuez });
+      socket.emit('juez-unirse', {
+        codigo: salaInfo.codigo,
+        nombre: document.getElementById('juez-badge').textContent.replace('JUEZ ','Juez '),
+        numJuez
+      });
     }
   });
-
-
 </script>
 </body>
 </html>
