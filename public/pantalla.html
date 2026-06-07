@@ -440,17 +440,18 @@
 
 <!-- SCORES P1 FIJOS -->
 <div id="scores-p1-fijos" class="scores-p1-fijos hidden">
-  <div class="score-p1-chip">
-    <div class="score-p1-chip-label">Poomsae 1</div>
-    <div class="score-p1-chip-nombre" id="p1-nombre-A">—</div>
+  <div class="score-p1-chip" style="border-color:#3d0000">
+    <div class="score-p1-chip-label">Poomsae 1 · Rojo</div>
+    <div class="score-p1-chip-nombre" id="p1-nombre-A" style="color:#ff6666">—</div>
     <div class="score-p1-chip-val" id="p1-score-A">—</div>
   </div>
-  <div class="score-p1-chip">
-    <div class="score-p1-chip-label">Poomsae 1</div>
-    <div class="score-p1-chip-nombre" id="p1-nombre-B">—</div>
+  <div class="score-p1-chip" style="border-color:#00003d">
+    <div class="score-p1-chip-label">Poomsae 1 · Azul</div>
+    <div class="score-p1-chip-nombre" id="p1-nombre-B" style="color:#6699ff">—</div>
     <div class="score-p1-chip-val" id="p1-score-B">—</div>
   </div>
 </div>
+
 
 <!-- CUERPO -->
 <div id="cuerpo" class="hidden">
@@ -654,13 +655,16 @@
     const nomA = document.getElementById('nombre-A')?.textContent;
     const nomB = document.getElementById('nombre-B')?.textContent;
     if (scoreA && scoreA !== '—') {
-      document.getElementById('p1-score-A').textContent = scoreA;
-      document.getElementById('p1-nombre-A').textContent = nomA || '—';
-      document.getElementById('p1-score-B').textContent = scoreB || '—';
-      document.getElementById('p1-nombre-B').textContent = nomB || '—';
+      // Izquierda = ROJO = B
+      document.getElementById('p1-score-A').textContent = scoreB || '—';
+      document.getElementById('p1-nombre-A').textContent = nomB || '—';
+      // Derecha = AZUL = A
+      document.getElementById('p1-score-B').textContent = scoreA || '—';
+      document.getElementById('p1-nombre-B').textContent = nomA || '—';
       document.getElementById('scores-p1-fijos').classList.remove('hidden');
     }
   }
+
 
   function ocultarScoresP1() {
     document.getElementById('scores-p1-fijos')?.classList.add('hidden');
