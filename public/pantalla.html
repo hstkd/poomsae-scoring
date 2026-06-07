@@ -121,7 +121,7 @@
 }
 .score-p1-chip-val {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 38px; letter-spacing: 2px; color: #c9a84c;
+  font-size: 24px; letter-spacing: 2px; color: #c9a84c;
 }
 
     /* ── ANIMACIÓN SORTEO ── */
@@ -241,20 +241,20 @@
     .lado-azul .comp-nombre-g { color: #8899ff; }
 
     /* Notas progresivas */
-  .notas-progresivas {
-  display: flex; flex-direction: column; gap: 6px;
-  margin-bottom: 12px; width: 90%; max-width: 520px;
-}
-   .nota-fila {
-  display: flex; justify-content: space-between; align-items: center;
-  background: rgba(255,255,255,0.04); border-radius: 8px; padding: 8px 16px;
-  font-size: 11px; transition: all 0.3s;
-}
+    .notas-progresivas {
+      display: flex; flex-direction: column; gap: 4px;
+      margin-bottom: 12px; width: 80%; max-width: 280px;
+    }
+    .nota-fila {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,0.04); border-radius: 6px; padding: 4px 10px;
+      font-size: 11px; transition: all 0.3s;
+    }
     .nota-fila.recibida { background: rgba(255,255,255,0.09); }
-    .nota-juez-id { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: #555; }
+    .nota-juez-id { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 1px; color: #555; }
     .nota-juez-id.recibida { color: #888; }
-    .nota-juez-score { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: #c9a84c; }
-    .nota-juez-detalle { font-size: 16px; color: #444; }
+    .nota-juez-score { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #c9a84c; }
+    .nota-juez-detalle { font-size: 9px; color: #444; }
 
     .comp-score-g {
       font-family: 'Bebas Neue', sans-serif;
@@ -361,151 +361,39 @@
 }
 .resumen-comp-nombre {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 40px; letter-spacing: 4px; margin-bottom: 16px;
-  text-align: center;
+  font-size: 28px; letter-spacing: 4px; margin-bottom: 16px;
 }
 .resumen-comp-card.rojo-card .resumen-comp-nombre { color: #ff8888; }
 .resumen-comp-card.azul-card .resumen-comp-nombre { color: #8899ff; }
 .resumen-fila-score {
-  display: flex; justify-content: center; align-items: center; gap: 16px;
-  padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
   font-size: 12px;
 }
 .resumen-fila-label { color: #555; letter-spacing: 2px; text-transform: uppercase; font-size: 10px; }
 .resumen-fila-val {
-  font-family: 'Bebas Neue', sans-serif; font-size: 44px; color: #c9a84c;
+  font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: #c9a84c;
 }
 .resumen-promedio {
   margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.15);
-  text-align: center;
 }
 .resumen-promedio-label {
   font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555;
   text-transform: uppercase; margin-bottom: 4px;
 }
 .resumen-promedio-val {
-  font-family: 'Bebas Neue', sans-serif; font-size: 90px; color: #fff; line-height: 1;
+  font-family: 'Bebas Neue', sans-serif; font-size: 60px; color: #fff; line-height: 1;
 }
 .resumen-vs {
   font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: #222; text-align: center;
 }
 .resumen-ganador-banner {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 36px; letter-spacing: 6px; color: #c9a84c;
+  font-size: 22px; letter-spacing: 6px; color: #c9a84c;
   text-align: center; animation: fadeIn 0.6s ease-out;
 }
 
     .hidden { display: none !important; }
-    
-  /* ── MODO CLARO ── */
-body.tema-claro { background: #f0f0f8; color: #111; }
-
-body.tema-claro .header {
-  background: linear-gradient(90deg, #e8e8f0, #f0f0f8, #e8e8f0);
-  border-bottom-color: #8B6914;
-}
-body.tema-claro .header-logo { color: #8B6914; }
-body.tema-claro .header-centro { color: #555; }
-body.tema-claro .header-sala { color: #8B6914; }
-
-body.tema-claro #estado-espera { background: #f0f0f8; }
-body.tema-claro .espera-logo { color: #ccc; }
-body.tema-claro .espera-sub { color: #999; }
-
-/* Lados — fondo claro, texto oscuro */
-body.tema-claro .lado-rojo { background: linear-gradient(135deg, #fff0f0, #ffe4e4); border-right-color: #ffaaaa; }
-body.tema-claro .lado-azul { background: linear-gradient(225deg, #f0f0ff, #e4e4ff); border-left-color: #aaaaff; }
-body.tema-claro .lado-rojo.ganador { background: linear-gradient(135deg, #ffd8d8, #ffcccc); }
-body.tema-claro .lado-azul.ganador { background: linear-gradient(225deg, #d8d8ff, #ccccff); }
-body.tema-claro .lado-rojo.perdedor { opacity: 0.3; }
-body.tema-claro .lado-azul.perdedor { opacity: 0.3; }
-
-body.tema-claro .centro-vs { background: #e8e8f0; border-color: #ccc; }
-body.tema-claro .vs-txt { color: #bbb; }
-
-body.tema-claro .comp-etiqueta { color: #999; }
-/* Nombre sobre fondo rojo claro → rojo oscuro legible */
-body.tema-claro .lado-rojo .comp-nombre-g { color: #990000; }
-/* Nombre sobre fondo azul claro → azul oscuro legible */
-body.tema-claro .lado-azul .comp-nombre-g { color: #000099; }
-
-/* Notas sobre fondo claro */
-body.tema-claro .nota-fila { background: rgba(0,0,0,0.05); }
-body.tema-claro .nota-fila.recibida { background: rgba(0,0,0,0.10); }
-body.tema-claro .nota-juez-id { color: #aaa; }
-body.tema-claro .nota-juez-id.recibida { color: #555; }
-/* Nota score sobre fondo rojo/azul claro → café oscuro legible */
-body.tema-claro .nota-juez-score { color: #8B6914; }
-body.tema-claro .nota-juez-detalle { color: #777; }
-
-/* Score grande sobre fondo rojo/azul claro */
-body.tema-claro .lado-rojo .comp-score-g { color: #990000; text-shadow: none; }
-body.tema-claro .lado-azul .comp-score-g { color: #000099; text-shadow: none; }
-
-/* Banner poomsae */
-body.tema-claro .poomsae-banner { background: rgba(245,245,250,0.97); border-bottom-color: #8B6914; }
-body.tema-claro .poomsae-banner-label { color: #999; }
-body.tema-claro .poomsae-banner-nombre { color: #8B6914; text-shadow: none; }
-body.tema-claro .poomsae-banner-ambas { color: #8B6914; }
-
-/* Cronómetro */
-body.tema-claro .crono-display { color: #8B6914; background: rgba(245,245,250,0.95); text-shadow: none; }
-body.tema-claro .crono-display.urgente { color: #cc0000; text-shadow: none; }
-body.tema-claro .crono-label-txt { color: #888; }
-
-/* Ronda badge */
-body.tema-claro .ronda-badge { background: rgba(245,245,250,0.97); border-color: #8B6914; }
-body.tema-claro .ronda-badge-label { color: #999; }
-body.tema-claro .ronda-badge-num { color: #8B6914; }
-
-/* Scores P1 fijos */
-body.tema-claro .score-p1-chip { background: rgba(245,245,250,0.97); border-color: #ccc; }
-body.tema-claro .score-p1-chip-label { color: #999; }
-body.tema-claro .score-p1-chip-val { color: #8B6914; }
-
-/* Resumen final — fondo semi-blanco, texto oscuro */
-body.tema-claro #overlay-resumen { background: rgba(240,240,248,0.98); }
-body.tema-claro .resumen-titulo-txt { color: #888; }
-body.tema-claro .resumen-comp-card.rojo-card { background: linear-gradient(135deg,#ffd8d8,#ffcccc); border-color: #cc0000; }
-body.tema-claro .resumen-comp-card.azul-card { background: linear-gradient(135deg,#d8d8ff,#ccccff); border-color: #0000cc; }
-body.tema-claro .resumen-comp-card.perdedor-card { opacity: 0.35; }
-/* Nombre sobre rojo claro → rojo oscuro */
-body.tema-claro .resumen-comp-card.rojo-card .resumen-comp-nombre { color: #990000; }
-/* Nombre sobre azul claro → azul oscuro */
-body.tema-claro .resumen-comp-card.azul-card .resumen-comp-nombre { color: #000099; }
-body.tema-claro .resumen-fila-label { color: #777; }
-/* Valor sobre rojo/azul claro → oscuro legible */
-body.tema-claro .resumen-comp-card.rojo-card .resumen-fila-val { color: #880000; }
-body.tema-claro .resumen-comp-card.azul-card .resumen-fila-val { color: #000088; }
-body.tema-claro .resumen-promedio-label { color: #777; }
-/* Promedio — el número más importante, negro sobre fondo claro */
-body.tema-claro .resumen-promedio-val { color: #111; }
-body.tema-claro .resumen-fila-score { border-bottom-color: rgba(0,0,0,0.1); }
-body.tema-claro .resumen-promedio { border-top-color: rgba(0,0,0,0.12); }
-body.tema-claro .resumen-vs { color: #ccc; }
-body.tema-claro .resumen-ganador-banner { color: #8B6914; }
-
-/* Sorteo */
-body.tema-claro #overlay-sorteo { background: rgba(240,240,248,0.97); }
-body.tema-claro .sorteo-titulo { color: #999; }
-body.tema-claro .sorteo-ruleta { color: #8B6914; text-shadow: none; }
-body.tema-claro .sorteo-card { background: #fff; border-color: #ddd; }
-body.tema-claro .sorteo-card.activa { border-color: #8B6914; box-shadow: none; }
-body.tema-claro .sorteo-card-label { color: #999; }
-body.tema-claro .sorteo-card-nombre { color: #8B6914; }
-
-/* Footer */
-body.tema-claro .footer { background: #e8e8f0; border-top-color: #ccc; }
-body.tema-claro .footer-txt { color: #aaa; }
-
-/* Jueces dots */
-body.tema-claro .jdot { background: #ddd; border-color: #bbb; }
-body.tema-claro .jcircle { background: #e0e0e0; border-color: #bbb; color: #999; }
-body.tema-claro .jcircle.listo { background: #16a34a; border-color: #22c55e; color: #fff; }
-
-/* Login */
-body.tema-claro #overlay-login { background: #f0f0f8; }
-body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111; }
   </style>
 </head>
 <body>
@@ -537,7 +425,7 @@ body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111
 </div>
 <!-- CRONÓMETRO — fuera del cuerpo para que siempre sea visible -->
 <div id="crono-wrap" class="hidden" style="
-  position:fixed; top:100px; left:50%; transform:translateX(-50%);
+  position:fixed; top:60px; left:50%; transform:translateX(-50%);
   z-index:100; text-align:center; pointer-events:none;">
   <div class="crono-label-txt" id="crono-label">Tiempo de Ejecución</div>
   <div class="crono-display" id="crono-display">1:30</div>
@@ -656,6 +544,11 @@ body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111
 
   // Poomsaes sorteadas
   let poomsae1 = null, poomsae2 = null;
+
+  // Scores por poomsae para resumen final
+  let scoreP1A = null, scoreP1B = null;
+  let scoreP2A = null, scoreP2B = null;
+  let fasePuntaje = 1;
 
   // Lista de poomsaes para animación (hardcoded igual que server/mesa)
   const POOMSAES_TODAS = ['Taegeuk 4','Taegeuk 5','Taegeuk 6','Taegeuk 7','Taegeuk 8',
@@ -856,19 +749,6 @@ body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111
     initNotasGrid('B');
   }
 
-    // Guardar scores por poomsae para resumen
-  function registrarScorePoomsae(poomsaeNum) {
-    const sA = document.getElementById('score-A')?.textContent;
-    const sB = document.getElementById('score-B')?.textContent;
-    if (poomsaeNum === 1) {
-      scoreP1A = sA !== '—' && sA ? parseFloat(sA) : null;
-      scoreP1B = sB !== '—' && sB ? parseFloat(sB) : null;
-    } else {
-      scoreP2A = sA !== '—' && sA ? parseFloat(sA) : null;
-      scoreP2B = sB !== '—' && sB ? parseFloat(sB) : null;
-    }
-  }
-
   function mostrarResumenFinal() {
     const nomA = document.getElementById('nombre-A')?.textContent || '—';
     const nomB = document.getElementById('nombre-B')?.textContent || '—';
@@ -942,24 +822,144 @@ body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111
     scoreP2A = null; scoreP2B = null;
   }
 
+  // ── RESTAURAR ESTADO COMPLETO (al conectar tarde o reconectar) ──
+  function restaurarEstadoCompleto(sala) {
+    const fase = sala.faseActual || 'sorteo';
+    const modo = sala.modo;
+
+    // Mostrar cuerpo
+    document.getElementById('estado-espera').classList.add('hidden');
+    document.getElementById('cuerpo').classList.remove('hidden');
+
+    if (modo === '1v1-simultaneo' || modo === '1v1-secuencial') {
+      document.getElementById('vista-1v1').classList.add('visible');
+      document.getElementById('vista-cutoff').classList.remove('visible');
+
+      const ti = sala.turnoIndex || 0;
+      const compA = sala.competidores[ti];
+      const compB = sala.competidores[ti + 1];
+      if (!compA || !compB) return;
+
+      compIdA = compA.id;
+      compIdB = compB.id;
+      document.getElementById('nombre-A').textContent = compA.nombre || '—';
+      document.getElementById('nombre-B').textContent = compB.nombre || '—';
+
+      // Restaurar poomsaes
+      poomsae1 = sala.poomsae1 || null;
+      poomsae2 = sala.poomsae2 || null;
+
+      // Inicializar grillas de notas
+      initNotasGrid('A');
+      initNotasGrid('B');
+
+      // Restaurar banner según fase
+      if (fase === 'sorteo' && poomsae1 && poomsae2) {
+        mostrarBannerAmbas();
+      } else if (fase.startsWith('p1') && poomsae1) {
+        mostrarBannerUna(1, poomsae1);
+        mostrarRonda(1);
+      } else if (fase.startsWith('p2') && poomsae2) {
+        mostrarBannerUna(2, poomsae2);
+        mostrarRonda(2);
+      }
+
+      // Restaurar cronómetro
+      if (sala.cronoSegundos > 0 && ['p1_corriendo','p2_corriendo'].includes(fase)) {
+        const wrap = document.getElementById('crono-wrap');
+        const el   = document.getElementById('crono-display');
+        wrap.classList.remove('hidden');
+        const min = Math.floor(sala.cronoSegundos / 60);
+        const seg = sala.cronoSegundos % 60;
+        el.textContent = `${min}:${seg.toString().padStart(2,'0')}`;
+        el.className = sala.cronoSegundos <= 10 ? 'crono-display urgente' : 'crono-display';
+        document.getElementById('footer-estado').textContent = '▶ En ejecución';
+      } else if (['p1_detenido','p2_detenido'].includes(fase)) {
+        document.getElementById('crono-wrap').classList.add('hidden');
+        document.getElementById('footer-estado').textContent = '⏸ Jueces califican';
+      }
+
+      // Restaurar fase p2: mostrar scores de P1 fijos
+      if (fase.startsWith('p2')) {
+        // Se restaurarán cuando lleguen los puntajes del snapshot
+        scoreP1A = null; scoreP1B = null;
+      }
+
+    } else {
+      document.getElementById('vista-cutoff').classList.add('visible');
+      document.getElementById('vista-1v1').classList.remove('visible');
+    }
+
+    document.getElementById('footer-estado').textContent = '⬤ En vivo';
+  }
+
+  // ── ESTADO-SNAPSHOT (replay de notas al reconectar) ──
+  // Este evento llega después de juez-ok cuando Mesa se reconecta
+  // y también cuando Pantalla se reconecta a una sala con juez-unirse
+  socket.on('estado-snapshot', (data) => {
+    // Actualizar poomsaes y fase desde el snapshot
+    if (data.poomsae1) poomsae1 = data.poomsae1;
+    if (data.poomsae2) poomsae2 = data.poomsae2;
+
+    const fase = data.faseActual || 'sorteo';
+
+    // Restaurar banner
+    if (fase.startsWith('p1') && poomsae1) {
+      mostrarBannerUna(1, poomsae1);
+      mostrarRonda(1);
+    } else if (fase.startsWith('p2') && poomsae2) {
+      mostrarBannerUna(2, poomsae2);
+      mostrarRonda(2);
+    } else if (fase === 'sorteo' && poomsae1 && poomsae2) {
+      mostrarBannerAmbas();
+    }
+
+    // Restaurar cronómetro
+    if (data.cronoSegundos > 0) {
+      const wrap = document.getElementById('crono-wrap');
+      const el   = document.getElementById('crono-display');
+      if (data.cronoActivo) {
+        wrap.classList.remove('hidden');
+        const min = Math.floor(data.cronoSegundos / 60);
+        const seg = data.cronoSegundos % 60;
+        el.textContent = `${min}:${seg.toString().padStart(2,'0')}`;
+        el.className = data.cronoSegundos <= 10 ? 'crono-display urgente' : 'crono-display';
+      }
+    }
+  });
+
   // ── SOCKET EVENTS ──
 
   socket.on('juez-ok', (data) => {
     salaInfo = data.sala;
     numJueces = salaInfo.numJueces;
+
+    // Mostrar chrome (header/footer)
     document.getElementById('overlay-login').classList.add('hidden');
     document.getElementById('header').classList.remove('hidden');
-    document.getElementById('estado-espera').classList.remove('hidden');
     document.getElementById('footer').classList.remove('hidden');
     document.getElementById('header-sala').textContent = salaInfo.codigo;
     document.getElementById('header-centro').textContent =
       `${salaInfo.categoria || ''} · ${salaInfo.ronda || ''} · ${salaInfo.tipo?.toUpperCase()}`;
     document.getElementById('footer-modo').textContent =
       `${salaInfo.tipo?.toUpperCase()} · ${salaInfo.modo} · ${numJueces} jueces`;
-    document.getElementById('espera-sub').textContent =
-      `${salaInfo.tipo?.toUpperCase()} · ${salaInfo.modo}`;
-    renderDots([]);
-    renderJuecesBar({});
+
+    // Restaurar jueces conectados
+    if (data.sala.juecesOcupados) renderDots(
+      (data.sala.juecesOcupados || []).map(n => ({ num: n }))
+    );
+
+    // Si NO hay competencia activa mostrar espera y salir
+    if (salaInfo.estado !== 'activo' || !salaInfo.competidores?.length) {
+      document.getElementById('estado-espera').classList.remove('hidden');
+      document.getElementById('espera-sub').textContent =
+        `${salaInfo.tipo?.toUpperCase()} · ${salaInfo.modo}`;
+      renderJuecesBar({});
+      return;
+    }
+
+    // ── Hay competencia activa: restaurar pantalla completa ──
+    restaurarEstadoCompleto(data.sala);
   });
 
   socket.on('juez-conectado', (data) => {
@@ -1017,14 +1017,16 @@ body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111
   socket.on('control-actualizado', (data) => {
     const { accion, fase, poomsae, esReconexion } = data;
 
+    // Mantener faseActual sincronizada para usar en puntaje-recibido
+    if (fase) salaInfo.faseActual = fase;
+
     if (accion === 'iniciar') {
-      // Ocultar banner de ambas poomsaes, mostrar solo la activa
       if (fase === 'p1_corriendo') {
         mostrarBannerUna(1, poomsae1);
         mostrarRonda(1);
       } else if (fase === 'p2_corriendo') {
         mostrarBannerUna(2, poomsae2);
-        mostrarRonda(2)
+        mostrarRonda(2);
       }
       document.getElementById('footer-estado').textContent = '▶ En ejecución';
 
@@ -1036,22 +1038,25 @@ body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111
       document.getElementById('footer-estado').textContent = '⬤ En vivo';
 
     } else if (accion === 'nueva-poomsae') {
-     registrarScorePoomsae(1)
-      guardarScoresP1()
-      // Poomsae 2
+      // Guardar scores de P1 antes de limpiar
+      if (scoreP1A === null) scoreP1A = parseFloat(document.getElementById('score-A')?.textContent) || null;
+      if (scoreP1B === null) scoreP1B = parseFloat(document.getElementById('score-B')?.textContent) || null;
+      guardarScoresP1();
       poomsae2 = poomsae || poomsae2;
       resetVista1v1();
       mostrarBannerAmbas();
-      mostrarRonda(2)
+      mostrarRonda(2);
       document.getElementById('crono-wrap').classList.add('hidden');
       document.getElementById('footer-estado').textContent = '⬤ En vivo';
 
     } else if (accion === 'nueva-competencia') {
-      ocultarResumenFinal()
-      ocultarRonda()
-      ocultarScoresP1()
-      // Nuevo enfrentamiento
+      ocultarResumenFinal();
+      ocultarRonda();
+      ocultarScoresP1();
       poomsae1 = null; poomsae2 = null;
+      poomsaeActiva = null;
+      scoreP1A = null; scoreP1B = null;
+      scoreP2A = null; scoreP2B = null;
       poomsaeBuffer = {};
       resetVista1v1();
       ocultarBanner();
@@ -1097,32 +1102,40 @@ body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111
     }
   });
 
-  // ── PUNTAJE RECIBIDO — notas progresivas ──
   socket.on('puntaje-recibido', (data) => {
     if (!data.desglose) return;
 
     const suffix = data.competidorId === compIdA ? 'A' : 'B';
     actualizarNotaGrid(suffix, data.juezNum, data.desglose, data.totalComp);
-    // Cuando llega el totalComp de P2 para ambos competidores, mostrar resumen
+
+    // Guardar scores de P1 cuando llegan completos (para mostrar fijos en P2)
+    if (data.poomsae === 1 && data.totalComp !== null) {
+      if (suffix === 'A') scoreP1A = data.totalComp;
+      else                scoreP1B = data.totalComp;
+
+      // Si tenemos ambos scores de P1 y estamos en P2, mostrar chips fijos
+      const faseActual = salaInfo.faseActual || '';
+      if (scoreP1A !== null && scoreP1B !== null && faseActual.startsWith('p2')) {
+        guardarScoresP1();
+      }
+    }
+
+    // Cuando llega totalComp de P2 para ambos competidores, mostrar resumen
     if (data.poomsae === 2 && data.totalComp !== null) {
-      registrarScorePoomsae(2);
-      const sA = scoreP2A ?? parseFloat(document.getElementById('score-A')?.textContent || '0');
-      const sB = scoreP2B ?? parseFloat(document.getElementById('score-B')?.textContent || '0');
-      if (sA > 0 && sB > 0) {
+      if (suffix === 'A') scoreP2A = data.totalComp;
+      else                scoreP2B = data.totalComp;
+
+      if (scoreP2A !== null && scoreP2B !== null) {
         setTimeout(() => mostrarResumenFinal(), 1500);
       }
     }
+
     // Actualizar círculos de jueces
     const received = {};
     Object.keys(notasRecibidas.A).forEach(j => received[j] = true);
     Object.keys(notasRecibidas.B).forEach(j => received[j] = true);
     renderJuecesBar(received);
   });
-
-  // Variables para resumen
-  let scoreP1A = null, scoreP1B = null;
-  let scoreP2A = null, scoreP2B = null;
-  let fasePuntaje = 1; // 1 o 2
 
   socket.on('puntaje-revelado', (data) => {
     if (data.tipo === '1v1') {
@@ -1196,24 +1209,6 @@ body.tema-claro .login-input { background: #fff; border-color: #ccc; color: #111
     salaInfo = {};
   });
 
-</script>
-  <button onclick="toggleTema()" id="btn-tema" style="
-  position:fixed; bottom:16px; right:16px; z-index:9999;
-  background:#1a1a1a; color:#c9a84c; border:1px solid #333;
-  padding:8px 16px; border-radius:20px; font-size:11px;
-  letter-spacing:2px; cursor:pointer;
-  font-family:'Bebas Neue',sans-serif">☀ TEMA</button>
-
-<script>
-function toggleTema() {
-  const claro = document.body.classList.toggle('tema-claro');
-  localStorage.setItem('tema-pantalla', claro ? 'claro' : 'oscuro');
-  document.getElementById('btn-tema').textContent = claro ? '🌙 TEMA' : '☀ TEMA';
-}
-if (localStorage.getItem('tema-pantalla') === 'claro') {
-  document.body.classList.add('tema-claro');
-  document.getElementById('btn-tema').textContent = '🌙 TEMA';
-}
 </script>
 </body>
 </html>
