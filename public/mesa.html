@@ -161,7 +161,11 @@
       <option value="7">7 Jueces</option>
     </select>
     <button class="btn-gold" onclick="crearSala()">CREAR SALA</button>
-    <button class="btn-dark" onclick="pedirResetearPorCodigo()" style="color:#dc2626;border-color:#3a0000;font-size:11px;padding:8px;margin-top:2px">
+    <div id="error-sala-msg" class="hidden" style="background:#1a0505;border:1px solid #7f1d1d;border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:11px;color:#ff8888;line-height:1.5">
+      ⚠️ <strong>Esta sala ya existe.</strong><br>
+      Si es tuya, puedes eliminarla para liberar el código.
+    </div>
+    <button class="btn-dark hidden" id="btn-eliminar-setup" onclick="pedirResetearPorCodigo()" style="color:#dc2626;border-color:#3a0000;font-size:11px;padding:8px">
       ✕ ELIMINAR SALA EXISTENTE
     </button>
   </div>
@@ -364,9 +368,18 @@
     numJueces = parseInt(document.getElementById('input-jueces').value);
     if (!codigo) return alert('Ingresa un código de sala');
     if (!categoria) return alert('Ingresa la categoría');
+    // Ocultar error previo
+    document.getElementById('error-sala-msg').classList.add('hidden');
+    document.getElementById('btn-eliminar-setup').classList.add('hidden');
     salaActual = codigo;
     socket.emit('mesa-crear-sala', { codigo, tipo, modo, numJueces, categoria, ronda, grupoCategoria });
   }
+
+  // Ocultar error cuando el usuario empieza a cambiar el código
+  document.getElementById('input-codigo').addEventListener('input', () => {
+    document.getElementById('error-sala-msg').classList.add('hidden');
+    document.getElementById('btn-eliminar-setup').classList.add('hidden');
+  });
 
   // ── COMPETIDORES (panel setup) ──
   function agregarCompetidor() {
@@ -1286,6 +1299,13 @@
     if (salaActual) {
       socket.emit('mesa-eliminar-sala', { codigo: salaActual });
     }
+  });
+
+  // ── ERROR: sala ya existe — mostrar botón de eliminar ──
+  socket.on('error-sala', (data) => {
+    salaActual = null; // limpiar para no dejar estado sucio
+    document.getElementById('error-sala-msg').classList.remove('hidden');
+    document.getElementById('btn-eliminar-setup').classList.remove('hidden');
   });
 
   socket.on('sala-creada', (data) => {
