@@ -318,7 +318,36 @@ io.on('connection', (socket) => {
     io.to(codigo).emit('corte-aplicado', { ranking, topN });
   });
 
-  // ── ELIMINAR SALA (reset completo — libera el código para reutilizar) ──
+  // ── MESA: RECONECTAR (re-join sala tras caída de socket) ──
+  socket.on('mesa-reconectar', ({ codigo }) => {
+    const sala = salas[codigo];
+    if (!sala) {
+      socket.emit('error-sala', { msg: 'Sala no encontrada al reconectar' });
+      return;
+    }
+    socket.join(codigo);
+    sala.mesaId = socket.id;
+    // Reenviar estado actual
+    socket.emit('sala-creada', {
+      codigo: sala.codigo,
+      tipo: sala.tipo,
+      modo: sala.modo,
+      numJueces: sala.numJueces,
+      categoria: sala.categoria,
+      ronda: sala.ronda
+    });
+    socket.emit('juez-conectado', { jueces: sala.jueces, nombre: '', numJuez: 0 });
+    if (sala.estado === 'activo' && sala.competidores.length > 0) {
+      socket.emit('competencia-iniciada', {
+        competidores: sala.competidores,
+        modo: sala.modo,
+        tipo: sala.tipo
+      });
+    }
+    console.log(`Mesa reconectada a sala ${codigo}`);
+  });
+
+  // ── ELIMINAR SALA ──
   socket.on('mesa-eliminar-sala', ({ codigo }) => {
     const sala = salas[codigo];
     if (!sala) {
