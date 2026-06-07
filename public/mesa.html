@@ -125,7 +125,8 @@
   <div class="panel">
     <div class="panel-titulo">Crear Sala</div>
     <label class="input-label">Código de Sala</label>
-    <input class="input-field" id="input-codigo" type="text" maxlength="8" placeholder="FINAL1" style="text-transform:uppercase">
+    <input class="input-field" id="input-codigo" type="text" maxlength="8" placeholder="FINAL1" style="text-transform:uppercase"
+      oninput="limpiarErrorSala()">
     <label class="input-label">Categoría</label>
     <input class="input-field" id="input-categoria" type="text" placeholder="ej: CADETE MASCULINO" style="text-transform:uppercase;font-size:13px;letter-spacing:1px">
     <label class="input-label">Ronda</label>
@@ -357,6 +358,11 @@
   // Cada entrada: { turnoIdx, a, b, poomsae1, poomsae2, notasP1snap, notasP2snap, promA, promB, ganador }
   let historialEnfrentamientos = [];
 
+  function limpiarErrorSala() {
+    document.getElementById('error-sala-msg').classList.add('hidden');
+    document.getElementById('btn-eliminar-setup').classList.add('hidden');
+  }
+
   // ── CREAR SALA ──
   function crearSala() {
     const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
@@ -368,18 +374,10 @@
     numJueces = parseInt(document.getElementById('input-jueces').value);
     if (!codigo) return alert('Ingresa un código de sala');
     if (!categoria) return alert('Ingresa la categoría');
-    // Ocultar error previo
-    document.getElementById('error-sala-msg').classList.add('hidden');
-    document.getElementById('btn-eliminar-setup').classList.add('hidden');
+    limpiarErrorSala();
     salaActual = codigo;
     socket.emit('mesa-crear-sala', { codigo, tipo, modo, numJueces, categoria, ronda, grupoCategoria });
   }
-
-  // Ocultar error cuando el usuario empieza a cambiar el código
-  document.getElementById('input-codigo').addEventListener('input', () => {
-    document.getElementById('error-sala-msg').classList.add('hidden');
-    document.getElementById('btn-eliminar-setup').classList.add('hidden');
-  });
 
   // ── COMPETIDORES (panel setup) ──
   function agregarCompetidor() {
