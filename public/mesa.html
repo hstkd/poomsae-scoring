@@ -1272,10 +1272,11 @@
   // SOCKET EVENTS
   // ════════════════════════════════════════
 
-  // ── LIBERAR SALA FANTASMA AL CERRAR/RECARGAR ──
-  window.addEventListener('beforeunload', () => {
+  // ── RECONEXIÓN DE SOCKET (si se cae la conexión WS y vuelve) ──
+  socket.on('connect', () => {
     if (salaActual) {
-      socket.emit('mesa-eliminar-sala', { codigo: salaActual });
+      // Re-emitir unión a sala para recibir estado actual
+      socket.emit('mesa-reconectar', { codigo: salaActual });
     }
   });
 
@@ -1286,6 +1287,8 @@
   });
 
   socket.on('sala-creada', (data) => {
+    // Guardar numJueces desde la respuesta del servidor (fuente de verdad)
+    numJueces = data.numJueces;
     document.getElementById('seccion-setup').classList.add('hidden');
     document.getElementById('seccion-sala').classList.remove('hidden');
     document.getElementById('display-codigo').textContent = data.codigo;
