@@ -416,24 +416,55 @@
   }
 
   // ── RESET PANEL SIMULTÁNEO ──
-  function resetSimultaneo() {
+   function resetSimultaneo() {
     faseActual = 'sorteo';
     poomsae1 = null; poomsae2 = null;
     notasP1 = {}; notasP2 = {};
+
+    // Limpiar filas de notas visibles
+    const rowsA = document.getElementById('notas-rows-A');
+    const rowsB = document.getElementById('notas-rows-B');
+    if (rowsA) rowsA.innerHTML = '';
+    if (rowsB) rowsB.innerHTML = '';
+
+    // Limpiar totales
+    const totalA = document.getElementById('total-A');
+    const totalB = document.getElementById('total-B');
+    if (totalA) totalA.textContent = '—';
+    if (totalB) totalB.textContent = '—';
+
+    // Limpiar nombres de competidores en panel de notas
+    const nomA = document.getElementById('nombre-comp-A');
+    const nomB = document.getElementById('nombre-comp-B');
+    if (nomA) nomA.textContent = '—';
+    if (nomB) nomB.textContent = '—';
+
+    // Resetear etiquetas de poomsae
+    const labelA = document.getElementById('poomsae-num-label-A');
+    const labelB = document.getElementById('poomsae-num-label-B');
+    if (labelA) labelA.textContent = '1';
+    if (labelB) labelB.textContent = '1';
+
     const el1 = document.getElementById('display-p1');
     const el2 = document.getElementById('display-p2');
     if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
     if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
+
     const bloqueRes = document.getElementById('bloque-resultado');
     if (bloqueRes) { bloqueRes.innerHTML = ''; bloqueRes.classList.add('hidden'); }
+
     document.getElementById('btn-finalizar').classList.add('hidden');
+    document.getElementById('btn-exportar-pdf').classList.add('hidden');
     document.getElementById('btn-next').classList.add('hidden');
     document.getElementById('bloque-notas').classList.add('hidden');
+
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     cronoActivo = false;
+
     mostrarTurnoSimultaneo();
     actualizarFaseUI();
   }
+
 
   // ── SORTEO ──
   function sortear() {
