@@ -1086,26 +1086,6 @@ body.tema-claro #overlay-login { background: #f0f0f8; }
       if (sA > 0 && sB > 0) {
         setTimeout(() => mostrarResumenFinal(), 1500);
       }
-      <button onclick="toggleTema()" id="btn-tema" style="
-  position:fixed; bottom:16px; right:16px; z-index:9999;
-  background:#1a1a1a; color:#c9a84c; border:1px solid #333;
-  padding:8px 16px; border-radius:20px; font-size:11px;
-  letter-spacing:2px; cursor:pointer;
-  font-family:'Bebas Neue',sans-serif">☀ TEMA</button>
-
-<script>
-function toggleTema() {
-  const claro = document.body.classList.toggle('tema-claro');
-  localStorage.setItem('tema-pantalla', claro ? 'claro' : 'oscuro');
-  document.getElementById('btn-tema').textContent = claro ? '🌙 TEMA' : '☀ TEMA';
-}
-if (localStorage.getItem('tema-pantalla') === 'claro') {
-  document.body.classList.add('tema-claro');
-  document.getElementById('btn-tema').textContent = '🌙 TEMA';
-}
-</script>
-    }
-
     // Actualizar círculos de jueces
     const received = {};
     Object.keys(notasRecibidas.A).forEach(j => received[j] = true);
@@ -1190,6 +1170,24 @@ if (localStorage.getItem('tema-pantalla') === 'claro') {
     salaInfo = {};
   });
 
+</script>
+  <button onclick="toggleTema()" id="btn-tema" style="
+  position:fixed; bottom:16px; right:16px; z-index:9999;
+  background:#1a1a1a; color:#c9a84c; border:1px solid #333;
+  padding:8px 16px; border-radius:20px; font-size:11px;
+  letter-spacing:2px; cursor:pointer;
+  font-family:'Bebas Neue',sans-serif">☀ TEMA</button>
+
+<script>
+function toggleTema() {
+  const claro = document.body.classList.toggle('tema-claro');
+  localStorage.setItem('tema-pantalla', claro ? 'claro' : 'oscuro');
+  document.getElementById('btn-tema').textContent = claro ? '🌙 TEMA' : '☀ TEMA';
+}
+if (localStorage.getItem('tema-pantalla') === 'claro') {
+  document.body.classList.add('tema-claro');
+  document.getElementById('btn-tema').textContent = '🌙 TEMA';
+}
 </script>
 </body>
 </html>
