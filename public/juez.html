@@ -1204,20 +1204,16 @@
     console.log(`✓ Confirmado comp ${data.competidorId} P${data.poomsae}`);
   });
 
-  socket.on('disconnect', () => {
-    console.log('Juez desconectado del servidor');
-  });
-
-  // Socket.io v4+: usar 'connect' no 'reconnect'
-  socket.on('connect', () => {
+  socket.on('disconnect', () => console.log('Desconectado'));
+  socket.on('reconnect', () => {
     if (salaInfo.codigo) {
-      console.log('Reconectando juez a sala:', salaInfo.codigo);
-      const nombre = document.getElementById('juez-badge')
-        ?.textContent?.replace('JUEZ ', '') || 'Juez';
-      socket.emit('juez-unirse', { codigo: salaInfo.codigo, nombre, numJuez });
+      socket.emit('juez-unirse', {
+        codigo: salaInfo.codigo,
+        nombre: document.getElementById('juez-badge').textContent.replace('JUEZ ','Juez '),
+        numJuez
+      });
     }
   });
-
 </script>
 </body>
 </html>
