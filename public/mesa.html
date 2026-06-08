@@ -416,55 +416,24 @@
   }
 
   // ── RESET PANEL SIMULTÁNEO ──
-   function resetSimultaneo() {
+  function resetSimultaneo() {
     faseActual = 'sorteo';
     poomsae1 = null; poomsae2 = null;
     notasP1 = {}; notasP2 = {};
-
-    // Limpiar filas de notas visibles
-    const rowsA = document.getElementById('notas-rows-A');
-    const rowsB = document.getElementById('notas-rows-B');
-    if (rowsA) rowsA.innerHTML = '';
-    if (rowsB) rowsB.innerHTML = '';
-
-    // Limpiar totales
-    const totalA = document.getElementById('total-A');
-    const totalB = document.getElementById('total-B');
-    if (totalA) totalA.textContent = '—';
-    if (totalB) totalB.textContent = '—';
-
-    // Limpiar nombres de competidores en panel de notas
-    const nomA = document.getElementById('nombre-comp-A');
-    const nomB = document.getElementById('nombre-comp-B');
-    if (nomA) nomA.textContent = '—';
-    if (nomB) nomB.textContent = '—';
-
-    // Resetear etiquetas de poomsae
-    const labelA = document.getElementById('poomsae-num-label-A');
-    const labelB = document.getElementById('poomsae-num-label-B');
-    if (labelA) labelA.textContent = '1';
-    if (labelB) labelB.textContent = '1';
-
     const el1 = document.getElementById('display-p1');
     const el2 = document.getElementById('display-p2');
     if (el1) { el1.textContent = '— Sin sortear —'; el1.classList.add('vacio'); }
     if (el2) { el2.textContent = '— Sin sortear —'; el2.classList.add('vacio'); }
-
     const bloqueRes = document.getElementById('bloque-resultado');
     if (bloqueRes) { bloqueRes.innerHTML = ''; bloqueRes.classList.add('hidden'); }
-
     document.getElementById('btn-finalizar').classList.add('hidden');
-    document.getElementById('btn-exportar-pdf').classList.add('hidden');
     document.getElementById('btn-next').classList.add('hidden');
     document.getElementById('bloque-notas').classList.add('hidden');
-
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     cronoActivo = false;
-
     mostrarTurnoSimultaneo();
     actualizarFaseUI();
   }
-
 
   // ── SORTEO ──
   function sortear() {
@@ -1318,8 +1287,11 @@
   });
 
   socket.on('sala-creada', (data) => {
-    // Guardar numJueces desde la respuesta del servidor (fuente de verdad)
-    numJueces = data.numJueces;
+    // Guardar variables de sala desde servidor (fuente de verdad al reconectar)
+    numJueces      = data.numJueces;
+    modo           = data.modo;
+    tipo           = data.tipo;
+    grupoCategoria = data.grupoCategoria || grupoCategoria; // FIX #14
     document.getElementById('seccion-setup').classList.add('hidden');
     document.getElementById('seccion-sala').classList.remove('hidden');
     document.getElementById('display-codigo').textContent = data.codigo;
@@ -1334,14 +1306,18 @@
   // FIX #3: competencia-iniciada ahora llega con los competidores indexados por el servidor.
   // Mesa reemplaza su array local con estos para que los IDs sean correctos.
   socket.on('competencia-iniciada', (data) => {
-    competidores = data.competidores; // [{id:0, nombre:...}, {id:1, nombre:...}, ...]
+    competidores = data.competidores;
+    // Actualizar modo/tipo desde el servidor por si Mesa reconectó
+    if (data.modo) modo = data.modo;
+    if (data.tipo) tipo = data.tipo;
     log(`Competencia iniciada · ${competidores.length} competidores`);
 
     document.getElementById('panel-competidores').classList.add('hidden');
 
     if (modo === '1v1-simultaneo') {
       document.getElementById('panel-control-simultaneo').classList.remove('hidden');
-      resetSimultaneo();
+      // Solo resetear si no hay enfrentamiento en curso (reconexión)
+      if (faseActual === 'sorteo') resetSimultaneo();
     } else {
       document.getElementById('panel-control').classList.remove('hidden');
       if (modo === 'cutoff' || tipo === 'freestyle') {
@@ -1353,12 +1329,12 @@
 
   socket.on('juez-conectado', (data) => {
     renderJueces(data.jueces);
-    log(`Juez ${data.numJuez} conectado`);
+    if (data.numJuez > 0) log(`Juez ${data.numJuez} conectado`);
   });
 
   socket.on('juez-desconectado', (data) => {
     renderJueces(data.jueces);
-    log(`Juez ${data.numJuez} desconectado`);
+    if (data.numJuez > 0) log(`Juez ${data.numJuez} desconectado`);
   });
 
   // FIX #4 + #13: enrutar por data.poomsae y usar totalComp del servidor
@@ -1371,6 +1347,49 @@
     const tot = ((data.desglose.prec || 0) + (data.desglose.vel || 0) +
                  (data.desglose.rit  || 0) + (data.desglose.exp  || 0)).toFixed(2);
     log(`J${data.juezNum} P${data.poomsae} → ${data.competidorNombre}: ${tot}`);
+  });
+
+  // ── SNAPSHOT COMPLETO AL RECONECTAR ──
+  // Recibido solo por Mesa cuando se reconecta (mesa-reconectar)
+  socket.on('estado-snapshot', (data) => {
+    faseActual = data.faseActual || 'sorteo';
+    poomsae1   = data.poomsae1 || null;
+    poomsae2   = data.poomsae2 || null;
+    turnoIndex = data.turnoIndex || 0;
+
+    // Restaurar cronómetro
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    cronoSegundos  = data.cronoSegundos || 90;
+    cronoOriginal  = cronoSegundos;
+    cronoActivo    = data.cronoActivo || false;
+    actualizarDisplayCrono();
+
+    // Si el cronómetro estaba corriendo, reanudarlo
+    if (cronoActivo) {
+      cronoInterval = setInterval(() => {
+        cronoSegundos--;
+        actualizarDisplayCrono();
+        socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'tick', duracion: cronoSegundos });
+        if (cronoSegundos <= 0) detenerCrono();
+      }, 1000);
+    }
+
+    // Restaurar displays de poomsae sorteada
+    const el1 = document.getElementById('display-p1');
+    const el2 = document.getElementById('display-p2');
+    if (el1 && poomsae1) { el1.textContent = poomsae1; el1.classList.remove('vacio'); }
+    if (el2 && poomsae2) { el2.textContent = poomsae2; el2.classList.remove('vacio'); }
+
+    // Restaurar fase UI
+    actualizarFaseUI();
+
+    // Restaurar botón NEXT si estaba visible
+    const btnNext = document.getElementById('btn-next');
+    if (btnNext && ['p1_detenido','p2_detenido'].includes(faseActual)) {
+      btnNext.classList.remove('hidden');
+    }
+
+    log(`↩ Estado restaurado: ${faseActual} · P1:${poomsae1||'—'} P2:${poomsae2||'—'} · ${cronoSegundos}s`);
   });
 
   // FIX #12: handler real para poomsae-sorteada (antes era un no-op vacío)
