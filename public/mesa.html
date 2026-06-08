@@ -691,12 +691,17 @@
   }
 
   // ── NOTAS ──
-  // FIX #4 + #13: enrutar por data.poomsae (del servidor), no por faseActual.
-  // El total lo muestra el servidor (data.totalComp), Mesa ya no recalcula.
   function actualizarNotasVista(data) {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
     if (!a || !b) return;
+
+    // Ignorar puntajes de competidores que no pertenecen al enfrentamiento actual
+    // Esto descarta notas tardías del enfrentamiento anterior
+    if (data.competidorId !== a.id && data.competidorId !== b.id) {
+      log(`⚠️ Nota descartada (enfrentamiento anterior): id=${data.competidorId}`);
+      return;
+    }
 
     const numPoomsae = data.poomsae; // 1 o 2 — fuente de verdad del servidor
     const notasObj = numPoomsae === 1 ? notasP1 : notasP2;
@@ -704,13 +709,14 @@
     const idComp = data.competidorId;
 
     if (!notasObj[idComp]) notasObj[idComp] = { jueces: {}, total: null };
-    // Guardar desglose del juez + presentacion
     notasObj[idComp].jueces[data.juezNum] = { ...data.desglose, presentacion: data.presentacion };
 
-    // FIX #13: usar el total calculado por el servidor, no recalcular aquí
+    // Usar el total calculado por el servidor
     if (data.totalComp !== null && data.totalComp !== undefined) {
       notasObj[idComp].total = data.totalComp;
       document.getElementById(`total-${suffix}`).textContent = data.totalComp.toFixed(2);
+      // Asegurar que el label de poomsae coincide con lo que realmente llegó
+      document.getElementById(`poomsae-num-label-${suffix}`).textContent = String(numPoomsae);
     }
 
     // Render filas de jueces
@@ -735,14 +741,9 @@
     }
     div.innerHTML = html;
 
-    // FIX #10: verificar completitud solo si estamos en p2_detenido Y Mesa ya presionó NEXT
-    // El resultado final lo desencadena intentarMostrarResultado(), no este handler directamente.
     if (numPoomsae === 2 && data.totalFinal !== null && data.totalFinal !== undefined) {
-      // El servidor ya calculó totalFinal para este competidor.
-      // Guardarlo para cuando Mesa presione NEXT (o si ya lo presionó, mostrar ahora).
       const comp = competidores.find(c => c.id === idComp);
       if (comp) comp.totalFinal = data.totalFinal;
-      // Si Mesa ya presionó NEXT (btn-next oculto y fase p2_detenido), mostrar resultado
       if (faseActual === 'p2_detenido' && document.getElementById('btn-next').classList.contains('hidden')) {
         intentarMostrarResultado();
       }
