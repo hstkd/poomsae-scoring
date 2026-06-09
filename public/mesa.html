@@ -299,20 +299,30 @@
     <div id="display-turno-sec"></div>
 
     <div style="text-align:center;margin-bottom:10px">
-      <span class="fase-badge sorteo" id="fase-badge-sec">Esperando inicio</span>
+      <span class="fase-badge sorteo" id="fase-badge-sec">Confirma las poomsaes</span>
     </div>
 
-    <!-- POOMSAE MANUAL -->
-    <div id="bloque-poomsae-sec" style="margin-bottom:10px">
-      <div class="panel-titulo">Poomsae a ejecutar</div>
-      <div class="add-row">
-        <input class="input-field" id="input-poomsae-sec" type="text"
+    <!-- POOMSAES MANUALES — ambas antes de iniciar -->
+    <div id="bloque-poomsae-sec" style="margin-bottom:12px">
+      <div class="panel-titulo">Poomsaes del enfrentamiento</div>
+      <label class="input-label">Poomsae Atleta Azul</label>
+      <div class="add-row" style="margin-bottom:6px">
+        <input class="input-field" id="input-poomsae-sec-A" type="text"
           placeholder="ej: KORYO" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
-        <button class="btn-add" onclick="confirmarPoomsaeSec()">✓</button>
+        <button class="btn-add" onclick="confirmarPoomsaeSec('A')">✓</button>
       </div>
-      <div id="display-poomsae-sec"
-        style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;
-               color:#333;text-align:center;margin-top:6px">— Sin confirmar —</div>
+      <div id="display-poomsae-sec-A"
+        style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;
+               color:#333;text-align:center;margin-bottom:8px">— Sin confirmar —</div>
+      <label class="input-label">Poomsae Atleta Rojo</label>
+      <div class="add-row" style="margin-bottom:6px">
+        <input class="input-field" id="input-poomsae-sec-B" type="text"
+          placeholder="ej: KEUMGANG" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
+        <button class="btn-add" onclick="confirmarPoomsaeSec('B')">✓</button>
+      </div>
+      <div id="display-poomsae-sec-B"
+        style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;
+               color:#333;text-align:center;margin-bottom:4px">— Sin confirmar —</div>
     </div>
 
     <!-- FASE ACTIVA: quién está ejecutando -->
@@ -951,30 +961,41 @@
   let cronoSegundosSec = 90, cronoOriginalSec = 90;
   let notasSecA = {};
   let notasSecB = {};
-  let poomsaeSec = null; // poomsae confirmada manualmente
+  let poomsaeSecA = null; // poomsae del atleta azul
+  let poomsaeSecB = null; // poomsae del atleta rojo
 
-  function confirmarPoomsaeSec() {
-    const val = document.getElementById('input-poomsae-sec').value.trim().toUpperCase();
+  function confirmarPoomsaeSec(lado) {
+    const inputId   = `input-poomsae-sec-${lado}`;
+    const displayId = `display-poomsae-sec-${lado}`;
+    const val = document.getElementById(inputId)?.value.trim().toUpperCase();
     if (!val) return;
-    poomsaeSec = val;
-    document.getElementById('display-poomsae-sec').textContent = val;
-    document.getElementById('display-poomsae-sec').style.color = '#c9a84c';
-    // Notificar a jueces y pantalla
-    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 1, poomsae: val });
-    log(`Poomsae confirmada: ${val}`);
+    const numero = lado === 'A' ? 1 : 2;
+    if (lado === 'A') poomsaeSecA = val;
+    else              poomsaeSecB = val;
+    document.getElementById(displayId).textContent = val;
+    document.getElementById(displayId).style.color = lado === 'A' ? '#6699ff' : '#ff6666';
+    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero, poomsae: val });
+    log(`Poomsae ${lado === 'A' ? 'Azul' : 'Rojo'}: ${val}`);
+    // Mostrar cronómetro cuando ambas estén confirmadas
+    if (poomsaeSecA && poomsaeSecB) {
+      faseActualSec = 'secA_listo';
+      actualizarFaseUISec();
+    }
   }
 
   function resetSecuencial() {
     faseActualSec = 'inicio';
-    poomsaeSec = null;
+    poomsaeSecA = null; poomsaeSecB = null;
     notasSecA = {}; notasSecB = {};
     if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
 
-    // Limpiar input de poomsae
-    const inputP = document.getElementById('input-poomsae-sec');
-    const displayP = document.getElementById('display-poomsae-sec');
-    if (inputP) inputP.value = '';
-    if (displayP) { displayP.textContent = '— Sin confirmar —'; displayP.style.color = '#333'; }
+    // Limpiar inputs de poomsae
+    ['A','B'].forEach(l => {
+      const inp = document.getElementById(`input-poomsae-sec-${l}`);
+      const dsp = document.getElementById(`display-poomsae-sec-${l}`);
+      if (inp) inp.value = '';
+      if (dsp) { dsp.textContent = '— Sin confirmar —'; dsp.style.color = '#333'; }
+    });
 
     ['A','B'].forEach(s => {
       const rows = document.getElementById(`notas-sec-rows-${s}`);
@@ -1021,8 +1042,66 @@
     socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
   }
 
+  function setCronoSec(segundos, label) {
+    if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
+    cronoSegundosSec = segundos;
+    cronoOriginalSec = segundos;
+    const lbl = document.getElementById('crono-label-sec');
+    if (lbl) lbl.textContent = label;
+    actualizarDisplayCronoSec();
+  }
+
+  function iniciarCronoSec() {
+    if (cronoIntervalSec) return;
+    if (!['secA_listo','secB_listo'].includes(faseActualSec)) return;
+    if (faseActualSec === 'secA_listo') faseActualSec = 'secA_corriendo';
+    else faseActualSec = 'secB_corriendo';
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'iniciar', fase: faseActualSec });
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundosSec });
+    document.getElementById('btn-next-sec').classList.add('hidden');
+    actualizarFaseUISec();
+    cronoIntervalSec = setInterval(() => {
+      cronoSegundosSec--;
+      actualizarDisplayCronoSec();
+      socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'tick', duracion: cronoSegundosSec });
+      if (cronoSegundosSec <= 0) detenerCronoSec();
+    }, 1000);
+  }
+
+  function detenerCronoSec() {
+    if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
+    if (faseActualSec === 'secA_corriendo') faseActualSec = 'secA_detenido';
+    else if (faseActualSec === 'secB_corriendo') faseActualSec = 'secB_detenido';
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundosSec });
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'detener', fase: faseActualSec });
+    document.getElementById('btn-next-sec').classList.remove('hidden');
+    actualizarFaseUISec();
+  }
+
+  function restablecerCronoSec() {
+    if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
+    if (['secA_corriendo','secA_detenido'].includes(faseActualSec)) faseActualSec = 'secA_listo';
+    else if (['secB_corriendo','secB_detenido'].includes(faseActualSec)) faseActualSec = 'secB_listo';
+    cronoSegundosSec = cronoOriginalSec;
+    actualizarDisplayCronoSec();
+    document.getElementById('btn-next-sec').classList.add('hidden');
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginalSec });
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'restablecer', fase: faseActualSec });
+    actualizarFaseUISec();
+  }
+
+  function actualizarDisplayCronoSec() {
+    const min = Math.floor(cronoSegundosSec / 60);
+    const seg = cronoSegundosSec % 60;
+    const el = document.getElementById('crono-display-sec');
+    if (!el) return;
+    el.textContent = `${min}:${seg.toString().padStart(2, '0')}`;
+    el.className = (cronoSegundosSec <= 10 && cronoSegundosSec > 0)
+      ? 'cronometro-display rojo' : 'cronometro-display';
+  }
+
+  // ── FIX poomsae ref in presionarNextSec ──
   function actualizarFaseUISec() {
-    const badge    = document.getElementById('fase-badge-sec');
     const blqCrono = document.getElementById('bloque-crono-sec');
     const blqFase  = document.getElementById('bloque-fase-sec');
     const blqNotas = document.getElementById('bloque-notas-sec');
@@ -1034,7 +1113,8 @@
     blqCrono.classList.add('hidden');
     blqFase.classList.add('hidden');
 
-    const setPoom = () => { if (lblPoom) lblPoom.textContent = poomsaeSec || '—'; };
+    const getPoom = () => ['secA_listo','secA_corriendo','secA_detenido'].includes(faseActualSec) ? (poomsaeSecA||'—') : (poomsaeSecB||'—');
+    const setPoom = () => { if (lblPoom) lblPoom.textContent = getPoom(); };
 
     if (faseActualSec === 'inicio') {
       badge.className = 'fase-badge sorteo';
@@ -1116,7 +1196,7 @@
         codigo: salaActual,
         accion: 'nueva-poomsae',
         fase: 'secB_listo',
-        poomsae: poomsaeSec
+        poomsae: poomsaeSecB
       });
       actualizarFaseUISec();
 
