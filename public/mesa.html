@@ -302,10 +302,27 @@
       <span class="fase-badge sorteo" id="fase-badge-sec">Esperando inicio</span>
     </div>
 
+    <!-- POOMSAE MANUAL -->
+    <div id="bloque-poomsae-sec" style="margin-bottom:10px">
+      <div class="panel-titulo">Poomsae a ejecutar</div>
+      <div class="add-row">
+        <input class="input-field" id="input-poomsae-sec" type="text"
+          placeholder="ej: KORYO" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
+        <button class="btn-add" onclick="confirmarPoomsaeSec()">✓</button>
+      </div>
+      <div id="display-poomsae-sec"
+        style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;
+               color:#333;text-align:center;margin-top:6px">— Sin confirmar —</div>
+    </div>
+
     <!-- FASE ACTIVA: quién está ejecutando -->
     <div id="bloque-fase-sec" class="hidden" style="text-align:center;margin-bottom:8px">
-      <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:4px">Ejecutando ahora</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px" id="label-ejecutando">—</div>
+      <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;
+                  text-transform:uppercase;margin-bottom:2px">Ejecutando</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px"
+           id="label-ejecutando">—</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;
+                  color:#c9a84c;margin-top:2px" id="label-poomsae-activa-sec">—</div>
     </div>
 
     <!-- CRONÓMETRO -->
@@ -328,7 +345,6 @@
     <div id="bloque-notas-sec" class="hidden" style="margin-top:8px">
       <div class="panel-titulo">Notas Recibidas</div>
       <div class="notas-grid">
-        <!-- Competidor A = Azul -->
         <div class="notas-comp azul">
           <div class="notas-comp-titulo azul" id="nombre-sec-A">—</div>
           <div id="notas-sec-rows-A"></div>
@@ -337,7 +353,6 @@
             <span class="total-comp-val" id="total-sec-A">—</span>
           </div>
         </div>
-        <!-- Competidor B = Rojo -->
         <div class="notas-comp rojo">
           <div class="notas-comp-titulo rojo" id="nombre-sec-B">—</div>
           <div id="notas-sec-rows-B"></div>
@@ -357,7 +372,7 @@
       FINALIZAR ›
     </button>
 
-    <!-- SIGUIENTE ENFRENTAMIENTO (cutoff) -->
+    <!-- SIGUIENTE TURNO (cutoff) -->
     <button class="btn-dark hidden" id="btn-siguiente-gen" onclick="siguienteTurno()" style="margin-top:6px">SIGUIENTE →</button>
 
   </div>
@@ -931,18 +946,35 @@
   }
 
   // ── 1V1 SECUENCIAL ──
-  // Fases: sorteo → secA_listo → secA_corriendo → secA_detenido
-  //        → secB_listo → secB_corriendo → secB_detenido → resultado
   let faseActualSec = 'inicio';
   let cronoIntervalSec = null;
   let cronoSegundosSec = 90, cronoOriginalSec = 90;
-  let notasSecA = {}; // { [compId]: { jueces: {}, total: null } }
+  let notasSecA = {};
   let notasSecB = {};
+  let poomsaeSec = null; // poomsae confirmada manualmente
+
+  function confirmarPoomsaeSec() {
+    const val = document.getElementById('input-poomsae-sec').value.trim().toUpperCase();
+    if (!val) return;
+    poomsaeSec = val;
+    document.getElementById('display-poomsae-sec').textContent = val;
+    document.getElementById('display-poomsae-sec').style.color = '#c9a84c';
+    // Notificar a jueces y pantalla
+    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 1, poomsae: val });
+    log(`Poomsae confirmada: ${val}`);
+  }
 
   function resetSecuencial() {
     faseActualSec = 'inicio';
+    poomsaeSec = null;
     notasSecA = {}; notasSecB = {};
     if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
+
+    // Limpiar input de poomsae
+    const inputP = document.getElementById('input-poomsae-sec');
+    const displayP = document.getElementById('display-poomsae-sec');
+    if (inputP) inputP.value = '';
+    if (displayP) { displayP.textContent = '— Sin confirmar —'; displayP.style.color = '#333'; }
 
     ['A','B'].forEach(s => {
       const rows = document.getElementById(`notas-sec-rows-${s}`);
@@ -995,22 +1027,23 @@
     const blqFase  = document.getElementById('bloque-fase-sec');
     const blqNotas = document.getElementById('bloque-notas-sec');
     const lblEjec  = document.getElementById('label-ejecutando');
+    const lblPoom  = document.getElementById('label-poomsae-activa-sec');
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
 
     blqCrono.classList.add('hidden');
     blqFase.classList.add('hidden');
 
+    const setPoom = () => { if (lblPoom) lblPoom.textContent = poomsaeSec || '—'; };
+
     if (faseActualSec === 'inicio') {
       badge.className = 'fase-badge sorteo';
-      badge.textContent = '▶ Listo para iniciar';
+      badge.textContent = '▶ Confirma poomsae e inicia';
       blqNotas.classList.remove('hidden');
       blqCrono.classList.remove('hidden');
       blqFase.classList.remove('hidden');
-      if (lblEjec && a) {
-        lblEjec.textContent = a.nombre;
-        lblEjec.style.color = '#6699ff';
-      }
+      if (lblEjec && a) { lblEjec.textContent = a.nombre; lblEjec.style.color = '#6699ff'; }
+      setPoom();
       setCronoSec(90, `${a?.nombre || '—'} · Tiempo de Ejecución`);
 
     } else if (faseActualSec === 'secA_listo') {
@@ -1020,6 +1053,7 @@
       blqFase.classList.remove('hidden');
       blqNotas.classList.remove('hidden');
       if (lblEjec && a) { lblEjec.textContent = a.nombre; lblEjec.style.color = '#6699ff'; }
+      setPoom();
       setCronoSec(90, `${a?.nombre || '—'} · Tiempo de Ejecución`);
 
     } else if (faseActualSec === 'secA_corriendo') {
@@ -1029,6 +1063,7 @@
       blqFase.classList.remove('hidden');
       blqNotas.classList.remove('hidden');
       if (lblEjec && a) { lblEjec.textContent = a.nombre; lblEjec.style.color = '#6699ff'; }
+      setPoom();
 
     } else if (faseActualSec === 'secA_detenido') {
       badge.className = 'fase-badge detenido';
@@ -1037,6 +1072,7 @@
       blqFase.classList.remove('hidden');
       blqNotas.classList.remove('hidden');
       if (lblEjec && a) { lblEjec.textContent = a.nombre; lblEjec.style.color = '#6699ff'; }
+      setPoom();
 
     } else if (faseActualSec === 'secB_listo') {
       badge.className = 'fase-badge ejecucion';
@@ -1045,6 +1081,7 @@
       blqFase.classList.remove('hidden');
       blqNotas.classList.remove('hidden');
       if (lblEjec && b) { lblEjec.textContent = b.nombre; lblEjec.style.color = '#ff6666'; }
+      setPoom();
       setCronoSec(90, `${b?.nombre || '—'} · Tiempo de Ejecución`);
 
     } else if (faseActualSec === 'secB_corriendo') {
@@ -1054,6 +1091,7 @@
       blqFase.classList.remove('hidden');
       blqNotas.classList.remove('hidden');
       if (lblEjec && b) { lblEjec.textContent = b.nombre; lblEjec.style.color = '#ff6666'; }
+      setPoom();
 
     } else if (faseActualSec === 'secB_detenido') {
       badge.className = 'fase-badge detenido';
@@ -1062,67 +1100,8 @@
       blqFase.classList.remove('hidden');
       blqNotas.classList.remove('hidden');
       if (lblEjec && b) { lblEjec.textContent = b.nombre; lblEjec.style.color = '#ff6666'; }
+      setPoom();
     }
-  }
-
-  function setCronoSec(segundos, label) {
-    if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
-    cronoSegundosSec = segundos;
-    cronoOriginalSec = segundos;
-    document.getElementById('crono-label-sec').textContent = label;
-    actualizarDisplayCronoSec();
-  }
-
-  function iniciarCronoSec() {
-    if (cronoIntervalSec) return;
-    if (faseActualSec === 'inicio' || faseActualSec === 'secA_listo') faseActualSec = 'secA_corriendo';
-    else if (faseActualSec === 'secB_listo') faseActualSec = 'secB_corriendo';
-
-    const faseSoc = faseActualSec === 'secA_corriendo' ? 'secA' : 'secB';
-    socket.emit('mesa-control', { codigo: salaActual, accion: 'iniciar', fase: faseActualSec });
-    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundosSec });
-    document.getElementById('btn-next-sec').classList.add('hidden');
-    actualizarFaseUISec();
-
-    cronoIntervalSec = setInterval(() => {
-      cronoSegundosSec--;
-      actualizarDisplayCronoSec();
-      socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'tick', duracion: cronoSegundosSec });
-      if (cronoSegundosSec <= 0) detenerCronoSec();
-    }, 1000);
-  }
-
-  function detenerCronoSec() {
-    if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
-    if (faseActualSec === 'secA_corriendo') faseActualSec = 'secA_detenido';
-    else if (faseActualSec === 'secB_corriendo') faseActualSec = 'secB_detenido';
-
-    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundosSec });
-    socket.emit('mesa-control', { codigo: salaActual, accion: 'detener', fase: faseActualSec });
-    document.getElementById('btn-next-sec').classList.remove('hidden');
-    actualizarFaseUISec();
-  }
-
-  function restablecerCronoSec() {
-    if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
-    if (['secA_corriendo','secA_detenido'].includes(faseActualSec)) faseActualSec = 'secA_listo';
-    else if (['secB_corriendo','secB_detenido'].includes(faseActualSec)) faseActualSec = 'secB_listo';
-    cronoSegundosSec = cronoOriginalSec;
-    actualizarDisplayCronoSec();
-    document.getElementById('btn-next-sec').classList.add('hidden');
-    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginalSec });
-    socket.emit('mesa-control', { codigo: salaActual, accion: 'restablecer', fase: faseActualSec });
-    actualizarFaseUISec();
-  }
-
-  function actualizarDisplayCronoSec() {
-    const min = Math.floor(cronoSegundosSec / 60);
-    const seg = cronoSegundosSec % 60;
-    const el = document.getElementById('crono-display-sec');
-    if (!el) return;
-    el.textContent = `${min}:${seg.toString().padStart(2, '0')}`;
-    el.className = 'cronometro-display';
-    if (cronoSegundosSec <= 10 && cronoSegundosSec > 0) el.classList.add('rojo');
   }
 
   function presionarNextSec() {
@@ -1131,22 +1110,28 @@
     const b = competidores[turnoIndex + 1];
 
     if (faseActualSec === 'secA_detenido') {
-      // Pasar a competidor B
       faseActualSec = 'secB_listo';
-      socket.emit('mesa-control', { codigo: salaActual, accion: 'sec-siguiente', fase: 'secB_listo' });
+      // Usar nueva-poomsae para que juez.html habilite controles para el segundo atleta
+      socket.emit('mesa-control', {
+        codigo: salaActual,
+        accion: 'nueva-poomsae',
+        fase: 'secB_listo',
+        poomsae: poomsaeSec
+      });
       actualizarFaseUISec();
 
     } else if (faseActualSec === 'secB_detenido') {
-      // Calcular resultado
       const totA = notasSecA[a?.id]?.total;
       const totB = notasSecB[b?.id]?.total;
       if (totA == null || totB == null) {
         log('⏳ Esperando puntajes pendientes...');
+        document.getElementById('btn-next-sec').classList.remove('hidden');
         return;
       }
       mostrarResultadoSecuencial(a, b, totA, totB);
     }
   }
+
 
   function actualizarNotasSecuencial(data) {
     const a = competidores[turnoIndex];
