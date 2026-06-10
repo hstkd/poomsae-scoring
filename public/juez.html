@@ -1152,24 +1152,25 @@
       if (data.poomsaeNum) poomsaeActiva = data.poomsaeNum;
       else poomsaeActiva = (data.fase && data.fase.startsWith('p2')) ? 2 : 1;
 
-      // Ocultar overlay de espera
       document.getElementById('overlay-espera').classList.add('hidden');
 
       const panel = document.getElementById('panel-calificacion');
-      if (!panel.classList.contains('visible') && turnoActual) {
+      if (turnoActual && turnoActual.tipo === '1v1-secuencial') {
+        // Secuencial: siempre mostrar un solo atleta según la fase
+        const fase = data.fase || '';
+        // p1A/p2A = competidor A (azul), p1B/p2B = competidor B (rojo)
+        const esB  = fase.includes('B');
+        const comp = esB ? turnoActual.competidorB : turnoActual.competidorA;
+        const key  = esB ? 'B' : 'A';
         panel.innerHTML = '';
-        // Renderizar según modo — secuencial usa renderUno con el competidor activo
-        if (turnoActual.tipo === '1v1-secuencial') {
-          // Determinar qué competidor ejecuta según la fase
-          const fase = data.fase || '';
-          const esB = fase.includes('B'); // p1B o p2B
-          const comp = esB ? turnoActual.competidorB : turnoActual.competidorA;
-          const key  = esB ? 'B' : 'A';
-          const faseLegacy = esB ? 'B' : 'A'; // para compatibilidad con irPresentacionUno
-          renderUno(panel, comp, comp?.nombre || '—', key, faseLegacy);
-        } else {
-          renderSimultaneo(panel);
-        }
+        renderUno(panel, comp, comp?.nombre || '—', key, key);
+        panel.style.display = 'flex';
+        panel.classList.add('visible');
+        document.getElementById('overlay-enviado').classList.add('hidden');
+      } else if (turnoActual && !panel.classList.contains('visible')) {
+        // Simultáneo: re-render completo
+        panel.innerHTML = '';
+        renderSimultaneo(panel);
         panel.style.display = 'flex';
         panel.classList.add('visible');
       }
@@ -1184,10 +1185,12 @@
       precisionBloqueada = true;
       controlesHabilitados = false;
       precisionConfirmada = { A: false, B: false, C: false };
+      // Limpiar panel completamente para forzar re-render en el siguiente iniciar
+      const panel = document.getElementById('panel-calificacion');
+      panel.innerHTML = '';
+      panel.style.display = 'none';
+      panel.classList.remove('visible');
       document.getElementById('overlay-enviado').classList.add('hidden');
-      // Ocultar panel pero NO borrar turnoActual — necesitamos re-renderizar al iniciar
-      document.getElementById('panel-calificacion').style.display = 'none';
-      document.getElementById('panel-calificacion').classList.remove('visible');
       const poomLabel = fase.startsWith('p2') ? '2DA POOMSAE' : '1RA POOMSAE';
       mostrarEsperaConInfo(salaInfo.categoria, salaInfo.ronda, data.poomsae || null, poomLabel);
 
