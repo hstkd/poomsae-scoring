@@ -1056,10 +1056,11 @@
 
   function iniciarCronoSec() {
     if (cronoIntervalSec) return;
-    const listos = ['p1A_listo','p1B_listo','p2A_listo','p2B_listo'];
+    const listos = ['p1A_listo','p1B_listo','p2A_listo','p2B_listo',
+                    'p1A_detenido','p1B_detenido','p2A_detenido','p2B_detenido'];
     if (!listos.includes(faseActualSec)) return;
-    faseActualSec = faseActualSec.replace('_listo','_corriendo');
-    // poomsae number: 1 for p1 phases, 2 for p2 phases
+    // From detenido → back to corriendo (re-initiation after accidental stop)
+    faseActualSec = faseActualSec.replace('_listo','_corriendo').replace('_detenido','_corriendo');
     const poomsaeNum = faseActualSec.startsWith('p1') ? 1 : 2;
     socket.emit('mesa-control', {
       codigo: salaActual,
