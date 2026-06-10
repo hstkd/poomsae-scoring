@@ -771,9 +771,11 @@
   }
 
   function irPresentacionUno(key, fase, nombre) {
-    // Enviar precisión al confirmar
+    // Determine comp — secuencial uses competidorA/B, cutoff uses competidor
     let comp;
-    if (fase === 'A') comp = turnoActual.competidorA;
+    if (turnoActual.tipo === '1v1-secuencial') {
+      comp = key === 'B' ? turnoActual.competidorB : turnoActual.competidorA;
+    } else if (fase === 'A') comp = turnoActual.competidorA;
     else if (fase === 'B') comp = turnoActual.competidorB;
     else comp = turnoActual.competidor;
     enviarPrecision(key, comp);
@@ -1150,14 +1152,24 @@
       if (data.poomsaeNum) poomsaeActiva = data.poomsaeNum;
       else poomsaeActiva = (data.fase && data.fase.startsWith('p2')) ? 2 : 1;
 
-      // Ocultar overlay de espera y mostrar panel
+      // Ocultar overlay de espera
       document.getElementById('overlay-espera').classList.add('hidden');
 
       const panel = document.getElementById('panel-calificacion');
-      // Si el panel está oculto (venimos de nueva-poomsae), re-renderizarlo
       if (!panel.classList.contains('visible') && turnoActual) {
         panel.innerHTML = '';
-        renderSimultaneo(panel);
+        // Renderizar según modo — secuencial usa renderUno con el competidor activo
+        if (turnoActual.tipo === '1v1-secuencial') {
+          // Determinar qué competidor ejecuta según la fase
+          const fase = data.fase || '';
+          const esB = fase.includes('B'); // p1B o p2B
+          const comp = esB ? turnoActual.competidorB : turnoActual.competidorA;
+          const key  = esB ? 'B' : 'A';
+          const faseLegacy = esB ? 'B' : 'A'; // para compatibilidad con irPresentacionUno
+          renderUno(panel, comp, comp?.nombre || '—', key, faseLegacy);
+        } else {
+          renderSimultaneo(panel);
+        }
         panel.style.display = 'flex';
         panel.classList.add('visible');
       }
