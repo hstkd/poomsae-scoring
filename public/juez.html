@@ -1147,20 +1147,27 @@
   socket.on('control-actualizado', (data) => {
     if (data.accion === 'iniciar') {
       precisionConfirmada = { A: false, B: false, C: false };
+      // Use poomsaeNum from mesa if provided (secuencial), else derive from fase
+      if (data.poomsaeNum) poomsaeActiva = data.poomsaeNum;
+      else poomsaeActiva = (data.fase && data.fase.startsWith('p2')) ? 2 : 1;
       habilitarControlesPrecision();
 
     } else if (data.accion === 'detener') {
       bloquearSoloPrecision();
 
     } else if (data.accion === 'nueva-poomsae') {
-      poomsaeActiva = 2;
+      // In secuencial: this means next athlete or next poomsae round
+      // Derive poomsaeActiva from fase
+      const fase = data.fase || '';
+      poomsaeActiva = fase.startsWith('p2') ? 2 : 1;
       precisionBloqueada = true;
       controlesHabilitados = false;
       precisionConfirmada = { A: false, B: false, C: false };
       document.getElementById('overlay-enviado').classList.add('hidden');
       document.getElementById('panel-calificacion').style.display = 'none';
       document.getElementById('panel-calificacion').classList.remove('visible');
-      mostrarEsperaConInfo(salaInfo.categoria, salaInfo.ronda, data.poomsae || salaInfo.poomsae2, '2DA POOMSAE');
+      const poomLabel = fase.startsWith('p2') ? '2DA POOMSAE' : '1RA POOMSAE';
+      mostrarEsperaConInfo(salaInfo.categoria, salaInfo.ronda, data.poomsae || null, poomLabel);
 
     } else if (data.accion === 'nueva-competencia') {
       poomsaeActiva = 1;
