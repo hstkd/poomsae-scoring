@@ -976,9 +976,11 @@
     document.getElementById(displayId).style.color = lado === 'A' ? '#6699ff' : '#ff6666';
     socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero, poomsae: val });
     log(`Poomsae ${lado === 'A' ? 'Azul' : 'Rojo'}: ${val}`);
-    // Mostrar cronómetro cuando ambas estén confirmadas
+    // Mostrar cronómetro solo cuando ambas estén confirmadas
     if (poomsaeSecA && poomsaeSecB) {
-      faseActualSec = 'secA_listo';
+      faseActualSec = 'p1A_listo';
+      // Ocultar bloque de poomsae y mostrar control
+      document.getElementById('bloque-poomsae-sec').classList.add('hidden');
       actualizarFaseUISec();
     }
   }
@@ -1011,6 +1013,7 @@
     document.getElementById('bloque-notas-sec')?.classList.add('hidden');
     document.getElementById('bloque-crono-sec')?.classList.add('hidden');
     document.getElementById('bloque-fase-sec')?.classList.add('hidden');
+    document.getElementById('bloque-poomsae-sec')?.classList.remove('hidden');
 
     mostrarTurnoSecuencial();
     actualizarFaseUISec();
@@ -1053,10 +1056,17 @@
 
   function iniciarCronoSec() {
     if (cronoIntervalSec) return;
-    if (!['secA_listo','secB_listo'].includes(faseActualSec)) return;
-    if (faseActualSec === 'secA_listo') faseActualSec = 'secA_corriendo';
-    else faseActualSec = 'secB_corriendo';
-    socket.emit('mesa-control', { codigo: salaActual, accion: 'iniciar', fase: faseActualSec });
+    const listos = ['p1A_listo','p1B_listo','p2A_listo','p2B_listo'];
+    if (!listos.includes(faseActualSec)) return;
+    faseActualSec = faseActualSec.replace('_listo','_corriendo');
+    // poomsae number: 1 for p1 phases, 2 for p2 phases
+    const poomsaeNum = faseActualSec.startsWith('p1') ? 1 : 2;
+    socket.emit('mesa-control', {
+      codigo: salaActual,
+      accion: 'iniciar',
+      fase: faseActualSec,
+      poomsaeNum  // jueces usarán esto para saber qué número enviar
+    });
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundosSec });
     document.getElementById('btn-next-sec').classList.add('hidden');
     actualizarFaseUISec();
@@ -1070,8 +1080,7 @@
 
   function detenerCronoSec() {
     if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
-    if (faseActualSec === 'secA_corriendo') faseActualSec = 'secA_detenido';
-    else if (faseActualSec === 'secB_corriendo') faseActualSec = 'secB_detenido';
+    faseActualSec = faseActualSec.replace('_corriendo','_detenido');
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundosSec });
     socket.emit('mesa-control', { codigo: salaActual, accion: 'detener', fase: faseActualSec });
     document.getElementById('btn-next-sec').classList.remove('hidden');
@@ -1080,8 +1089,7 @@
 
   function restablecerCronoSec() {
     if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
-    if (['secA_corriendo','secA_detenido'].includes(faseActualSec)) faseActualSec = 'secA_listo';
-    else if (['secB_corriendo','secB_detenido'].includes(faseActualSec)) faseActualSec = 'secB_listo';
+    faseActualSec = faseActualSec.replace('_corriendo','_listo').replace('_detenido','_listo');
     cronoSegundosSec = cronoOriginalSec;
     actualizarDisplayCronoSec();
     document.getElementById('btn-next-sec').classList.add('hidden');
@@ -1111,99 +1119,92 @@
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
 
-    blqCrono.classList.add('hidden');
-    blqFase.classList.add('hidden');
+    // Siempre mostrar notas
+    blqNotas?.classList.remove('hidden');
 
-    const getPoom = () => ['secA_listo','secA_corriendo','secA_detenido'].includes(faseActualSec) ? (poomsaeSecA||'—') : (poomsaeSecB||'—');
-    const setPoom = () => { if (lblPoom) lblPoom.textContent = getPoom(); };
+    // Mapa de fase → { atleta, color, poomsae, label }
+    const fases = {
+      'inicio':       null,
+      'p1A_listo':    { comp: a, color: '#6699ff', poom: poomsaeSecA, badge: `▶ ${a?.nombre||'Azul'} · P1 · Listo` },
+      'p1A_corriendo':{ comp: a, color: '#6699ff', poom: poomsaeSecA, badge: `▶ ${a?.nombre||'Azul'} · P1 · En ejecución` },
+      'p1A_detenido': { comp: a, color: '#6699ff', poom: poomsaeSecA, badge: `⏹ ${a?.nombre||'Azul'} · P1 · Jueces califican` },
+      'p1B_listo':    { comp: b, color: '#ff6666', poom: poomsaeSecA, badge: `▶ ${b?.nombre||'Rojo'} · P1 · Listo` },
+      'p1B_corriendo':{ comp: b, color: '#ff6666', poom: poomsaeSecA, badge: `▶ ${b?.nombre||'Rojo'} · P1 · En ejecución` },
+      'p1B_detenido': { comp: b, color: '#ff6666', poom: poomsaeSecA, badge: `⏹ ${b?.nombre||'Rojo'} · P1 · Jueces califican` },
+      'p2A_listo':    { comp: a, color: '#6699ff', poom: poomsaeSecB, badge: `▶ ${a?.nombre||'Azul'} · P2 · Listo` },
+      'p2A_corriendo':{ comp: a, color: '#6699ff', poom: poomsaeSecB, badge: `▶ ${a?.nombre||'Azul'} · P2 · En ejecución` },
+      'p2A_detenido': { comp: a, color: '#6699ff', poom: poomsaeSecB, badge: `⏹ ${a?.nombre||'Azul'} · P2 · Jueces califican` },
+      'p2B_listo':    { comp: b, color: '#ff6666', poom: poomsaeSecB, badge: `▶ ${b?.nombre||'Rojo'} · P2 · Listo` },
+      'p2B_corriendo':{ comp: b, color: '#ff6666', poom: poomsaeSecB, badge: `▶ ${b?.nombre||'Rojo'} · P2 · En ejecución` },
+      'p2B_detenido': { comp: b, color: '#ff6666', poom: poomsaeSecB, badge: `⏹ ${b?.nombre||'Rojo'} · P2 · Jueces califican` },
+    };
 
-    if (faseActualSec === 'inicio') {
-      badge.className = 'fase-badge sorteo';
-      badge.textContent = '▶ Confirma poomsae e inicia';
-      blqNotas.classList.remove('hidden');
-      blqCrono.classList.remove('hidden');
-      blqFase.classList.remove('hidden');
-      if (lblEjec && a) { lblEjec.textContent = a.nombre; lblEjec.style.color = '#6699ff'; }
-      setPoom();
-      setCronoSec(90, `${a?.nombre || '—'} · Tiempo de Ejecución`);
+    const info = fases[faseActualSec];
 
-    } else if (faseActualSec === 'secA_listo') {
-      badge.className = 'fase-badge ejecucion';
-      badge.textContent = `▶ ${a?.nombre || 'A'} · Listo`;
-      blqCrono.classList.remove('hidden');
-      blqFase.classList.remove('hidden');
-      blqNotas.classList.remove('hidden');
-      if (lblEjec && a) { lblEjec.textContent = a.nombre; lblEjec.style.color = '#6699ff'; }
-      setPoom();
-      setCronoSec(90, `${a?.nombre || '—'} · Tiempo de Ejecución`);
+    if (!info) {
+      // inicio — solo mostrar badge
+      if (badge) { badge.className = 'fase-badge sorteo'; badge.textContent = '🎲 Confirma las poomsaes'; }
+      blqCrono?.classList.add('hidden');
+      blqFase?.classList.add('hidden');
+      return;
+    }
 
-    } else if (faseActualSec === 'secA_corriendo') {
-      badge.className = 'fase-badge ejecucion';
-      badge.textContent = `▶ ${a?.nombre || 'A'} · En ejecución`;
-      blqCrono.classList.remove('hidden');
-      blqFase.classList.remove('hidden');
-      blqNotas.classList.remove('hidden');
-      if (lblEjec && a) { lblEjec.textContent = a.nombre; lblEjec.style.color = '#6699ff'; }
-      setPoom();
+    // Badge
+    if (badge) {
+      const isRunning  = faseActualSec.includes('corriendo');
+      const isStopped  = faseActualSec.includes('detenido');
+      badge.className  = 'fase-badge ' + (isRunning ? 'ejecucion' : isStopped ? 'detenido' : 'ejecucion');
+      badge.textContent = info.badge;
+    }
 
-    } else if (faseActualSec === 'secA_detenido') {
-      badge.className = 'fase-badge detenido';
-      badge.textContent = `⏹ ${a?.nombre || 'A'} · Jueces califican`;
-      blqCrono.classList.remove('hidden');
-      blqFase.classList.remove('hidden');
-      blqNotas.classList.remove('hidden');
-      if (lblEjec && a) { lblEjec.textContent = a.nombre; lblEjec.style.color = '#6699ff'; }
-      setPoom();
+    // Bloque ejecutando
+    blqFase?.classList.remove('hidden');
+    if (lblEjec && info.comp) { lblEjec.textContent = info.comp.nombre; lblEjec.style.color = info.color; }
+    if (lblPoom) lblPoom.textContent = info.poom || '—';
 
-    } else if (faseActualSec === 'secB_listo') {
-      badge.className = 'fase-badge ejecucion';
-      badge.textContent = `▶ ${b?.nombre || 'B'} · Listo`;
-      blqCrono.classList.remove('hidden');
-      blqFase.classList.remove('hidden');
-      blqNotas.classList.remove('hidden');
-      if (lblEjec && b) { lblEjec.textContent = b.nombre; lblEjec.style.color = '#ff6666'; }
-      setPoom();
-      setCronoSec(90, `${b?.nombre || '—'} · Tiempo de Ejecución`);
-
-    } else if (faseActualSec === 'secB_corriendo') {
-      badge.className = 'fase-badge ejecucion';
-      badge.textContent = `▶ ${b?.nombre || 'B'} · En ejecución`;
-      blqCrono.classList.remove('hidden');
-      blqFase.classList.remove('hidden');
-      blqNotas.classList.remove('hidden');
-      if (lblEjec && b) { lblEjec.textContent = b.nombre; lblEjec.style.color = '#ff6666'; }
-      setPoom();
-
-    } else if (faseActualSec === 'secB_detenido') {
-      badge.className = 'fase-badge detenido';
-      badge.textContent = `⏹ ${b?.nombre || 'B'} · Jueces califican`;
-      blqCrono.classList.remove('hidden');
-      blqFase.classList.remove('hidden');
-      blqNotas.classList.remove('hidden');
-      if (lblEjec && b) { lblEjec.textContent = b.nombre; lblEjec.style.color = '#ff6666'; }
-      setPoom();
+    // Cronómetro
+    blqCrono?.classList.remove('hidden');
+    // Resetear crono al llegar a _listo
+    if (faseActualSec.includes('_listo')) {
+      const isP1 = faseActualSec.startsWith('p1');
+      const poom = isP1 ? poomsaeSecA : poomsaeSecB;
+      setCronoSec(90, `${info.comp?.nombre || '—'} · ${poom || ''}`);
     }
   }
+
 
   function presionarNextSec() {
     document.getElementById('btn-next-sec').classList.add('hidden');
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
 
-    if (faseActualSec === 'secA_detenido') {
-      faseActualSec = 'secB_listo';
-      // Usar nueva-poomsae para que juez.html habilite controles para el segundo atleta
-      socket.emit('mesa-control', {
-        codigo: salaActual,
-        accion: 'nueva-poomsae',
-        fase: 'secB_listo',
-        poomsae: poomsaeSecB
-      });
+    if (faseActualSec === 'p1A_detenido') {
+      // P1 Azul terminó → P1 Rojo
+      faseActualSec = 'p1B_listo';
+      socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-poomsae', fase: 'p1B_listo', poomsae: poomsaeSecA });
       actualizarFaseUISec();
 
-    } else if (faseActualSec === 'secB_detenido') {
-      const totA = notasSecA[a?.id]?.total;
-      const totB = notasSecB[b?.id]?.total;
+    } else if (faseActualSec === 'p1B_detenido') {
+      // P1 Rojo terminó → P2 Azul
+      faseActualSec = 'p2A_listo';
+      socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-poomsae', fase: 'p2A_listo', poomsae: poomsaeSecB });
+      actualizarFaseUISec();
+
+    } else if (faseActualSec === 'p2A_detenido') {
+      // P2 Azul terminó → P2 Rojo
+      faseActualSec = 'p2B_listo';
+      socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-poomsae', fase: 'p2B_listo', poomsae: poomsaeSecB });
+      actualizarFaseUISec();
+
+    } else if (faseActualSec === 'p2B_detenido') {
+      const a = competidores[turnoIndex];
+      const b = competidores[turnoIndex + 1];
+      const totA = (notasSecA[a?.id]?.p1?.total != null && notasSecA[a?.id]?.p2?.total != null)
+        ? Math.round(((notasSecA[a.id].p1.total + notasSecA[a.id].p2.total) / 2) * 100) / 100
+        : null;
+      const totB = (notasSecB[b?.id]?.p1?.total != null && notasSecB[b?.id]?.p2?.total != null)
+        ? Math.round(((notasSecB[b.id].p1.total + notasSecB[b.id].p2.total) / 2) * 100) / 100
+        : null;
       if (totA == null || totB == null) {
         log('⏳ Esperando puntajes pendientes...');
         document.getElementById('btn-next-sec').classList.remove('hidden');
@@ -1214,54 +1215,73 @@
   }
 
 
+  // notasSecA/B now store both poomsaes: { [compId]: { p1: { jueces:{}, total:null }, p2: { jueces:{}, total:null } } }
   function actualizarNotasSecuencial(data) {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
     if (!a || !b) return;
-
-    // Ignorar notas de competidores de otro enfrentamiento
     if (data.competidorId !== a.id && data.competidorId !== b.id) return;
 
-    const isA   = data.competidorId === a.id;
+    const isA    = data.competidorId === a.id;
     const suffix = isA ? 'A' : 'B';
-    const notasObj = isA ? notasSecA : notasSecB;
-    const idComp = data.competidorId;
+    const store  = isA ? notasSecA : notasSecB;
+    const id     = data.competidorId;
+    const pNum   = data.poomsae; // 1 or 2
 
-    if (!notasObj[idComp]) notasObj[idComp] = { jueces: {}, total: null };
-    notasObj[idComp].jueces[data.juezNum] = { ...data.desglose, presentacion: data.presentacion };
+    if (!store[id]) store[id] = { p1: { jueces: {}, total: null }, p2: { jueces: {}, total: null } };
+    const pKey = pNum === 1 ? 'p1' : 'p2';
+    store[id][pKey].jueces[data.juezNum] = { ...data.desglose, presentacion: data.presentacion };
 
     if (data.totalComp !== null && data.totalComp !== undefined) {
-      notasObj[idComp].total = data.totalComp;
-      const el = document.getElementById(`total-sec-${suffix}`);
-      if (el) el.textContent = data.totalComp.toFixed(2);
+      store[id][pKey].total = data.totalComp;
     }
 
+    // Calcular total combinado si ambas poomsaes tienen total
+    const totP1 = store[id].p1.total;
+    const totP2 = store[id].p2.total;
+    const totCombinado = (totP1 !== null && totP2 !== null)
+      ? Math.round(((totP1 + totP2) / 2) * 100) / 100
+      : null;
+
+    // Mostrar en UI
+    const el = document.getElementById(`total-sec-${suffix}`);
+    if (el) {
+      if (totCombinado !== null) el.textContent = `${totCombinado.toFixed(2)} (P1:${totP1.toFixed(2)} P2:${totP2.toFixed(2)})`;
+      else if (totP1 !== null)   el.textContent = `P1: ${totP1.toFixed(2)}`;
+      else if (totP2 !== null)   el.textContent = `P2: ${totP2.toFixed(2)}`;
+    }
+
+    // Render filas (mostrar la poomsae activa)
     const div = document.getElementById(`notas-sec-rows-${suffix}`);
     if (!div) return;
-    let html = '';
+    const juecesActivos = store[id][pKey].jueces;
+    let html = `<div style="font-size:8px;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:4px">
+      P${pNum} · ${pNum === 1 ? poomsaeSecA : poomsaeSecB}</div>`;
     for (let i = 1; i <= numJueces; i++) {
-      const d = notasObj[idComp].jueces[i];
+      const d = juecesActivos[i];
       if (!d) {
-        html += `<div class="nota-juez-row">
-          <span class="nota-juez-num">J${i}</span>
-          <span class="nota-juez-detalle" style="color:#333">—</span>
-        </div>`;
+        html += `<div class="nota-juez-row"><span class="nota-juez-num">J${i}</span>
+          <span class="nota-juez-detalle" style="color:#333">—</span></div>`;
       } else {
         const tot = ((d.prec||0)+(d.vel||0)+(d.rit||0)+(d.exp||0)).toFixed(2);
         html += `<div class="nota-juez-row">
           <span class="nota-juez-num">J${i}</span>
           <span class="nota-juez-detalle">${(d.prec||0).toFixed(1)} / ${(d.vel||0).toFixed(1)} ${(d.rit||0).toFixed(1)} ${(d.exp||0).toFixed(1)}</span>
-          <span class="nota-juez-val">${tot}</span>
-        </div>`;
+          <span class="nota-juez-val">${tot}</span></div>`;
       }
     }
     div.innerHTML = html;
 
-    // Si ambas notas llegaron y Mesa ya presionó NEXT en secB_detenido, mostrar resultado
-    const totA = notasSecA[a.id]?.total;
-    const totB = notasSecB[b.id]?.total;
-    if (totA != null && totB != null &&
-        faseActualSec === 'secB_detenido' &&
+    // Cuando todos tienen P1+P2 y Mesa ya presionó NEXT en p2B_detenido
+    const totA = notasSecA[a.id]?.p1?.total !== null && notasSecA[a.id]?.p2?.total !== null
+      ? Math.round(((notasSecA[a.id].p1.total + notasSecA[a.id].p2.total) / 2) * 100) / 100
+      : null;
+    const totB = notasSecB[b.id]?.p1?.total !== null && notasSecB[b.id]?.p2?.total !== null
+      ? Math.round(((notasSecB[b.id].p1.total + notasSecB[b.id].p2.total) / 2) * 100) / 100
+      : null;
+
+    if (totA !== null && totB !== null &&
+        faseActualSec === 'p2B_detenido' &&
         document.getElementById('btn-next-sec').classList.contains('hidden')) {
       mostrarResultadoSecuencial(a, b, totA, totB);
     }
