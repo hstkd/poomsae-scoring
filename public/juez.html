@@ -1133,8 +1133,8 @@
   });
 
   socket.on('competencia-iniciada', (d) => {
-    salaInfo.tipo = d.tipo;
-    salaInfo.modo = d.modo;
+    salaInfo.tipo  = d.tipo;
+    salaInfo.modo  = d.modo;   // guardar modo como fuente de verdad
     salaInfo.competidores = d.competidores;
     salaInfo.estado = 'activo';
     // Controles siguen bloqueados hasta que Mesa presione INICIAR crono
@@ -1155,24 +1155,41 @@
       document.getElementById('overlay-espera').classList.add('hidden');
 
       const panel = document.getElementById('panel-calificacion');
-      if (turnoActual && turnoActual.tipo === '1v1-secuencial') {
-        // Secuencial: siempre mostrar un solo atleta según la fase
+      // Determinar modo — usar salaInfo.modo como fuente de verdad, no turnoActual.tipo
+      const modoActual = salaInfo.modo || (turnoActual?.tipo);
+      const esSecuencial = modoActual === '1v1-secuencial';
+
+      // Siempre re-renderizar en secuencial (cada atleta es distinto)
+      // En simultáneo solo re-renderizar si el panel estaba oculto
+      if (esSecuencial) {
         const fase = data.fase || '';
-        // p1A/p2A = competidor A (azul), p1B/p2B = competidor B (rojo)
         const esB  = fase.includes('B');
-        const comp = esB ? turnoActual.competidorB : turnoActual.competidorA;
-        const key  = esB ? 'B' : 'A';
-        panel.innerHTML = '';
-        renderUno(panel, comp, comp?.nombre || '—', key, key);
-        panel.style.display = 'flex';
-        panel.classList.add('visible');
-        document.getElementById('overlay-enviado').classList.add('hidden');
-      } else if (turnoActual && !panel.classList.contains('visible')) {
-        // Simultáneo: re-render completo
+        // turnoActual puede ser null si reconectamos — usar salaInfo como fallback
+        const compA = turnoActual?.competidorA || salaInfo.competidores?.[salaInfo.turnoIndex];
+        const compB = turnoActual?.competidorB || salaInfo.competidores?.[salaInfo.turnoIndex + 1];
+        const comp  = esB ? compB : compA;
+        const key   = esB ? 'B' : 'A';
+        if (comp) {
+          // Asegurar turnoActual tiene datos correctos para enviarPrecision
+          if (!turnoActual) turnoActual = {
+            tipo: '1v1-secuencial',
+            competidorA: compA,
+            competidorB: compB
+          };
+          resetEstado();
+          panel.innerHTML = '';
+          renderUno(panel, comp, comp.nombre, key, key);
+          panel.style.display = 'flex';
+          panel.classList.add('visible');
+          document.getElementById('overlay-enviado').classList.add('hidden');
+        }
+      } else if (!panel.classList.contains('visible') && turnoActual) {
+        resetEstado();
         panel.innerHTML = '';
         renderSimultaneo(panel);
         panel.style.display = 'flex';
         panel.classList.add('visible');
+        document.getElementById('overlay-enviado').classList.add('hidden');
       }
       habilitarControlesPrecision();
 
