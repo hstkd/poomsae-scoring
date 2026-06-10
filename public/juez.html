@@ -1147,23 +1147,33 @@
   socket.on('control-actualizado', (data) => {
     if (data.accion === 'iniciar') {
       precisionConfirmada = { A: false, B: false, C: false };
-      // Use poomsaeNum from mesa if provided (secuencial), else derive from fase
       if (data.poomsaeNum) poomsaeActiva = data.poomsaeNum;
       else poomsaeActiva = (data.fase && data.fase.startsWith('p2')) ? 2 : 1;
+
+      // Ocultar overlay de espera y mostrar panel
+      document.getElementById('overlay-espera').classList.add('hidden');
+
+      const panel = document.getElementById('panel-calificacion');
+      // Si el panel está oculto (venimos de nueva-poomsae), re-renderizarlo
+      if (!panel.classList.contains('visible') && turnoActual) {
+        panel.innerHTML = '';
+        renderSimultaneo(panel);
+        panel.style.display = 'flex';
+        panel.classList.add('visible');
+      }
       habilitarControlesPrecision();
 
     } else if (data.accion === 'detener') {
       bloquearSoloPrecision();
 
     } else if (data.accion === 'nueva-poomsae') {
-      // In secuencial: this means next athlete or next poomsae round
-      // Derive poomsaeActiva from fase
       const fase = data.fase || '';
       poomsaeActiva = fase.startsWith('p2') ? 2 : 1;
       precisionBloqueada = true;
       controlesHabilitados = false;
       precisionConfirmada = { A: false, B: false, C: false };
       document.getElementById('overlay-enviado').classList.add('hidden');
+      // Ocultar panel pero NO borrar turnoActual — necesitamos re-renderizar al iniciar
       document.getElementById('panel-calificacion').style.display = 'none';
       document.getElementById('panel-calificacion').classList.remove('visible');
       const poomLabel = fase.startsWith('p2') ? '2DA POOMSAE' : '1RA POOMSAE';
