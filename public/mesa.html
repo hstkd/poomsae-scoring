@@ -2093,7 +2093,7 @@
         </div>`;
       socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
     }
-);
+  });
 
   socket.on('juez-conectado', (data) => {
     renderJueces(data.jueces);
@@ -2106,7 +2106,7 @@
   });
 
   // FIX #4 + #13: enrutar por data.poomsae y usar totalComp del servidor
-  socket.on('puntaje-recibido', (data) => {
+   socket.on('puntaje-recibido', (data) => {
     if (!data.desglose) return;
     if (modo === '1v1-simultaneo') {
       actualizarNotasVista(data);
@@ -2118,13 +2118,12 @@
       const tot = ((data.desglose.prec || 0) + (data.desglose.vel || 0) +
                    (data.desglose.rit  || 0) + (data.desglose.exp  || 0)).toFixed(2);
       log(`J${data.juezNum} → ${data.competidorNombre}: ${tot}`);
-    }
-        } else if (modo === 'cutoff') {
+    } else if (modo === 'cutoff') {
       actualizarNotasCutoff(data);
       log(`J${data.juezNum} P${data.poomsae} → ${data.competidorNombre}`);
     }
-
   });
+
 
   // ── SNAPSHOT COMPLETO AL RECONECTAR ──
   // Recibido solo por Mesa cuando se reconecta (mesa-reconectar)
