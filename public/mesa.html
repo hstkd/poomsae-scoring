@@ -407,20 +407,29 @@
     <div id="display-turno-cut"></div>
 
     <div style="text-align:center;margin-bottom:10px">
-      <span class="fase-badge sorteo" id="fase-badge-cut">Sortear Poomsaes</span>
+      <span class="fase-badge sorteo" id="fase-badge-cut">Confirma las Poomsaes</span>
     </div>
 
     <!-- SORTEO (una vez para toda la ronda) -->
-    <div id="bloque-sorteo-cut">
-      <div class="poomsae-card">
-        <div class="poomsae-label">1ra Poomsae · toda la ronda</div>
-        <div class="poomsae-nombre vacio" id="display-cut-p1">— Sin sortear —</div>
+        <!-- POOMSAES MANUALES (toda la ronda) -->
+    <div id="bloque-poomsae-cut" style="margin-bottom:12px">
+      <div class="panel-titulo">Poomsaes de la ronda</div>
+      <label class="input-label">1ra Poomsae</label>
+      <div class="add-row" style="margin-bottom:6px">
+        <input class="input-field" id="input-poomsae-cut-1" type="text"
+          placeholder="ej: KORYO" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
+        <button class="btn-add" onclick="confirmarPoomsaeCut(1)">✓</button>
       </div>
-      <div class="poomsae-card" style="margin-top:8px">
-        <div class="poomsae-label">2da Poomsae · toda la ronda</div>
-        <div class="poomsae-nombre vacio" id="display-cut-p2">— Sin sortear —</div>
+      <div id="display-poomsae-cut-1"
+        style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#333;text-align:center;margin-bottom:8px">— Sin confirmar —</div>
+      <label class="input-label">2da Poomsae</label>
+      <div class="add-row" style="margin-bottom:6px">
+        <input class="input-field" id="input-poomsae-cut-2" type="text"
+          placeholder="ej: KEUMGANG" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
+        <button class="btn-add" onclick="confirmarPoomsaeCut(2)">✓</button>
       </div>
-      <button class="btn-blue" onclick="sortearCutoff()">🎲 SORTEAR AMBAS POOMSAES</button>
+      <div id="display-poomsae-cut-2"
+        style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#333;text-align:center;margin-bottom:4px">— Sin confirmar —</div>
     </div>
 
     <!-- EJECUTANDO -->
@@ -1459,28 +1468,25 @@
   let poomsaeCut1 = null, poomsaeCut2 = null;
   let notasCut = {}; // { p1:{jueces:{},total:null}, p2:{jueces:{},total:null} }
 
-  function sortearCutoff() {
-    const lista = POOMSAES_GRUPO[grupoCategoria] || [];
-    if (!lista.length) return alert('No hay poomsaes disponibles');
-    poomsaeCut1 = lista[Math.floor(Math.random() * lista.length)];
-    const restantes = lista.filter(p => p !== poomsaeCut1);
-    poomsaeCut2 = restantes[Math.floor(Math.random() * restantes.length)];
+  function confirmarPoomsaeCut(numero) {
+    const val = document.getElementById(`input-poomsae-cut-${numero}`)?.value.trim().toUpperCase();
+    if (!val) return;
+    if (numero === 1) poomsaeCut1 = val; else poomsaeCut2 = val;
 
-    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 1, poomsae: poomsaeCut1 });
-    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 2, poomsae: poomsaeCut2 });
+    const dsp = document.getElementById(`display-poomsae-cut-${numero}`);
+    dsp.textContent = val;
+    dsp.style.color = '#c9a84c';
+    document.getElementById(`poom-cut-${numero}`).textContent = val;
 
-    document.getElementById('display-cut-p1').textContent = poomsaeCut1;
-    document.getElementById('display-cut-p1').classList.remove('vacio');
-    document.getElementById('display-cut-p2').textContent = poomsaeCut2;
-    document.getElementById('display-cut-p2').classList.remove('vacio');
-    document.getElementById('poom-cut-1').textContent = poomsaeCut1;
-    document.getElementById('poom-cut-2').textContent = poomsaeCut2;
-    document.getElementById('bloque-sorteo-cut').classList.add('hidden');
+    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero, poomsae: val });
+    log(`Poomsae ${numero}: ${val}`);
 
-    log(`Sorteadas (ronda completa): ${poomsaeCut1} / ${poomsaeCut2}`);
-    iniciarAtletaCut();
+    if (poomsaeCut1 && poomsaeCut2) {
+      document.getElementById('bloque-poomsae-cut').classList.add('hidden');
+      iniciarAtletaCut();
+    }
   }
-
+  
   function iniciarAtletaCut() {
     const c = competidores[turnoIndex];
     if (!c) { finCutoff(); return; }
@@ -1555,7 +1561,13 @@
     if (cronoIntervalCut) return;
     faseActualCut = faseActualCut.replace('_listo','_corriendo').replace('_detenido','_corriendo');
     // ★ Activa los mandos de los jueces
-    socket.emit('mesa-control', { codigo: salaActual, accion: 'iniciar', fase: faseActualCut });
+        const poomsaeNum = faseActualCut.startsWith('p1') ? 1 : 2;
+    socket.emit('mesa-control', {
+      codigo: salaActual,
+      accion: 'iniciar',
+      fase: faseActualCut,
+      poomsaeNum
+    });
     socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundosCut });
     document.getElementById('btn-next-cut').classList.add('hidden');
     actualizarFaseUICut();
@@ -2085,6 +2097,15 @@
       document.getElementById('panel-control-cutoff').classList.remove('hidden');
       document.getElementById('panel-ranking').classList.remove('hidden');
       faseActualCut = 'sorteo';
+            poomsaeCut1 = null; poomsaeCut2 = null;
+      document.getElementById('bloque-poomsae-cut').classList.remove('hidden');
+      ['1','2'].forEach(n => {
+        const inp = document.getElementById(`input-poomsae-cut-${n}`);
+        const dsp = document.getElementById(`display-poomsae-cut-${n}`);
+        if (inp) inp.value = '';
+        if (dsp) { dsp.textContent = '— Sin confirmar —'; dsp.style.color = '#333'; }
+      });
+
       const c = competidores[turnoIndex];
       document.getElementById('display-turno-cut').innerHTML = `
         <div class="turno-card">
