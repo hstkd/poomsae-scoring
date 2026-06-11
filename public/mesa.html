@@ -355,20 +355,34 @@
     <div id="bloque-notas-sec" class="hidden" style="margin-top:8px">
       <div class="panel-titulo">Notas Recibidas</div>
       <div class="notas-grid">
+        <!-- Azul -->
         <div class="notas-comp azul">
           <div class="notas-comp-titulo azul" id="nombre-sec-A">—</div>
-          <div id="notas-sec-rows-A"></div>
-          <div class="total-comp" style="border-top-color:#1d3a7f">
-            <span class="total-comp-label">Total</span>
+          <div style="font-size:8px;letter-spacing:2px;color:#4466aa;text-transform:uppercase;margin-bottom:4px">P1 · <span id="poom-sec-A1">—</span></div>
+          <div id="notas-sec-rows-A1"></div>
+          <div style="font-size:8px;letter-spacing:2px;color:#4466aa;text-transform:uppercase;margin:6px 0 4px">P2 · <span id="poom-sec-A2">—</span></div>
+          <div id="notas-sec-rows-A2"></div>
+          <div class="total-comp" style="border-top-color:#1d3a7f;margin-top:6px">
+            <span class="total-comp-label">Promedio</span>
             <span class="total-comp-val" id="total-sec-A">—</span>
           </div>
+          <div style="font-size:9px;color:#4466aa;text-align:right;margin-top:2px">
+            P1: <span id="parcial-sec-A1">—</span> · P2: <span id="parcial-sec-A2">—</span>
+          </div>
         </div>
+        <!-- Rojo -->
         <div class="notas-comp rojo">
           <div class="notas-comp-titulo rojo" id="nombre-sec-B">—</div>
-          <div id="notas-sec-rows-B"></div>
-          <div class="total-comp" style="border-top-color:#7f1d1d">
-            <span class="total-comp-label">Total</span>
+          <div style="font-size:8px;letter-spacing:2px;color:#aa4444;text-transform:uppercase;margin-bottom:4px">P1 · <span id="poom-sec-B1">—</span></div>
+          <div id="notas-sec-rows-B1"></div>
+          <div style="font-size:8px;letter-spacing:2px;color:#aa4444;text-transform:uppercase;margin:6px 0 4px">P2 · <span id="poom-sec-B2">—</span></div>
+          <div id="notas-sec-rows-B2"></div>
+          <div class="total-comp" style="border-top-color:#7f1d1d;margin-top:6px">
+            <span class="total-comp-label">Promedio</span>
             <span class="total-comp-val" id="total-sec-B">—</span>
+          </div>
+          <div style="font-size:9px;color:#aa4444;text-align:right;margin-top:2px">
+            P1: <span id="parcial-sec-B1">—</span> · P2: <span id="parcial-sec-B2">—</span>
           </div>
         </div>
       </div>
@@ -970,16 +984,25 @@
     const val = document.getElementById(inputId)?.value.trim().toUpperCase();
     if (!val) return;
     const numero = lado === 'A' ? 1 : 2;
-    if (lado === 'A') poomsaeSecA = val;
-    else              poomsaeSecB = val;
+    if (lado === 'A') {
+      poomsaeSecA = val;
+      ['A','B'].forEach(s => {
+        const el = document.getElementById(`poom-sec-${s}1`);
+        if (el) el.textContent = val;
+      });
+    } else {
+      poomsaeSecB = val;
+      ['A','B'].forEach(s => {
+        const el = document.getElementById(`poom-sec-${s}2`);
+        if (el) el.textContent = val;
+      });
+    }
     document.getElementById(displayId).textContent = val;
     document.getElementById(displayId).style.color = lado === 'A' ? '#6699ff' : '#ff6666';
     socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero, poomsae: val });
     log(`Poomsae ${lado === 'A' ? 'Azul' : 'Rojo'}: ${val}`);
-    // Mostrar cronómetro solo cuando ambas estén confirmadas
     if (poomsaeSecA && poomsaeSecB) {
       faseActualSec = 'p1A_listo';
-      // Ocultar bloque de poomsae y mostrar control
       document.getElementById('bloque-poomsae-sec').classList.add('hidden');
       actualizarFaseUISec();
     }
@@ -1030,8 +1053,8 @@
     }
     document.getElementById('nombre-sec-A').textContent = a.nombre;
     document.getElementById('nombre-sec-B').textContent = b.nombre;
-    notasSecA = { [a.id]: { jueces: {}, total: null } };
-    notasSecB = { [b.id]: { jueces: {}, total: null } };
+    notasSecA = { [a.id]: { p1: { jueces: {}, total: null }, p2: { jueces: {}, total: null } } };
+    notasSecB = { [b.id]: { p1: { jueces: {}, total: null }, p2: { jueces: {}, total: null } } };
 
     if (div) div.innerHTML = `
       <div class="turno-card">
@@ -1200,23 +1223,24 @@
     } else if (faseActualSec === 'p2B_detenido') {
       const a = competidores[turnoIndex];
       const b = competidores[turnoIndex + 1];
-      const totA = (notasSecA[a?.id]?.p1?.total != null && notasSecA[a?.id]?.p2?.total != null)
-        ? Math.round(((notasSecA[a.id].p1.total + notasSecA[a.id].p2.total) / 2) * 100) / 100
-        : null;
-      const totB = (notasSecB[b?.id]?.p1?.total != null && notasSecB[b?.id]?.p2?.total != null)
-        ? Math.round(((notasSecB[b.id].p1.total + notasSecB[b.id].p2.total) / 2) * 100) / 100
-        : null;
-      if (totA == null || totB == null) {
+      const totA1 = notasSecA[a?.id]?.p1?.total;
+      const totA2 = notasSecA[a?.id]?.p2?.total;
+      const totB1 = notasSecB[b?.id]?.p1?.total;
+      const totB2 = notasSecB[b?.id]?.p2?.total;
+      if (totA1 == null || totA2 == null || totB1 == null || totB2 == null) {
         log('⏳ Esperando puntajes pendientes...');
         document.getElementById('btn-next-sec').classList.remove('hidden');
         return;
       }
-      mostrarResultadoSecuencial(a, b, totA, totB);
+      const promA = Math.round(((totA1 + totA2) / 2) * 100) / 100;
+      const promB = Math.round(((totB1 + totB2) / 2) * 100) / 100;
+      mostrarResultadoSecuencial(a, b, promA, promB);
     }
   }
 
 
-  // notasSecA/B now store both poomsaes: { [compId]: { p1: { jueces:{}, total:null }, p2: { jueces:{}, total:null } } }
+  // ── NOTAS SECUENCIAL ──
+  // notasSecA/B: { [compId]: { p1:{jueces:{},total:null}, p2:{jueces:{},total:null} } }
   function actualizarNotasSecuencial(data) {
     const a = competidores[turnoIndex];
     const b = competidores[turnoIndex + 1];
@@ -1227,71 +1251,82 @@
     const suffix = isA ? 'A' : 'B';
     const store  = isA ? notasSecA : notasSecB;
     const id     = data.competidorId;
-    const pNum   = data.poomsae; // 1 or 2
+    const pNum   = data.poomsae;     // 1 o 2 — fuente de verdad del servidor
+    const pKey   = pNum === 1 ? 'p1' : 'p2';
 
     if (!store[id]) store[id] = { p1: { jueces: {}, total: null }, p2: { jueces: {}, total: null } };
-    const pKey = pNum === 1 ? 'p1' : 'p2';
     store[id][pKey].jueces[data.juezNum] = { ...data.desglose, presentacion: data.presentacion };
 
+    // Usar total del servidor (ya calcula trimmed mean si aplica)
     if (data.totalComp !== null && data.totalComp !== undefined) {
       store[id][pKey].total = data.totalComp;
     }
 
-    // Calcular total combinado si ambas poomsaes tienen total
-    const totP1 = store[id].p1.total;
-    const totP2 = store[id].p2.total;
-    const totCombinado = (totP1 !== null && totP2 !== null)
-      ? Math.round(((totP1 + totP2) / 2) * 100) / 100
-      : null;
-
-    // Mostrar en UI
-    const el = document.getElementById(`total-sec-${suffix}`);
-    if (el) {
-      if (totCombinado !== null) el.textContent = `${totCombinado.toFixed(2)} (P1:${totP1.toFixed(2)} P2:${totP2.toFixed(2)})`;
-      else if (totP1 !== null)   el.textContent = `P1: ${totP1.toFixed(2)}`;
-      else if (totP2 !== null)   el.textContent = `P2: ${totP2.toFixed(2)}`;
+    // Actualizar parcial y promedio en UI
+    const p1total = store[id].p1.total;
+    const p2total = store[id].p2.total;
+    const parcial1El = document.getElementById(`parcial-sec-${suffix}1`);
+    const parcial2El = document.getElementById(`parcial-sec-${suffix}2`);
+    const totalEl    = document.getElementById(`total-sec-${suffix}`);
+    if (parcial1El) parcial1El.textContent = p1total !== null ? p1total.toFixed(2) : '—';
+    if (parcial2El) parcial2El.textContent = p2total !== null ? p2total.toFixed(2) : '—';
+    if (totalEl) {
+      if (p1total !== null && p2total !== null) {
+        const prom = Math.round(((p1total + p2total) / 2) * 100) / 100;
+        totalEl.textContent = prom.toFixed(2);
+      } else if (p1total !== null) {
+        totalEl.textContent = `P1: ${p1total.toFixed(2)}`;
+      }
     }
 
-    // Render filas (mostrar la poomsae activa)
-    const div = document.getElementById(`notas-sec-rows-${suffix}`);
+    // Render filas de jueces para la poomsae activa
+    const divId = `notas-sec-rows-${suffix}${pNum}`;
+    const div   = document.getElementById(divId);
     if (!div) return;
-    const juecesActivos = store[id][pKey].jueces;
-    let html = `<div style="font-size:8px;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:4px">
-      P${pNum} · ${pNum === 1 ? poomsaeSecA : poomsaeSecB}</div>`;
+    const juecesData = store[id][pKey].jueces;
+    let html = '';
     for (let i = 1; i <= numJueces; i++) {
-      const d = juecesActivos[i];
+      const d = juecesData[i];
       if (!d) {
-        html += `<div class="nota-juez-row"><span class="nota-juez-num">J${i}</span>
+        html += `<div class="nota-juez-row">
+          <span class="nota-juez-num">J${i}</span>
           <span class="nota-juez-detalle" style="color:#333">—</span></div>`;
       } else {
         const tot = ((d.prec||0)+(d.vel||0)+(d.rit||0)+(d.exp||0)).toFixed(2);
         html += `<div class="nota-juez-row">
           <span class="nota-juez-num">J${i}</span>
-          <span class="nota-juez-detalle">${(d.prec||0).toFixed(1)} / ${(d.vel||0).toFixed(1)} ${(d.rit||0).toFixed(1)} ${(d.exp||0).toFixed(1)}</span>
+          <span class="nota-juez-detalle">${(d.prec||0).toFixed(1)}/${(d.vel||0).toFixed(1)} ${(d.rit||0).toFixed(1)} ${(d.exp||0).toFixed(1)}</span>
           <span class="nota-juez-val">${tot}</span></div>`;
       }
     }
     div.innerHTML = html;
 
-    // Cuando todos tienen P1+P2 y Mesa ya presionó NEXT en p2B_detenido
-    const totA = notasSecA[a.id]?.p1?.total !== null && notasSecA[a.id]?.p2?.total !== null
-      ? Math.round(((notasSecA[a.id].p1.total + notasSecA[a.id].p2.total) / 2) * 100) / 100
-      : null;
-    const totB = notasSecB[b.id]?.p1?.total !== null && notasSecB[b.id]?.p2?.total !== null
-      ? Math.round(((notasSecB[b.id].p1.total + notasSecB[b.id].p2.total) / 2) * 100) / 100
-      : null;
+    // Verificar si ya tenemos todos los totales para mostrar resultado automáticamente
+    const totA1 = notasSecA[a.id]?.p1?.total;
+    const totA2 = notasSecA[a.id]?.p2?.total;
+    const totB1 = notasSecB[b.id]?.p1?.total;
+    const totB2 = notasSecB[b.id]?.p2?.total;
 
-    if (totA !== null && totB !== null &&
-        faseActualSec === 'p2B_detenido' &&
-        document.getElementById('btn-next-sec').classList.contains('hidden')) {
-      mostrarResultadoSecuencial(a, b, totA, totB);
+    if (totA1 != null && totA2 != null && totB1 != null && totB2 != null) {
+      const promA = Math.round(((totA1 + totA2) / 2) * 100) / 100;
+      const promB = Math.round(((totB1 + totB2) / 2) * 100) / 100;
+      // Solo mostrar resultado si Mesa ya está en p2B_detenido y presionó NEXT
+      if (faseActualSec === 'p2B_detenido' &&
+          document.getElementById('btn-next-sec').classList.contains('hidden')) {
+        mostrarResultadoSecuencial(a, b, promA, promB);
+      }
     }
   }
 
-  function mostrarResultadoSecuencial(a, b, totA, totB) {
-    const ganador = totA > totB ? a.nombre : totB > totA ? b.nombre : 'EMPATE';
-    const colorG  = totA > totB ? '#6699ff' : totB > totA ? '#ff6666' : '#c9a84c';
+    function mostrarResultadoSecuencial(a, b, promA, promB) {
+    const ganador = promA > promB ? a.nombre : promB > promA ? b.nombre : 'EMPATE';
+    const colorG  = promA > promB ? '#6699ff' : promB > promA ? '#ff6666' : '#c9a84c';
     faseActualSec = 'resultado';
+
+    const totA1 = notasSecA[a.id]?.p1?.total;
+    const totA2 = notasSecA[a.id]?.p2?.total;
+    const totB1 = notasSecB[b.id]?.p1?.total;
+    const totB2 = notasSecB[b.id]?.p2?.total;
 
     const bloqueRes = document.getElementById('bloque-resultado-sec');
     bloqueRes.classList.remove('hidden');
@@ -1299,15 +1334,35 @@
       <div class="resultado-final">
         <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:12px">Resultado Final</div>
         <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:start;margin-bottom:14px">
+
+          <!-- Azul -->
           <div style="background:#050a1a;border:1px solid #1d3a7f;border-radius:10px;padding:10px;text-align:center">
             <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#6699ff;margin-bottom:6px">${a.nombre}</div>
-            <div class="${totA > totB ? 'promedio-ganador' : ''}" style="font-family:'Bebas Neue',sans-serif;font-size:44px;color:#fff;line-height:1">${totA.toFixed(2)}</div>
+            <div style="font-size:9px;color:#4466aa;margin-bottom:2px">${poomsaeSecA || 'P1'}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#aabbff">${totA1 != null ? totA1.toFixed(2) : '—'}</div>
+            <div style="font-size:9px;color:#4466aa;margin-top:4px;margin-bottom:2px">${poomsaeSecB || 'P2'}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#aabbff">${totA2 != null ? totA2.toFixed(2) : '—'}</div>
+            <div style="border-top:1px solid #1d3a7f;margin-top:8px;padding-top:6px">
+              <div style="font-size:8px;font-weight:700;letter-spacing:2px;color:#4466aa;text-transform:uppercase;margin-bottom:2px">Promedio</div>
+              <div class="${promA > promB ? 'promedio-ganador' : ''}" style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;line-height:1">${promA.toFixed(2)}</div>
+            </div>
           </div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#333;padding-top:20px">VS</div>
+
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#333;padding-top:40px">VS</div>
+
+          <!-- Rojo -->
           <div style="background:#1a0505;border:1px solid #7f1d1d;border-radius:10px;padding:10px;text-align:center">
             <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#ff6666;margin-bottom:6px">${b.nombre}</div>
-            <div class="${totB > totA ? 'promedio-ganador' : ''}" style="font-family:'Bebas Neue',sans-serif;font-size:44px;color:#fff;line-height:1">${totB.toFixed(2)}</div>
+            <div style="font-size:9px;color:#aa4444;margin-bottom:2px">${poomsaeSecA || 'P1'}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ffaaaa">${totB1 != null ? totB1.toFixed(2) : '—'}</div>
+            <div style="font-size:9px;color:#aa4444;margin-top:4px;margin-bottom:2px">${poomsaeSecB || 'P2'}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:#ffaaaa">${totB2 != null ? totB2.toFixed(2) : '—'}</div>
+            <div style="border-top:1px solid #7f1d1d;margin-top:8px;padding-top:6px">
+              <div style="font-size:8px;font-weight:700;letter-spacing:2px;color:#aa4444;text-transform:uppercase;margin-bottom:2px">Promedio</div>
+              <div class="${promB > promA ? 'promedio-ganador' : ''}" style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#fff;line-height:1">${promB.toFixed(2)}</div>
+            </div>
           </div>
+
         </div>
         <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:4px">Ganador</div>
         <div class="resultado-ganador" style="color:${colorG}">🏆 ${ganador}</div>
@@ -1317,7 +1372,8 @@
     const btnFin = document.getElementById('btn-finalizar-sec');
     btnFin.textContent = haySiguiente ? 'SIGUIENTE ENFRENTAMIENTO →' : 'FINALIZAR COMPETENCIA ✓';
     btnFin.classList.remove('hidden');
-    log(`🏆 ${ganador} | ${a.nombre} ${totA.toFixed(2)} vs ${b.nombre} ${totB.toFixed(2)}`);
+    document.getElementById('btn-exportar-pdf').classList.remove('hidden');
+    log(`🏆 ${ganador} | ${a.nombre} ${promA.toFixed(2)} vs ${b.nombre} ${promB.toFixed(2)}`);
   }
 
   function presionarFinalizarSec() {
