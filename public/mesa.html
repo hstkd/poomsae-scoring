@@ -1410,15 +1410,18 @@
 function siguienteTurno() {
   turnoIndex += (modo === '1v1-secuencial') ? 2 : 1;
 
-  // Resetear marcadores en pantalla y jueces antes del nuevo turno
-  socket.emit('mesa-control', {
-    codigo: salaActual,
-    accion: 'nueva-competencia',
-    fase: 'sorteo'
-  });
+  // Limpiar marcador local de mesa
+  const bar = document.getElementById('puntajes-bar-gen');
+  if (bar) bar.innerHTML = '';
+  notasP1 = {};
+  notasP2 = {};
+
+  // Resetear jueces y pantalla
+  socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-competencia', fase: 'sorteo' });
 
   mostrarTurnoActual();
 }
+
 
 
   function definirCorte() {
