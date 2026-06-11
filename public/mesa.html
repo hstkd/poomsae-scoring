@@ -1022,12 +1022,20 @@
       if (dsp) { dsp.textContent = '— Sin confirmar —'; dsp.style.color = '#333'; }
     });
 
-    ['A','B'].forEach(s => {
+     ['A1','A2','B1','B2'].forEach(s => {
       const rows = document.getElementById(`notas-sec-rows-${s}`);
-      const tot  = document.getElementById(`total-sec-${s}`);
       if (rows) rows.innerHTML = '';
-      if (tot)  tot.textContent = '—';
+      const parcial = document.getElementById(`parcial-sec-${s}`);
+      if (parcial) parcial.textContent = '—';
+      const poom = document.getElementById(`poom-sec-${s}`);
+      if (poom) poom.textContent = '—';
     });
+
+    ['A','B'].forEach(s => {
+      const tot = document.getElementById(`total-sec-${s}`);
+      if (tot) tot.textContent = '—';
+    });
+
 
     const bloqueRes = document.getElementById('bloque-resultado-sec');
     if (bloqueRes) { bloqueRes.innerHTML = ''; bloqueRes.classList.add('hidden'); }
