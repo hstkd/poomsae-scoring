@@ -401,6 +401,72 @@
 
   </div>
 
+    <!-- CONTROL CUTOFF -->
+  <div class="panel hidden" id="panel-control-cutoff">
+    <div class="panel-titulo">Cut Off</div>
+    <div id="display-turno-cut"></div>
+
+    <div style="text-align:center;margin-bottom:10px">
+      <span class="fase-badge sorteo" id="fase-badge-cut">Sortear Poomsaes</span>
+    </div>
+
+    <!-- SORTEO (una vez para toda la ronda) -->
+    <div id="bloque-sorteo-cut">
+      <div class="poomsae-card">
+        <div class="poomsae-label">1ra Poomsae · toda la ronda</div>
+        <div class="poomsae-nombre vacio" id="display-cut-p1">— Sin sortear —</div>
+      </div>
+      <div class="poomsae-card" style="margin-top:8px">
+        <div class="poomsae-label">2da Poomsae · toda la ronda</div>
+        <div class="poomsae-nombre vacio" id="display-cut-p2">— Sin sortear —</div>
+      </div>
+      <button class="btn-blue" onclick="sortearCutoff()">🎲 SORTEAR AMBAS POOMSAES</button>
+    </div>
+
+    <!-- EJECUTANDO -->
+    <div id="bloque-fase-cut" class="hidden" style="text-align:center;margin-bottom:8px">
+      <div style="font-size:9px;font-weight:700;letter-spacing:3px;color:#555;text-transform:uppercase;margin-bottom:2px">Ejecutando</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:#fff" id="label-ejecutando-cut">—</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:#c9a84c;margin-top:2px" id="label-poomsae-cut">—</div>
+    </div>
+
+    <!-- CRONÓMETRO -->
+    <div class="cronometro-card hidden" id="bloque-crono-cut">
+      <div class="cronometro-label" id="crono-label-cut">—</div>
+      <div class="cronometro-display" id="crono-display-cut">1:30</div>
+      <div class="crono-btns">
+        <button class="btn-green" onclick="iniciarCronoCut()">▶ INICIAR</button>
+        <button class="btn-red" onclick="detenerCronoCut()">⏹ DETENER</button>
+      </div>
+      <button class="btn-dark" onclick="restablecerCronoCut()" style="margin-top:6px">↺ RESTABLECER</button>
+    </div>
+
+    <!-- NEXT -->
+    <button class="btn-next hidden" id="btn-next-cut" onclick="presionarNextCut()" style="margin-top:8px">NEXT ›</button>
+
+    <!-- NOTAS -->
+    <div id="bloque-notas-cut" class="hidden" style="margin-top:8px">
+      <div class="panel-titulo">Notas Recibidas</div>
+      <div class="notas-comp">
+        <div class="notas-comp-titulo" style="color:#c9a84c" id="nombre-cut">—</div>
+        <div style="font-size:8px;letter-spacing:2px;color:#777;text-transform:uppercase;margin-bottom:4px">P1 · <span id="poom-cut-1">—</span></div>
+        <div id="notas-cut-rows-1"></div>
+        <div style="font-size:8px;letter-spacing:2px;color:#777;text-transform:uppercase;margin:6px 0 4px">P2 · <span id="poom-cut-2">—</span></div>
+        <div id="notas-cut-rows-2"></div>
+        <div class="total-comp">
+          <span class="total-comp-label">Total (P1 + P2)</span>
+          <span class="total-comp-val" id="total-cut">—</span>
+        </div>
+        <div style="font-size:9px;color:#777;text-align:right;margin-top:2px">
+          P1: <span id="parcial-cut-1">—</span> · P2: <span id="parcial-cut-2">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIGUIENTE ATLETA -->
+    <button class="btn-finalizar hidden" id="btn-siguiente-cut" onclick="siguienteAtletaCut()">SIGUIENTE ATLETA ›</button>
+  </div>
+
   <!-- RANKING -->
   <div class="panel hidden" id="panel-ranking">
     <div class="panel-titulo">Ranking en Vivo</div>
@@ -485,11 +551,13 @@
     renderCompetidoresSetup();
   }
 
-  function renderCompetidoresSetup() {
-    const colorClases = ['azul', 'rojo']; // índice 0=azul, 1=rojo, resto neutro
+ function renderCompetidoresSetup() {
+    const es1v1 = modo === '1v1-simultaneo' || modo === '1v1-secuencial';
     document.getElementById('lista-competidores').innerHTML =
       competidoresSetup.map((c, i) => {
-        const colorLabel = i === 0 ? 'color:#6699ff' : i === 1 ? 'color:#ff6666' : 'color:#888';
+        const colorLabel = es1v1
+          ? (i === 0 ? 'color:#6699ff' : i === 1 ? 'color:#ff6666' : 'color:#888')
+          : 'color:#888';   // cutoff: todos neutros
         return `
           <div class="comp-item" id="comp-item-${i}">
             <span class="comp-num" style="${colorLabel}">${i + 1}</span>
@@ -498,8 +566,8 @@
             <button class="btn-del" onclick="eliminarCompetidor(${i})">✕</button>
           </div>`;
       }).join('');
-  }
-
+}
+  
   function eliminarCompetidor(i) {
     competidoresSetup.splice(i, 1);
     renderCompetidoresSetup();
@@ -1384,51 +1452,222 @@
     log(`🏆 ${ganador} | ${a.nombre} ${promA.toFixed(2)} vs ${b.nombre} ${promB.toFixed(2)}`);
   }
 
-  function presionarFinalizarSec() {
-    document.getElementById('btn-finalizar-sec').classList.add('hidden');
-    const haySiguiente = competidores[turnoIndex + 2] && competidores[turnoIndex + 3];
-    if (haySiguiente) {
-      turnoIndex += 2;
-      socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-competencia', fase: 'inicio' });
-      resetSecuencial();
+  // ── CUTOFF: cada atleta hace P1 y luego P2 ──
+  let faseActualCut = 'sorteo'; // sorteo → p1_listo → p1_corriendo → p1_detenido → p2_listo → p2_corriendo → p2_detenido → atleta_completo
+  let cronoIntervalCut = null;
+  let cronoSegundosCut = 90, cronoOriginalCut = 90;
+  let poomsaeCut1 = null, poomsaeCut2 = null;
+  let notasCut = {}; // { p1:{jueces:{},total:null}, p2:{jueces:{},total:null} }
+
+  function sortearCutoff() {
+    const lista = POOMSAES_GRUPO[grupoCategoria] || [];
+    if (!lista.length) return alert('No hay poomsaes disponibles');
+    poomsaeCut1 = lista[Math.floor(Math.random() * lista.length)];
+    const restantes = lista.filter(p => p !== poomsaeCut1);
+    poomsaeCut2 = restantes[Math.floor(Math.random() * restantes.length)];
+
+    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 1, poomsae: poomsaeCut1 });
+    socket.emit('mesa-sortear-poomsae', { codigo: salaActual, numero: 2, poomsae: poomsaeCut2 });
+
+    document.getElementById('display-cut-p1').textContent = poomsaeCut1;
+    document.getElementById('display-cut-p1').classList.remove('vacio');
+    document.getElementById('display-cut-p2').textContent = poomsaeCut2;
+    document.getElementById('display-cut-p2').classList.remove('vacio');
+    document.getElementById('poom-cut-1').textContent = poomsaeCut1;
+    document.getElementById('poom-cut-2').textContent = poomsaeCut2;
+    document.getElementById('bloque-sorteo-cut').classList.add('hidden');
+
+    log(`Sorteadas (ronda completa): ${poomsaeCut1} / ${poomsaeCut2}`);
+    iniciarAtletaCut();
+  }
+
+  function iniciarAtletaCut() {
+    const c = competidores[turnoIndex];
+    if (!c) { finCutoff(); return; }
+    faseActualCut = 'p1_listo';
+    notasCut = { p1: { jueces: {}, total: null }, p2: { jueces: {}, total: null } };
+
+    // Limpiar panel de notas
+    document.getElementById('nombre-cut').textContent = c.nombre;
+    document.getElementById('notas-cut-rows-1').innerHTML = '';
+    document.getElementById('notas-cut-rows-2').innerHTML = '';
+    document.getElementById('total-cut').textContent = '—';
+    document.getElementById('parcial-cut-1').textContent = '—';
+    document.getElementById('parcial-cut-2').textContent = '—';
+    document.getElementById('btn-siguiente-cut').classList.add('hidden');
+    document.getElementById('bloque-notas-cut').classList.remove('hidden');
+    document.getElementById('bloque-fase-cut').classList.remove('hidden');
+
+    document.getElementById('display-turno-cut').innerHTML = `
+      <div class="turno-card">
+        <div class="turno-label">Atleta ${turnoIndex + 1} de ${competidores.length}</div>
+        <div class="turno-nombre">${c.nombre}</div>
+      </div>`;
+
+    // Re-render del panel del juez para el nuevo atleta (queda bloqueado hasta INICIAR)
+    socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
+    actualizarFaseUICut();
+  }
+
+  function actualizarFaseUICut() {
+    const c = competidores[turnoIndex];
+    const badge = document.getElementById('fase-badge-cut');
+    const esP1 = faseActualCut.startsWith('p1');
+    const poom = esP1 ? poomsaeCut1 : poomsaeCut2;
+
+    document.getElementById('label-ejecutando-cut').textContent = c?.nombre || '—';
+    document.getElementById('label-poomsae-cut').textContent = poom || '—';
+    document.getElementById('bloque-crono-cut').classList.remove('hidden');
+
+    const pTxt = esP1 ? 'P1' : 'P2';
+    if (faseActualCut.includes('corriendo')) {
+      badge.className = 'fase-badge ejecucion';
+      badge.textContent = `▶ ${c?.nombre || ''} · ${pTxt} · En ejecución`;
+    } else if (faseActualCut.includes('detenido')) {
+      badge.className = 'fase-badge detenido';
+      badge.textContent = `⏹ ${c?.nombre || ''} · ${pTxt} · Jueces califican`;
     } else {
-      finDeSala();
+      badge.className = 'fase-badge ejecucion';
+      badge.textContent = `▶ ${c?.nombre || ''} · ${pTxt} · Listo`;
+      setCronoCut(90, `${c?.nombre || '—'} · ${poom || ''}`);
     }
   }
 
-  // ── CUTOFF ──
-  function mostrarTurnoActual() {
-    const div = document.getElementById('display-turno-sec');
+  function setCronoCut(segundos, label) {
+    if (cronoIntervalCut) { clearInterval(cronoIntervalCut); cronoIntervalCut = null; }
+    cronoSegundosCut = segundos;
+    cronoOriginalCut = segundos;
+    document.getElementById('crono-label-cut').textContent = label;
+    actualizarDisplayCronoCut();
+  }
+
+  function actualizarDisplayCronoCut() {
+    const min = Math.floor(cronoSegundosCut / 60);
+    const seg = cronoSegundosCut % 60;
+    const el = document.getElementById('crono-display-cut');
+    if (!el) return;
+    el.textContent = `${min}:${seg.toString().padStart(2, '0')}`;
+    el.className = (cronoSegundosCut <= 10 && cronoSegundosCut > 0)
+      ? 'cronometro-display rojo' : 'cronometro-display';
+  }
+
+  function iniciarCronoCut() {
+    if (cronoIntervalCut) return;
+    faseActualCut = faseActualCut.replace('_listo','_corriendo').replace('_detenido','_corriendo');
+    // ★ Activa los mandos de los jueces
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'iniciar', fase: faseActualCut });
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundosCut });
+    document.getElementById('btn-next-cut').classList.add('hidden');
+    actualizarFaseUICut();
+    cronoIntervalCut = setInterval(() => {
+      cronoSegundosCut--;
+      actualizarDisplayCronoCut();
+      socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'tick', duracion: cronoSegundosCut });
+      if (cronoSegundosCut <= 0) detenerCronoCut();
+    }, 1000);
+  }
+
+  function detenerCronoCut() {
+    if (cronoIntervalCut) { clearInterval(cronoIntervalCut); cronoIntervalCut = null; }
+    faseActualCut = faseActualCut.replace('_corriendo','_detenido');
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundosCut });
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'detener', fase: faseActualCut });
+    document.getElementById('btn-next-cut').classList.remove('hidden');
+    actualizarFaseUICut();
+  }
+
+  function restablecerCronoCut() {
+    if (cronoIntervalCut) { clearInterval(cronoIntervalCut); cronoIntervalCut = null; }
+    faseActualCut = faseActualCut.replace('_corriendo','_listo').replace('_detenido','_listo');
+    cronoSegundosCut = cronoOriginalCut;
+    actualizarDisplayCronoCut();
+    document.getElementById('btn-next-cut').classList.add('hidden');
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginalCut });
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'restablecer', fase: faseActualCut });
+    actualizarFaseUICut();
+  }
+
+  function presionarNextCut() {
+    document.getElementById('btn-next-cut').classList.add('hidden');
+
+    if (faseActualCut === 'p1_detenido') {
+      // Mismo atleta → Poomsae 2
+      faseActualCut = 'p2_listo';
+      // ★ Avisa a jueces: nueva poomsae (poomsaeActiva pasa a 2 y se resetea su panel)
+      socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-poomsae', fase: 'p2_listo', poomsae: poomsaeCut2 });
+      // Re-render del panel del juez (bloqueado hasta INICIAR)
+      socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
+      actualizarFaseUICut();
+
+    } else if (faseActualCut === 'p2_detenido') {
+      const c = competidores[turnoIndex];
+      if (notasCut.p1.total == null || notasCut.p2.total == null) {
+        log('⏳ Esperando puntajes pendientes...');
+        document.getElementById('btn-next-cut').classList.remove('hidden');
+        return;
+      }
+      faseActualCut = 'atleta_completo';
+      // Revelar en pantalla (score + ranking)
+      socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
+      const btn = document.getElementById('btn-siguiente-cut');
+      btn.textContent = competidores[turnoIndex + 1] ? 'SIGUIENTE ATLETA ›' : 'FINALIZAR COMPETENCIA ✓';
+      btn.classList.remove('hidden');
+      log(`✅ ${c.nombre}: P1=${notasCut.p1.total.toFixed(2)} P2=${notasCut.p2.total.toFixed(2)} Total=${(notasCut.p1.total + notasCut.p2.total).toFixed(2)}`);
+    }
+  }
+
+  function siguienteAtletaCut() {
+    document.getElementById('btn-siguiente-cut').classList.add('hidden');
+    if (!competidores[turnoIndex + 1]) { finDeSala(); return; }
+    turnoIndex += 1;
+    // ★ Resetea jueces (poomsaeActiva vuelve a 1, controles bloqueados hasta INICIAR)
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-competencia', fase: 'p1_listo' });
+    iniciarAtletaCut();
+  }
+
+  function finCutoff() {
+    document.getElementById('display-turno-cut').innerHTML = `
+      <div class="turno-card" style="border-color:#22c55e">
+        <div class="turno-nombre" style="color:#22c55e;font-size:20px">COMPETENCIA FINALIZADA</div>
+      </div>`;
+    document.getElementById('bloque-crono-cut').classList.add('hidden');
+    document.getElementById('bloque-fase-cut').classList.add('hidden');
+  }
+
+  // ── NOTAS CUTOFF ──
+  function actualizarNotasCutoff(data) {
     const c = competidores[turnoIndex];
-    if (!c) { finGen(); return; }
-    if (div) div.innerHTML = `<div class="turno-card">
-      <div class="turno-label">${turnoIndex + 1} de ${competidores.length}</div>
-      <div class="turno-nombre">${c.nombre}</div></div>`;
-    document.getElementById('btn-siguiente-gen').classList.add('hidden');
-    socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
+    if (!c || data.competidorId !== c.id) return; // descarta notas tardías de otro atleta
+
+    const pKey = data.poomsae === 1 ? 'p1' : 'p2';
+    notasCut[pKey].jueces[data.juezNum] = { ...data.desglose, presentacion: data.presentacion };
+    if (data.totalComp !== null && data.totalComp !== undefined) {
+      notasCut[pKey].total = data.totalComp;
+      document.getElementById(`parcial-cut-${data.poomsae}`).textContent = data.totalComp.toFixed(2);
+    }
+    if (data.totalFinal !== null && data.totalFinal !== undefined) {
+      document.getElementById('total-cut').textContent = data.totalFinal.toFixed(2);
+    }
+
+    // Render filas de jueces
+    const div = document.getElementById(`notas-cut-rows-${data.poomsae}`);
+    if (!div) return;
+    let html = '';
+    for (let i = 1; i <= numJueces; i++) {
+      const d = notasCut[pKey].jueces[i];
+      if (!d) {
+        html += `<div class="nota-juez-row"><span class="nota-juez-num">J${i}</span>
+          <span class="nota-juez-detalle" style="color:#333">—</span></div>`;
+      } else {
+        const tot = ((d.prec||0)+(d.vel||0)+(d.rit||0)+(d.exp||0)).toFixed(2);
+        html += `<div class="nota-juez-row"><span class="nota-juez-num">J${i}</span>
+          <span class="nota-juez-detalle">${(d.prec||0).toFixed(1)}/${(d.vel||0).toFixed(1)} ${(d.rit||0).toFixed(1)} ${(d.exp||0).toFixed(1)}</span>
+          <span class="nota-juez-val">${tot}</span></div>`;
+      }
+    }
+    div.innerHTML = html;
   }
 
-  function finGen() {
-    const div = document.getElementById('display-turno-sec');
-    if (div) div.innerHTML = `<div class="turno-card" style="border-color:#22c55e">
-      <div class="turno-nombre" style="color:#22c55e;font-size:20px">COMPETENCIA FINALIZADA</div></div>`;
-    document.getElementById('btn-siguiente-gen')?.classList.add('hidden');
-  }
-
-function siguienteTurno() {
-  turnoIndex += (modo === '1v1-secuencial') ? 2 : 1;
-
-  // Limpiar marcador local de mesa
-  const bar = document.getElementById('puntajes-bar-gen');
-  if (bar) bar.innerHTML = '';
-  notasP1 = {};
-  notasP2 = {};
-
-  // Resetear jueces y pantalla
-  socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-competencia', fase: 'sorteo' });
-
-  mostrarTurnoActual();
-}
 
 
 
@@ -1842,13 +2081,19 @@ function siguienteTurno() {
       document.getElementById('panel-control').classList.remove('hidden');
       resetSecuencial();
     } else {
-      document.getElementById('panel-control').classList.remove('hidden');
-      if (modo === 'cutoff' || tipo === 'freestyle') {
-        document.getElementById('panel-ranking').classList.remove('hidden');
-      }
-      mostrarTurnoActual();
+      // CUTOFF
+      document.getElementById('panel-control-cutoff').classList.remove('hidden');
+      document.getElementById('panel-ranking').classList.remove('hidden');
+      faseActualCut = 'sorteo';
+      const c = competidores[turnoIndex];
+      document.getElementById('display-turno-cut').innerHTML = `
+        <div class="turno-card">
+          <div class="turno-label">Atleta 1 de ${competidores.length}</div>
+          <div class="turno-nombre">${c?.nombre || '—'}</div>
+        </div>`;
+      socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
     }
-  });
+);
 
   socket.on('juez-conectado', (data) => {
     renderJueces(data.jueces);
@@ -1874,6 +2119,11 @@ function siguienteTurno() {
                    (data.desglose.rit  || 0) + (data.desglose.exp  || 0)).toFixed(2);
       log(`J${data.juezNum} → ${data.competidorNombre}: ${tot}`);
     }
+        } else if (modo === 'cutoff') {
+      actualizarNotasCutoff(data);
+      log(`J${data.juezNum} P${data.poomsae} → ${data.competidorNombre}`);
+    }
+
   });
 
   // ── SNAPSHOT COMPLETO AL RECONECTAR ──
@@ -1934,6 +2184,9 @@ function siguienteTurno() {
     historialEnfrentamientos = [];
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
+    if (cronoIntervalCut) { clearInterval(cronoIntervalCut); cronoIntervalCut = null; }
+    document.getElementById('panel-control-cutoff').classList.add('hidden');
+
     faseActualSec = 'inicio';
     document.getElementById('panel-control-simultaneo').classList.add('hidden');
     document.getElementById('panel-control').classList.add('hidden');
@@ -1954,6 +2207,9 @@ function siguienteTurno() {
     salaActual = null;
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
+    if (cronoIntervalCut) { clearInterval(cronoIntervalCut); cronoIntervalCut = null; }
+    document.getElementById('panel-control-cutoff').classList.add('hidden');
+
     // Volver al setup
     document.getElementById('seccion-sala').classList.add('hidden');
     document.getElementById('seccion-setup').classList.remove('hidden');
@@ -2001,6 +2257,8 @@ function siguienteTurno() {
     salaActual = null;
     if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
     if (cronoIntervalSec) { clearInterval(cronoIntervalSec); cronoIntervalSec = null; }
+    if (cronoIntervalCut) { clearInterval(cronoIntervalCut); cronoIntervalCut = null; }
+    document.getElementById('panel-control-cutoff').classList.add('hidden');
     faseActualSec = 'inicio';
     log('Sala finalizada');
   });
