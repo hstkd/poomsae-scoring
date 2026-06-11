@@ -1407,10 +1407,19 @@
     document.getElementById('btn-siguiente-gen')?.classList.add('hidden');
   }
 
-  function siguienteTurno() {
-    turnoIndex++;
-    mostrarTurnoActual();
-  }
+function siguienteTurno() {
+  turnoIndex += (modo === '1v1-secuencial') ? 2 : 1;
+
+  // Resetear marcadores en pantalla y jueces antes del nuevo turno
+  socket.emit('mesa-control', {
+    codigo: salaActual,
+    accion: 'nueva-competencia',
+    fase: 'sorteo'
+  });
+
+  mostrarTurnoActual();
+}
+
 
   function definirCorte() {
     const topN = parseInt(document.getElementById('input-topN').value);
