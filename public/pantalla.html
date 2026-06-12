@@ -777,7 +777,8 @@
 
     function renderRanking(ranking, topN) {
     const lista = document.getElementById('ranking-lista');
-    const divisor = (esCut() && !esFS()) ? 2 : 1;
+          const divisor = 1;   // el servidor ya envía promedio/P1 correcto
+
     let html = '';
     ranking.forEach((c, i) => {
       let clase = '';
