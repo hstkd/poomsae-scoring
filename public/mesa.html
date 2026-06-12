@@ -1525,7 +1525,9 @@
     const poom = esP1 ? poomsaeCut1 : poomsaeCut2;
 
     document.getElementById('label-ejecutando-cut').textContent = c?.nombre || '—';
-    document.getElementById('label-poomsae-cut').textContent = poom || '—';
+    document.getElementById('label-poomsae-cut').textContent =
+      tipo === 'freestyle' ? 'Rutina Freestyle' : (poom || '—');
+
     document.getElementById('bloque-crono-cut').classList.remove('hidden');
 
     const pTxt = esP1 ? 'P1' : 'P2';
@@ -1929,9 +1931,10 @@
       const clase = topN ? (i < topN ? 'pasa' : 'fuera') : '';
       if (topN && i === topN) html += `<hr style="border-color:#c9a84c;margin:6px 0">`;
       // Cutoff: mostrar promedio (el servidor envía la suma P1+P2)
-      const valor = c.total !== null
-        ? (modo === 'cutoff' ? (c.total / 2) : c.total).toFixed(2)
+            const valor = c.total !== null
+        ? ((modo === 'cutoff' && tipo !== 'freestyle') ? (c.total / 2) : c.total).toFixed(2)
         : '—';
+
       html += `<div class="rank-item ${clase}">
         <span class="rank-pos">${i + 1}</span>
         <span class="rank-nombre">${c.nombre}</span>
@@ -2181,25 +2184,34 @@
       // CUTOFF
       document.getElementById('panel-control-cutoff').classList.remove('hidden');
       document.getElementById('panel-ranking').classList.remove('hidden');
+      historialCutoff = [];
+      document.getElementById('bloque-posiciones-cut').classList.add('hidden');
       faseActualCut = 'sorteo';
-            poomsaeCut1 = null; poomsaeCut2 = null;
-      document.getElementById('bloque-poomsae-cut').classList.remove('hidden');
-      ['1','2'].forEach(n => {
-        const inp = document.getElementById(`input-poomsae-cut-${n}`);
-        const dsp = document.getElementById(`display-poomsae-cut-${n}`);
-        if (inp) inp.value = '';
-        if (dsp) { dsp.textContent = '— Sin confirmar —'; dsp.style.color = '#333'; }
-      });
 
-      const c = competidores[turnoIndex];
-      document.getElementById('display-turno-cut').innerHTML = `
-        <div class="turno-card">
-          <div class="turno-label">Atleta 1 de ${competidores.length}</div>
-          <div class="turno-nombre">${c?.nombre || '—'}</div>
-        </div>`;
-      socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
-    }
-  });
+      if (tipo === 'freestyle') {
+        // Freestyle: no se ingresan poomsaes — directo al primer atleta
+        poomsaeCut1 = 'FREESTYLE'; poomsaeCut2 = null;
+        document.getElementById('bloque-poomsae-cut').classList.add('hidden');
+        document.getElementById('poom-cut-1').textContent = 'RUTINA';
+        iniciarAtletaCut();
+      } else {
+        poomsaeCut1 = null; poomsaeCut2 = null;
+        document.getElementById('bloque-poomsae-cut').classList.remove('hidden');
+        ['1','2'].forEach(n => {
+          const inp = document.getElementById(`input-poomsae-cut-${n}`);
+          const dsp = document.getElementById(`display-poomsae-cut-${n}`);
+          if (inp) inp.value = '';
+          if (dsp) { dsp.textContent = '— Sin confirmar —'; dsp.style.color = '#333'; }
+        });
+        const c = competidores[turnoIndex];
+        document.getElementById('display-turno-cut').innerHTML = `
+          <div class="turno-card">
+            <div class="turno-label">Atleta 1 de ${competidores.length}</div>
+            <div class="turno-nombre">${c?.nombre || '—'}</div>
+          </div>`;
+        socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
+      }
+    });
 
   socket.on('juez-conectado', (data) => {
     renderJueces(data.jueces);
