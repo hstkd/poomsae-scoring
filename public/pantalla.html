@@ -392,7 +392,27 @@
   font-size: 22px; letter-spacing: 6px; color: #c9a84c;
   text-align: center; animation: fadeIn 0.6s ease-out;
 }
-
+    /* ── VISTA SECUENCIAL ── */
+    #vista-sec { flex: 1; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
+    #vista-sec.visible { display: flex; }
+    .sec-poomsae { font-family:'Bebas Neue',sans-serif; font-size: 30px; letter-spacing: 6px; color: #c9a84c; }
+    .sec-nombre { font-family:'Bebas Neue',sans-serif; font-size: 72px; letter-spacing: 6px; line-height: 1.1; margin-bottom: 18px; }
+    .sec-nombre.azul { color: #8899ff; } .sec-nombre.rojo { color: #ff8888; }
+    .sec-tabla { width: 90%; max-width: 720px; border-collapse: collapse; margin-bottom: 18px; }
+    .sec-tabla th { font-size: 10px; letter-spacing: 2px; color: #555; text-transform: uppercase; padding: 6px; border-bottom: 1px solid #2a2a2a; }
+    .sec-tabla td { font-family:'Bebas Neue',sans-serif; font-size: 22px; color: #ccc; text-align: center; padding: 7px; border-bottom: 1px solid #1a1a1a; }
+    .sec-tabla td.jcol { color: #666; font-size: 16px; }
+    .sec-tabla td.totcol { color: #c9a84c; font-size: 26px; }
+    .sec-total-label { font-size: 11px; letter-spacing: 4px; color: #555; text-transform: uppercase; text-align: center; }
+    .sec-total { font-family:'Bebas Neue',sans-serif; font-size: 110px; letter-spacing: 4px; color: #c9a84c; line-height: 1; text-align: center; text-shadow: 0 0 40px rgba(201,168,76,0.4); }
+    .cmp-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 24px; align-items: center; width: 80%; max-width: 850px; }
+    .cmp-card { border-radius: 14px; padding: 22px; text-align: center; }
+    .cmp-card.azul { background: linear-gradient(135deg,#00002a,#05053d); border: 2px solid #3b82f6; }
+    .cmp-card.rojo { background: linear-gradient(135deg,#2a0000,#3d0505); border: 2px solid #dc2626; }
+    .cmp-nombre { font-family:'Bebas Neue',sans-serif; font-size: 26px; letter-spacing: 3px; margin-bottom: 8px; }
+    .cmp-card.azul .cmp-nombre { color: #8899ff; } .cmp-card.rojo .cmp-nombre { color: #ff8888; }
+    .cmp-val { font-family:'Bebas Neue',sans-serif; font-size: 64px; color: #fff; line-height: 1; }
+    .cmp-lider { box-shadow: 0 0 40px rgba(201,168,76,0.5); }
     .hidden { display: none !important; }
   </style>
 </head>
@@ -498,6 +518,29 @@
     </div>
   </div>
 
+  <!-- VISTA SECUENCIAL -->
+  <div id="vista-sec">
+    <div class="sec-poomsae" id="sec-poomsae">—</div>
+    <div class="sec-nombre" id="sec-nombre">—</div>
+    <table class="sec-tabla">
+      <thead><tr>
+        <th>Juez</th><th>Precisión</th><th>Vel/Fuerza</th><th>Ritmo</th><th>Expresión</th><th>Total</th>
+      </tr></thead>
+      <tbody id="sec-tabla-body"></tbody>
+    </table>
+    <div class="sec-total-label">TOTAL POOMSAE <span id="sec-pnum">1</span></div>
+    <div class="sec-total" id="sec-total">—</div>
+  </div>
+
+  <!-- OVERLAY COMPARACIÓN -->
+  <div id="overlay-cmp" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.92);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:24px;z-index:150">
+    <div class="resumen-titulo-txt" id="cmp-titulo">Comparación Poomsae 1</div>
+    <div class="cmp-grid">
+      <div class="cmp-card azul" id="cmp-card-A"><div class="cmp-nombre" id="cmp-nom-A">—</div><div class="cmp-val" id="cmp-val-A">—</div></div>
+      <div class="resumen-vs">VS</div>
+      <div class="cmp-card rojo" id="cmp-card-B"><div class="cmp-nombre" id="cmp-nom-B">—</div><div class="cmp-val" id="cmp-val-B">—</div></div>
+    </div>
+  </div>
 
   <!-- CUTOFF -->
   <div id="vista-cutoff">
@@ -835,6 +878,76 @@
     scoreP1A = null; scoreP1B = null;
     scoreP2A = null; scoreP2B = null;
   }
+  // ── SECUENCIAL ──
+  let sec = { fase: null, tot: { A: {1:null,2:null}, B: {1:null,2:null} }, jueces: {} };
+
+  function esSec() { return salaInfo.modo === '1v1-secuencial'; }
+
+  function secParseFase(f) {       // 'p1A_corriendo' → {p:1, atleta:'A'}
+    if (!f || f.length < 3) return null;
+    return { p: parseInt(f[1]), atleta: f[2] };
+  }
+
+    function secReset() {
+    sec = { fase: null, nomA: sec.nomA, nomB: sec.nomB, tot: { A:{1:null,2:null}, B:{1:null,2:null} }, jueces: {} };
+    document.getElementById('overlay-cmp').classList.add('hidden');
+    document.getElementById('sec-total').textContent = '—';
+    secRenderTabla();
+  }
+
+
+  function secRenderAtleta(pf, poomsaeNombre) {
+    sec.jueces = {};
+    document.getElementById('sec-poomsae').textContent = poomsaeNombre || (pf.p === 1 ? poomsae1 : poomsae2) || `POOMSAE ${pf.p}`;
+    const nom = pf.atleta === 'A' ? sec.nomA : sec.nomB;
+    const el = document.getElementById('sec-nombre');
+    el.textContent = nom || '—';
+    el.className = 'sec-nombre ' + (pf.atleta === 'A' ? 'azul' : 'rojo');
+    document.getElementById('sec-pnum').textContent = pf.p;
+    document.getElementById('sec-total').textContent = '—';
+    secRenderTabla();
+    document.getElementById('overlay-cmp').classList.add('hidden');
+    document.getElementById('vista-sec').classList.add('visible');
+  }
+
+  function secRenderTabla() {
+    let html = '';
+    for (let i = 1; i <= numJueces; i++) {
+      const d = sec.jueces[i];
+      html += d
+        ? `<tr><td class="jcol">J${i}</td><td>${d.prec.toFixed(1)}</td><td>${d.vel.toFixed(1)}</td><td>${d.rit.toFixed(1)}</td><td>${d.exp.toFixed(1)}</td><td class="totcol">${(d.prec+d.vel+d.rit+d.exp).toFixed(2)}</td></tr>`
+        : `<tr><td class="jcol">J${i}</td><td colspan="5" style="color:#333">—</td></tr>`;
+    }
+    document.getElementById('sec-tabla-body').innerHTML = html;
+  }
+
+  function secMostrarComparacion(p) {
+    document.getElementById('cmp-titulo').textContent = `Comparación Poomsae ${p}`;
+    document.getElementById('cmp-nom-A').textContent = sec.nomA || '—';
+    document.getElementById('cmp-nom-B').textContent = sec.nomB || '—';
+    const tA = sec.tot.A[p], tB = sec.tot.B[p];
+    document.getElementById('cmp-val-A').textContent = tA != null ? tA.toFixed(2) : '—';
+    document.getElementById('cmp-val-B').textContent = tB != null ? tB.toFixed(2) : '—';
+    document.getElementById('cmp-card-A').classList.toggle('cmp-lider', tA > tB);
+    document.getElementById('cmp-card-B').classList.toggle('cmp-lider', tB > tA);
+    document.getElementById('overlay-cmp').classList.remove('hidden');
+  }
+
+  function secMostrarFinal() {
+    scoreP1A = sec.tot.A[1]; scoreP2A = sec.tot.A[2];
+    scoreP1B = sec.tot.B[1]; scoreP2B = sec.tot.B[2];
+    document.getElementById('nombre-A').textContent = sec.nomA;
+    document.getElementById('nombre-B').textContent = sec.nomB;
+    document.getElementById('overlay-cmp').classList.add('hidden');
+    mostrarResumenFinal();   // reusa el overlay final existente (promedios + ganador)
+  }
+
+  function secReset() {
+    sec = { fase: null, nomA: sec.nomA, nomB: sec.nomB, tot: { A:{1:null,2:null}, B:{1:null,2:null} }, jueces: {} };
+    document.getElementById('overlay-cmp').classList.add('hidden');
+    document.getElementById('sec-total').textContent = '—';
+    secRenderTabla();
+  }
 
   // ── SOCKET EVENTS ──
 
@@ -963,8 +1076,17 @@
     document.getElementById('nombre-A').textContent = compA.nombre || '—';
     document.getElementById('nombre-B').textContent = compB.nombre || '—';
     document.getElementById('estado-espera').classList.add('hidden');
-    document.getElementById('cuerpo').classList.remove('hidden');
-    document.getElementById('vista-1v1').classList.add('visible');
+        document.getElementById('cuerpo').classList.remove('hidden');
+    if (d.modo === '1v1-secuencial') {
+      document.getElementById('vista-sec').classList.add('visible');
+      document.getElementById('vista-1v1').classList.remove('visible');
+      sec.nomA = compA.nombre; sec.nomB = compB.nombre;
+      secReset();
+    } else {
+      document.getElementById('vista-1v1').classList.add('visible');
+      document.getElementById('vista-sec').classList.remove('visible');
+    }
+
     initNotasGrid('A');
     initNotasGrid('B');
   });
@@ -985,6 +1107,15 @@
     if (t.tipo === '1v1-simultaneo' || t.tipo === '1v1-secuencial') {
       compIdA = t.competidorA?.id ?? null;
       compIdB = t.competidorB?.id ?? null;
+            sec.nomA = t.competidorA?.nombre || '—';
+      sec.nomB = t.competidorB?.nombre || '—';
+      if (t.tipo === '1v1-secuencial') {
+        document.getElementById('vista-sec').classList.add('visible');
+        document.getElementById('vista-1v1').classList.remove('visible');
+        secReset();
+        return;
+      }
+
       if (document.getElementById('nombre-A'))
         document.getElementById('nombre-A').textContent = t.competidorA?.nombre || '—';
       if (document.getElementById('nombre-B'))
@@ -1000,6 +1131,26 @@
   });
 
   socket.on('control-actualizado', (data) => {
+        if (esSec()) {
+      const pf = secParseFase(data.fase);
+      if (data.accion === 'iniciar' && pf) {
+        sec.fase = pf;
+        secRenderAtleta(pf, data.poomsae);
+      } else if (data.accion === 'nueva-poomsae' && pf) {
+        // antes de pasar al siguiente: si se completó P1 de ambos, comparar
+        if (pf.p === 2 && pf.atleta === 'A' && sec.tot.A[1] != null && sec.tot.B[1] != null) {
+          secMostrarComparacion(1);
+        }
+        sec.fase = pf;
+        sec.jueces = {};
+        if (data.poomsae) { if (pf.p === 1) poomsae1 = data.poomsae; else poomsae2 = data.poomsae; }
+      } else if (data.accion === 'nueva-competencia') {
+        secReset();
+        ocultarResumenFinal();
+      }
+      return;  // no ejecutar la lógica de simultáneo
+    }
+
     const { accion, fase, poomsae, esReconexion } = data;
     if (fase) salaInfo.faseActual = fase;
 
@@ -1073,6 +1224,25 @@
 
   socket.on('puntaje-recibido', (data) => {
     if (!data.desglose) return;
+        if (esSec()) {
+      if (!data.desglose) return;
+      const atleta = data.competidorId === compIdA ? 'A' : 'B';
+      const p = data.poomsae;
+      // solo pinta filas si es el atleta/poomsae en vista
+      if (sec.fase && sec.fase.atleta === atleta && sec.fase.p === p) {
+        sec.jueces[data.juezNum] = { ...data.desglose };
+        secRenderTabla();
+        if (data.totalComp != null) document.getElementById('sec-total').textContent = data.totalComp.toFixed(2);
+      }
+      if (data.totalComp != null) sec.tot[atleta][p] = data.totalComp;
+      // ¿final? los 4 totales listos
+      if (sec.tot.A[1] != null && sec.tot.B[1] != null && sec.tot.A[2] != null && sec.tot.B[2] != null) {
+        secMostrarComparacion(2);
+        setTimeout(() => secMostrarFinal(), 4000);
+      }
+      return;
+    }
+
     const suffix = data.competidorId === compIdA ? 'A' : 'B';
     actualizarNotaGrid(suffix, data.juezNum, data.desglose, data.totalComp);
 
