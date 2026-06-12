@@ -1744,11 +1744,7 @@
       notasCut[pKey].total = data.totalComp;
       document.getElementById(`parcial-cut-${data.poomsae}`).textContent = data.totalComp.toFixed(2);
     }
-       // Promedio (P1 + P2) / 2 cuando ambos totales están
-    if (notasCut.p1.total != null && notasCut.p2.total != null) {
-      const prom = Math.round(((notasCut.p1.total + notasCut.p2.total) / 2) * 100) / 100;
-      document.getElementById('total-cut').textContent = prom.toFixed(2);
-    }
+
         if (tipo === 'freestyle') {
       if (notasCut.p1.total != null)
         document.getElementById('total-cut').textContent = notasCut.p1.total.toFixed(2);
@@ -1944,18 +1940,14 @@
     el.innerHTML = html;
   }
 
-   function renderRanking(ranking, topN) {
+     function renderRanking(ranking, topN) {
     const div = document.getElementById('display-ranking');
     if (!div) return;
     let html = '';
     ranking.forEach((c, i) => {
       const clase = topN ? (i < topN ? 'pasa' : 'fuera') : '';
       if (topN && i === topN) html += `<hr style="border-color:#c9a84c;margin:6px 0">`;
-      // Cutoff: mostrar promedio (el servidor envía la suma P1+P2)
       const valor = c.total !== null ? c.total.toFixed(2) : '—';
-        ? ((modo === 'cutoff' && tipo !== 'freestyle') ? (c.total / 2) : c.total).toFixed(2)
-        : '—';
-
       html += `<div class="rank-item ${clase}">
         <span class="rank-pos">${i + 1}</span>
         <span class="rank-nombre">${c.nombre}</span>
@@ -1964,7 +1956,6 @@
     });
     div.innerHTML = html;
   }
-
 
   function log(msg) {
     const div = document.getElementById('log');
