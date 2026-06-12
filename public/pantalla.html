@@ -542,7 +542,6 @@
     </div>
 
     </div>
-  </div>
 
   <!-- CUTOFF -->
   <div id="vista-cutoff">
@@ -776,13 +775,9 @@
     document.getElementById('jueces-bar').innerHTML = html;
   }
 
-  function renderRanking(ranking, topN) {
+    function renderRanking(ranking, topN) {
     const lista = document.getElementById('ranking-lista');
     const divisor = (esCut() && !esFS()) ? 2 : 1;
-      html += `...
-        <span class="rank-total">${c.total != null ? (c.total / divisor).toFixed(2) : '—'}</span>
-      ...`;
-
     let html = '';
     ranking.forEach((c, i) => {
       let clase = '';
@@ -791,11 +786,12 @@
       html += `<div class="rank-item ${clase}">
         <span class="rank-pos">${i+1}</span>
         <span class="rank-nombre">${c.nombre}</span>
-        <span class="rank-total">${c.total != null ? c.total.toFixed(2) : '—'}</span>
+        <span class="rank-total">${c.total != null ? (c.total / divisor).toFixed(2) : '—'}</span>
       </div>`;
     });
     lista.innerHTML = html;
   }
+
 
   function resetVista1v1() {
     document.getElementById('score-A').textContent = '—';
@@ -1132,7 +1128,7 @@
     if (data.numero === 1) poomsae1 = data.poomsae;
     else poomsae2 = data.poomsae;
 
-    if (salaInfo.modo === '1v1-secuencial') {
+    if (salaInfo.modo === '1v1-secuencial' || salaInfo.modo === 'cutoff') {
       if (poomsae1 && poomsae2) {
         mostrarBannerAmbas();
       } else if (data.numero === 1) {
@@ -1148,9 +1144,8 @@
       animarSorteo(poomsaeBuffer[1], poomsaeBuffer[2]);
       poomsaeBuffer = {};
     }
-    if (salaInfo.modo === '1v1-secuencial' || salaInfo.modo === 'cutoff') {
-
   });
+
 
   socket.on('turno-actualizado', (d) => {
     const t = d.turno;
