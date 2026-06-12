@@ -1538,7 +1538,9 @@
     } else {
       badge.className = 'fase-badge ejecucion';
       badge.textContent = `▶ ${c?.nombre || ''} · ${pTxt} · Listo`;
-      setCronoCut(90, `${c?.nombre || '—'} · ${poom || ''}`);
+      const duracion = tipo === 'freestyle' ? 100 : 90;  // 1:40 freestyle
+      setCronoCut(duracion, `${c?.nombre || '—'} · ${poom || ''}`);
+
     }
   }
 
@@ -1892,21 +1894,26 @@
     el.innerHTML = html;
   }
 
-  function renderRanking(ranking, topN) {
+   function renderRanking(ranking, topN) {
     const div = document.getElementById('display-ranking');
     if (!div) return;
     let html = '';
     ranking.forEach((c, i) => {
       const clase = topN ? (i < topN ? 'pasa' : 'fuera') : '';
       if (topN && i === topN) html += `<hr style="border-color:#c9a84c;margin:6px 0">`;
+      // Cutoff: mostrar promedio (el servidor envía la suma P1+P2)
+      const valor = c.total !== null
+        ? (modo === 'cutoff' ? (c.total / 2) : c.total).toFixed(2)
+        : '—';
       html += `<div class="rank-item ${clase}">
         <span class="rank-pos">${i + 1}</span>
         <span class="rank-nombre">${c.nombre}</span>
-        <span class="rank-total">${c.total !== null ? c.total.toFixed(2) : '—'}</span>
+        <span class="rank-total">${valor}</span>
       </div>`;
     });
     div.innerHTML = html;
   }
+
 
   function log(msg) {
     const div = document.getElementById('log');
