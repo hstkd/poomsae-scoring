@@ -1305,14 +1305,24 @@
       }
       return;
     }
-    if (esCut()) {
+       if (esCut()) {
       cutJueces[data.juezNum] = { ...data.desglose };
       cutRenderTabla();
       if (data.totalComp != null) {
         const el = document.getElementById('turno-score');
-        el.textContent = data.totalComp.toFixed(2);   // aparece apenas completan los jueces
+        el.textContent = data.totalComp.toFixed(2);
         el.classList.add('revelar-anim');
         setTimeout(() => el.classList.remove('revelar-anim'), 500);
+      }
+      // Atleta completo: el servidor envía totalFinal = promedio (o P1 en freestyle)
+      if (data.totalFinal != null) {
+        setTimeout(() => {
+          document.getElementById('cut-poomsae').textContent = esFS() ? 'RESULTADO' : 'PROMEDIO FINAL';
+          const el = document.getElementById('turno-score');
+          el.textContent = data.totalFinal.toFixed(2);
+          el.classList.add('revelar-anim');
+          setTimeout(() => el.classList.remove('revelar-anim'), 500);
+        }, 1500);
       }
       return;
     }
@@ -1349,8 +1359,17 @@
     renderJuecesBar(received);
   });
 
-  socket.on('puntaje-revelado', () => {});
-  socket.on('corte-aplicado', (d) => { renderRanking(d.ranking, d.topN); });
+   socket.on('puntaje-revelado', (d) => {
+    if (d.tipo === 'cutoff' && d.ranking) {
+      renderRanking(d.ranking, topNActual);
+    }
+  });
+  
+    socket.on('corte-aplicado', (d) => {
+    topNActual = d.topN;
+    renderRanking(d.ranking, d.topN);
+  });
+
   socket.on('ranking-actualizado', (d) => { renderRanking(d.ranking, null); });
 
   // FIX #10: sistema-restaurado ahora tiene handler
