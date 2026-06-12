@@ -1608,6 +1608,26 @@
     document.getElementById('btn-next-cut').classList.add('hidden');
 
     if (faseActualCut === 'p1_detenido') {
+          if (faseActualCut === 'p1_detenido') {
+      if (tipo === 'freestyle') {
+        // Freestyle: una sola rutina → atleta completo
+        const c = competidores[turnoIndex];
+        if (notasCut.p1.total == null) {
+          log('⏳ Esperando puntajes pendientes...');
+          document.getElementById('btn-next-cut').classList.remove('hidden');
+          return;
+        }
+        faseActualCut = 'atleta_completo';
+        historialCutoff.push({ nombre: c.nombre, p1: notasCut.p1.total, p2: null, prom: notasCut.p1.total });
+        socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex });
+        const btn = document.getElementById('btn-siguiente-cut');
+        btn.textContent = competidores[turnoIndex + 1] ? 'SIGUIENTE ATLETA ›' : 'FINALIZAR COMPETENCIA ✓';
+        btn.classList.remove('hidden');
+        log(`✅ ${c.nombre}: ${notasCut.p1.total.toFixed(2)}`);
+        return;
+      }
+      // ... (resto del flujo P2 traditional igual)
+
       // Mismo atleta → Poomsae 2
       faseActualCut = 'p2_listo';
       // ★ Avisa a jueces: nueva poomsae (poomsaeActiva pasa a 2 y se resetea su panel)
@@ -1713,6 +1733,14 @@
       const prom = Math.round(((notasCut.p1.total + notasCut.p2.total) / 2) * 100) / 100;
       document.getElementById('total-cut').textContent = prom.toFixed(2);
     }
+        if (tipo === 'freestyle') {
+      if (notasCut.p1.total != null)
+        document.getElementById('total-cut').textContent = notasCut.p1.total.toFixed(2);
+    } else if (notasCut.p1.total != null && notasCut.p2.total != null) {
+      const prom = Math.round(((notasCut.p1.total + notasCut.p2.total) / 2) * 100) / 100;
+      document.getElementById('total-cut').textContent = prom.toFixed(2);
+    }
+
 
     // Render filas de jueces
     const div = document.getElementById(`notas-cut-rows-${data.poomsae}`);
