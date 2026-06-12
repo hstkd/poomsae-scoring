@@ -266,17 +266,13 @@ io.on('connection', (socket) => {
       if (comp.puntajesP1.length === sala.numJueces) {
         comp.totalP1 = calcularTotal(comp.puntajesP1, sala.numJueces);
         console.log(`✅ Total P1 ${comp.nombre}: ${comp.totalP1}`);
-      }
-      totalComp = comp.totalP1;
-            if (comp.puntajesP1.length === sala.numJueces) {
-        comp.totalP1 = calcularTotal(comp.puntajesP1, sala.numJueces);
-        console.log(`✅ Total P1 ${comp.nombre}: ${comp.totalP1}`);
         // Freestyle: una sola rutina → total final = P1
         if (sala.tipo === 'freestyle') {
           comp.total = comp.totalP1;
           console.log(`🏆 Total final (freestyle) ${comp.nombre}: ${comp.total}`);
         }
       }
+      totalComp = comp.totalP1;
 
     } else if (poomsae === 2) {
       comp.puntajesP2 = comp.puntajesP2.filter(p => p.juez !== numJuez);
@@ -286,7 +282,7 @@ io.on('connection', (socket) => {
         console.log(`✅ Total P2 ${comp.nombre}: ${comp.totalP2}`);
       }
       totalComp = comp.totalP2;
-            if (comp.totalP1 !== null && comp.totalP2 !== null) {
+      if (comp.totalP1 !== null && comp.totalP2 !== null) {
         if (sala.modo === 'cutoff') {
           // Cutoff: promedio de las dos poomsaes
           comp.total = Math.round(((comp.totalP1 + comp.totalP2) / 2) * 100) / 100;
@@ -295,7 +291,7 @@ io.on('connection', (socket) => {
         }
         console.log(`🏆 Total final ${comp.nombre}: ${comp.total}`);
       }
-
+    }
 
     const totalRecibidosP = poomsae === 1 ? comp.puntajesP1.length : comp.puntajesP2.length;
 
@@ -319,6 +315,7 @@ io.on('connection', (socket) => {
     socket.emit('puntaje-confirmado', { competidorId, juezNum: numJuez, poomsae });
     console.log(`Puntaje J${numJuez} → ${comp.nombre}(id=${competidorId}) P${poomsae}: prec=${precision} pres=${presentacion}`);
   });
+
 
   // ── MESA: REVELAR ──
   socket.on('mesa-revelar', ({ codigo, turnoIndex }) => {
