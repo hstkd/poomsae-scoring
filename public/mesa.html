@@ -2212,7 +2212,7 @@
         socket.emit('mesa-turno', { codigo: salaActual, turnoIndex, modo });
       }
     }
-
+  });
   socket.on('juez-conectado', (data) => {
     renderJueces(data.jueces);
     if (data.numJuez > 0) log(`Juez ${data.numJuez} conectado`);
