@@ -1952,7 +1952,7 @@
       const clase = topN ? (i < topN ? 'pasa' : 'fuera') : '';
       if (topN && i === topN) html += `<hr style="border-color:#c9a84c;margin:6px 0">`;
       // Cutoff: mostrar promedio (el servidor envía la suma P1+P2)
-            const valor = c.total !== null
+      const valor = c.total !== null ? c.total.toFixed(2) : '—';
         ? ((modo === 'cutoff' && tipo !== 'freestyle') ? (c.total / 2) : c.total).toFixed(2)
         : '—';
 
