@@ -1044,9 +1044,15 @@
     resetSimultaneo();
   }
 
-  function finDeSala() {
-    socket.emit('mesa-fin-sala', { codigo: salaActual });
+    function finDeSala() {
+    if (modo === 'cutoff') {
+      // Cutoff/Freestyle: eliminar la sala libera el código de inmediato
+      socket.emit('mesa-eliminar-sala', { codigo: salaActual });
+    } else {
+      socket.emit('mesa-fin-sala', { codigo: salaActual });
+    }
   }
+
 
   // ── 1V1 SECUENCIAL ──
   let faseActualSec = 'inicio';
