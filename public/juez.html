@@ -485,6 +485,19 @@
       border-radius: 8px; max-width: 280px;
     }
     option:disabled { color: #555; }
+        /* ── FREESTYLE ── */
+    .fs-criterio { margin-bottom: 10px; }
+    .fs-crit-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .fs-btn-row { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; }
+    .fs-btn {
+      padding: 11px 0; background: #1a1a1a; border: 1px solid #2a2a2a;
+      color: #777; border-radius: 6px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 12px; letter-spacing: 0.5px; cursor: pointer;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    }
+    .fs-btn.sel { background: #c9a84c; color: #000; border-color: #c9a84c; font-weight: 700; }
+    .controles-bloqueados .fs-btn { opacity: 0.25 !important; pointer-events: none !important; }
+
   </style>
 </head>
 <body>
@@ -633,9 +646,15 @@
       const comp = turno.fase === 'A' ? turno.competidorA : turno.competidorB;
       const sig  = turno.fase === 'A' ? turno.competidorB : turno.competidorA;
       renderUno(panel, comp, sig ? `luego → ${sig.nombre}` : '', 'A', turno.fase);
-    } else {
-      renderUno(panel, turno.competidor, `${turno.numero} de ${turno.total}`, 'C', 'C');
+       } else {
+      // cutoff
+      if (salaInfo.tipo === 'freestyle') {
+        renderFreestyle(panel, turno.competidor, `${turno.numero} de ${turno.total}`);
+      } else {
+        renderUno(panel, turno.competidor, `${turno.numero} de ${turno.total}`, 'C', 'C');
+      }
     }
+
 
     document.getElementById('overlay-espera').classList.add('hidden');
     document.getElementById('overlay-enviado').classList.add('hidden');
@@ -975,6 +994,100 @@
     mostrarResumen([{ nombre: comp.nombre, ...v }]);
   }
 
+    // ── FREESTYLE ──
+  const FS_TECNICA = [
+    { id: 'yop',     nombre: 'Yop Chagui en salto' },
+    { id: 'mult',    nombre: 'Patadas múltiples en salto' },
+    { id: 'giro',    nombre: 'Giros en salto con patada' },
+    { id: 'combate', nombre: 'Combinación de combate' },
+    { id: 'acro',    nombre: 'Acrobacia con patada' },
+    { id: 'basico',  nombre: 'Mov. básicos y practicidad' }
+  ];
+  const FS_PRES = [
+    { id: 'crea', nombre: 'Creatividad' },
+    { id: 'arm',  nombre: 'Armonía' },
+    { id: 'expr', nombre: 'Expresión de la energía' },
+    { id: 'mus',  nombre: 'Música y coreografía' }
+  ];
+  let fsVals = {};
+
+  function fsCriterioHTML(c) {
+    return `
+      <div class="fs-criterio">
+        <div class="fs-crit-header">
+          <span class="modulo-nombre">${c.nombre}</span>
+          <span class="modulo-valor" id="fs-val-${c.id}" style="font-size:20px">—</span>
+        </div>
+        <div class="fs-btn-row">
+          ${Array.from({ length: 10 }, (_, i) => {
+            const v = (i + 1) / 10;
+            return `<button class="fs-btn" id="fs-btn-${c.id}-${i + 1}"
+              onclick="fsSet('${c.id}',${v})">${v.toFixed(1)}</button>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  function renderFreestyle(panel, comp, sub) {
+    fsVals = {};
+    panel.innerHTML = `
+      <div class="paso-pres">
+        ${headerHTML(sub || 'Freestyle', comp?.nombre, null, false)}
+        <div class="paso-label">FREESTYLE · TRANSCRIBE TU HOJA</div>
+        <div class="pres-bloque neutro">
+          <div class="pres-bloque-titulo">HABILIDAD TÉCNICA · <span id="fs-sub-tec">0.0</span> / 6.0</div>
+          ${FS_TECNICA.map(fsCriterioHTML).join('<hr class="sep">')}
+        </div>
+        <div class="pres-bloque neutro" style="margin-top:10px">
+          <div class="pres-bloque-titulo">PRESENTACIÓN · <span id="fs-sub-pres">0.0</span> / 4.0</div>
+          ${FS_PRES.map(fsCriterioHTML).join('<hr class="sep">')}
+        </div>
+        <div class="subtotal-pres" style="margin-top:12px">
+          <span class="subtotal-label">Total</span>
+          <span class="subtotal-valor" id="fs-total">0.00</span>
+        </div>
+        <button class="btn-enviar" id="btn-enviar-fs" style="margin-top:12px;opacity:0.25;pointer-events:none"
+          onclick="enviarFreestyle()">ENVIAR CALIFICACIÓN</button>
+        <div id="fs-faltan" style="text-align:center;font-size:9px;letter-spacing:2px;color:#555;margin-top:6px;text-transform:uppercase">
+          Completa los 10 criterios para enviar
+        </div>
+      </div>`;
+  }
+
+  function fsSet(id, val) {
+    fsVals[id] = val;
+    document.getElementById(`fs-val-${id}`).textContent = val.toFixed(1);
+    for (let i = 1; i <= 10; i++) {
+      document.getElementById(`fs-btn-${id}-${i}`)?.classList.toggle('sel', i === Math.round(val * 10));
+    }
+    const tec  = Math.round(FS_TECNICA.reduce((s, c) => s + (fsVals[c.id] || 0), 0) * 100) / 100;
+    const pres = Math.round(FS_PRES.reduce((s, c) => s + (fsVals[c.id] || 0), 0) * 100) / 100;
+    document.getElementById('fs-sub-tec').textContent  = tec.toFixed(1);
+    document.getElementById('fs-sub-pres').textContent = pres.toFixed(1);
+    document.getElementById('fs-total').textContent    = (tec + pres).toFixed(2);
+
+    const completo = [...FS_TECNICA, ...FS_PRES].every(c => fsVals[c.id] !== undefined);
+    const btn = document.getElementById('btn-enviar-fs');
+    if (btn) { btn.style.opacity = completo ? '1' : '0.25'; btn.style.pointerEvents = completo ? 'auto' : 'none'; }
+    const falta = document.getElementById('fs-faltan');
+    if (falta) falta.style.display = completo ? 'none' : 'block';
+    vibrar('suave');
+  }
+
+  function enviarFreestyle() {
+    const comp = turnoActual?.competidor;
+    if (!comp || comp.id === undefined) { console.error('Comp inválido:', comp); return; }
+    const tec  = Math.round(FS_TECNICA.reduce((s, c) => s + (fsVals[c.id] || 0), 0) * 100) / 100;
+    const pres = Math.round(FS_PRES.reduce((s, c) => s + (fsVals[c.id] || 0), 0) * 100) / 100;
+    socket.emit('juez-puntaje', {
+      codigo: salaInfo.codigo, competidorId: comp.id,
+      precision: tec, presentacion: pres,
+      desglose: { prec: tec, vel: pres, rit: 0, exp: 0 },
+      poomsae: 1
+    });
+    mostrarResumen([{ nombre: comp.nombre, precision: tec, presentacion: pres }]);
+  }
+
   // ── ESTADO DE CALIFICACIÓN ──
   let precisionBloqueada = true;
   let controlesHabilitados = false; // solo true después de competencia-iniciada + iniciar crono
@@ -1158,6 +1271,7 @@
       // Determinar modo — usar salaInfo.modo como fuente de verdad, no turnoActual.tipo
       const modoActual = salaInfo.modo || (turnoActual?.tipo);
       const esSecuencial = modoActual === '1v1-secuencial';
+      const esCutoff = modoActual === 'cutoff'
 
       // Siempre re-renderizar en secuencial (cada atleta es distinto)
       // En simultáneo solo re-renderizar si el panel estaba oculto
@@ -1182,7 +1296,19 @@
           panel.style.display = 'flex';
           panel.classList.add('visible');
           document.getElementById('overlay-enviado').classList.add('hidden');
+          }
+        } else if (esCutoff) {
+        const comp = turnoActual?.competidor;
+        if (comp) {
+          resetEstado();
+          panel.innerHTML = '';
+          if (salaInfo.tipo === 'freestyle') renderFreestyle(panel, comp, 'Freestyle');
+          else renderUno(panel, comp, '', 'C', 'C');
+          panel.style.display = 'flex';
+          panel.classList.add('visible');
+          document.getElementById('overlay-enviado').classList.add('hidden');
         }
+
       } else if (!panel.classList.contains('visible') && turnoActual) {
         resetEstado();
         panel.innerHTML = '';
