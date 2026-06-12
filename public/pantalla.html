@@ -546,11 +546,19 @@
 
   <!-- CUTOFF -->
   <div id="vista-cutoff">
-    <div class="panel-turno">
+       <div class="panel-turno">
       <div class="turno-etiqueta" id="turno-etiqueta">—</div>
       <div class="turno-nombre-grande" id="turno-nombre">—</div>
-      <div class="turno-score-grande" id="turno-score">—</div>
+      <div class="sec-poomsae" id="cut-poomsae" style="margin-bottom:10px">—</div>
+      <table class="sec-tabla" id="cut-tabla">
+        <thead><tr id="cut-thead">
+          <th>Juez</th><th>Precisión</th><th>Vel/Fuerza</th><th>Ritmo</th><th>Expresión</th><th>Total</th>
+        </tr></thead>
+        <tbody id="cut-tabla-body"></tbody>
+      </table>
+      <div class="turno-score-grande" id="turno-score" style="font-size:110px">—</div>
     </div>
+
     <div class="panel-ranking">
       <div class="ranking-header">Ranking</div>
       <div class="ranking-scroll" id="ranking-lista"></div>
@@ -770,6 +778,11 @@
 
   function renderRanking(ranking, topN) {
     const lista = document.getElementById('ranking-lista');
+    const divisor = (esCut() && !esFS()) ? 2 : 1;
+      html += `...
+        <span class="rank-total">${c.total != null ? (c.total / divisor).toFixed(2) : '—'}</span>
+      ...`;
+
     let html = '';
     ranking.forEach((c, i) => {
       let clase = '';
@@ -943,6 +956,34 @@
     document.getElementById('overlay-cmp').classList.add('hidden');
     mostrarResumenFinal();   // reusa el overlay final existente (promedios + ganador)
   }
+  // ── DETALLE CUTOFF/FREESTYLE ──
+  let cutJueces = {};
+  function esCut() { return salaInfo.modo === 'cutoff'; }
+  function esFS()  { return salaInfo.tipo === 'freestyle'; }
+
+  function initCutTabla() {
+    cutJueces = {};
+    document.getElementById('cut-thead').innerHTML = esFS()
+      ? `<th>Juez</th><th>Técnica</th><th>Presentación</th><th>Total</th>`
+      : `<th>Juez</th><th>Precisión</th><th>Vel/Fuerza</th><th>Ritmo</th><th>Expresión</th><th>Total</th>`;
+    cutRenderTabla();
+  }
+
+  function cutRenderTabla() {
+    let html = '';
+    const cols = esFS() ? 3 : 5;
+    for (let i = 1; i <= numJueces; i++) {
+      const d = cutJueces[i];
+      if (!d) {
+        html += `<tr><td class="jcol">J${i}</td><td colspan="${cols}" style="color:#333">—</td></tr>`;
+      } else if (esFS()) {
+        html += `<tr><td class="jcol">J${i}</td><td>${d.prec.toFixed(1)}</td><td>${d.vel.toFixed(1)}</td><td class="totcol">${(d.prec+d.vel).toFixed(2)}</td></tr>`;
+      } else {
+        html += `<tr><td class="jcol">J${i}</td><td>${d.prec.toFixed(1)}</td><td>${d.vel.toFixed(1)}</td><td>${d.rit.toFixed(1)}</td><td>${d.exp.toFixed(1)}</td><td class="totcol">${(d.prec+d.vel+d.rit+d.exp).toFixed(2)}</td></tr>`;
+      }
+    }
+    document.getElementById('cut-tabla-body').innerHTML = html;
+  }
 
 
   // ── SOCKET EVENTS ──
@@ -1107,6 +1148,8 @@
       animarSorteo(poomsaeBuffer[1], poomsaeBuffer[2]);
       poomsaeBuffer = {};
     }
+    if (salaInfo.modo === '1v1-secuencial' || salaInfo.modo === 'cutoff') {
+
   });
 
   socket.on('turno-actualizado', (d) => {
@@ -1135,6 +1178,9 @@
       document.getElementById('turno-score').textContent = '—';
       document.getElementById('vista-cutoff').classList.add('visible');
       document.getElementById('vista-1v1').classList.remove('visible');
+      document.getElementById('cut-poomsae').textContent = esFS() ? 'FREESTYLE' : '—';
+      initCutTabla();
+
     }
   });
 
@@ -1157,6 +1203,19 @@
         ocultarResumenFinal();
       }
       return;  // no ejecutar la lógica de simultáneo
+    }
+    if (esCut()) {
+      if (data.accion === 'iniciar') {
+        initCutTabla();
+        document.getElementById('turno-score').textContent = '—';
+        if (!esFS()) {
+          const pNum = (data.fase || '').startsWith('p2') ? 2 : 1;
+          document.getElementById('cut-poomsae').textContent =
+            (pNum === 1 ? poomsae1 : poomsae2) || `POOMSAE ${pNum}`;
+        }
+      }
+      // detener / nueva-competencia no tocan el ranking: queda visible
+      return;
     }
 
     const { accion, fase, poomsae, esReconexion } = data;
@@ -1247,6 +1306,17 @@
       if (sec.tot.A[1] != null && sec.tot.B[1] != null && sec.tot.A[2] != null && sec.tot.B[2] != null) {
         secMostrarComparacion(2);
         setTimeout(() => secMostrarFinal(), 4000);
+      }
+      return;
+    }
+    if (esCut()) {
+      cutJueces[data.juezNum] = { ...data.desglose };
+      cutRenderTabla();
+      if (data.totalComp != null) {
+        const el = document.getElementById('turno-score');
+        el.textContent = data.totalComp.toFixed(2);   // aparece apenas completan los jueces
+        el.classList.add('revelar-anim');
+        setTimeout(() => el.classList.remove('revelar-anim'), 500);
       }
       return;
     }
