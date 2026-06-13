@@ -275,6 +275,12 @@
     }
     .vs-txt { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 4px; color: #1a1a1a; }
 
+      <!-- OVERLAY RANKING CUTOFF -->
+  <div id="overlay-ranking" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.94);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;z-index:160">
+    <div class="resumen-titulo-txt">Tabla de Posiciones</div>
+    <div id="overlay-ranking-lista" style="width:90%;max-width:600px;max-height:70vh;overflow-y:auto"></div>
+  </div>
+
     /* ── CUTOFF ── */
     #vista-cutoff { flex: 1; display: none; }
     #vista-cutoff.visible { display: grid; grid-template-columns: 1fr; }
