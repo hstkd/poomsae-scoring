@@ -426,6 +426,61 @@
     .cmp-val { font-family:'Bebas Neue',sans-serif; font-size: 64px; color: #fff; line-height: 1; }
     .cmp-lider { box-shadow: 0 0 40px rgba(201,168,76,0.5); }
     .hidden { display: none !important; }
+     /* ════════ MODO CLARO ════════ */
+    body.claro { background: #f4f4f0; color: #1a1a1a; }
+    body.claro .header { background: linear-gradient(90deg,#fff,#ececec,#fff); border-bottom-color: #b8860b; }
+    body.claro .header-logo, body.claro .header-sala { color: #b8860b; }
+    body.claro .header-centro { color: #888; }
+    body.claro #cuerpo { background: #f4f4f0; }
+    body.claro #estado-espera { background: #f4f4f0; }
+    body.claro .espera-logo { color: #e0e0d8; }
+
+    /* Vistas y paneles */
+    body.claro .panel-turno { background: #f4f4f0; }
+    body.claro .lado-rojo { background: linear-gradient(135deg,#fff0f0,#ffe5e5); }
+    body.claro .lado-azul { background: linear-gradient(225deg,#f0f4ff,#e5ecff); }
+    body.claro .centro-vs { background: #f4f4f0; }
+
+    /* Textos grandes y acentos dorados → ámbar oscuro */
+    body.claro .turno-score-grande,
+    body.claro .turno-nombre-grande,
+    body.claro .comp-score-g,
+    body.claro .sec-total,
+    body.claro .sec-poomsae,
+    body.claro .nota-juez-score,
+    body.claro .rank-pos, body.claro .rank-total,
+    body.claro .crono-display { color: #b8860b; text-shadow: none; }
+
+    /* Tablas */
+    body.claro .sec-tabla td { color: #333; border-bottom-color: #ddd; }
+    body.claro .sec-tabla td.jcol { color: #999; }
+    body.claro .sec-tabla td.totcol { color: #b8860b; }
+    body.claro .sec-tabla th { color: #999; border-bottom-color: #ccc; }
+    body.claro .sec-tabla td.totcol { color: #b8860b; }
+
+    /* Notas */
+    body.claro .nota-fila { background: rgba(0,0,0,0.04); }
+    body.claro .nota-fila.recibida { background: rgba(0,0,0,0.09); }
+    body.claro .nota-juez-id.recibida { color: #555; }
+    body.claro .nota-juez-detalle { color: #888; }
+
+    /* Cronómetro y badges */
+    body.claro .crono-display { background: rgba(255,255,255,0.85); }
+    body.claro .ronda-badge { background: rgba(255,255,255,0.9); border-color: #b8860b; }
+    body.claro .ronda-badge-num { color: #b8860b; }
+
+    /* Ranking */
+    body.claro .rank-item { background: #fff; border-color: #e0e0e0; }
+    body.claro .ranking-header { color: #999; border-bottom-color: #ddd; }
+
+    /* Overlays */
+    body.claro #overlay-ranking,
+    body.claro #overlay-resumen,
+    body.claro #overlay-cmp { background: rgba(244,244,240,0.96); }
+    body.claro .resumen-titulo-txt { color: #999; }
+    body.claro .footer { background: #f4f4f0; border-top-color: #ddd; }
+    body.claro .footer-txt { color: #999; }
+
   </style>
 </head>
 <body>
