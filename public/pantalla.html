@@ -629,6 +629,9 @@
     if (!codigo) return;
     socket.emit('juez-unirse', { codigo, nombre: 'Pantalla', numJuez: 0 });
   }
+    function toggleTema() {
+    document.body.classList.toggle('claro');
+  }
 
   // ── ANIMACIÓN DE SORTEO ──
   let sorteoP1 = null, sorteoP2 = null;
