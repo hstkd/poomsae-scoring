@@ -1414,12 +1414,26 @@
     const colorG  = promA > promB ? '#6699ff' : promB > promA ? '#ff6666' : '#c9a84c';
     faseActualSec = 'resultado';
 
-    const totA1 = notasSecA[a.id]?.p1?.total;
+        const totA1 = notasSecA[a.id]?.p1?.total;
     const totA2 = notasSecA[a.id]?.p2?.total;
     const totB1 = notasSecB[b.id]?.p1?.total;
     const totB2 = notasSecB[b.id]?.p2?.total;
 
+    // Guardar en historial para PDF (formato secuencial: notas por P1/P2 de cada atleta)
+    historialEnfrentamientos.push({
+      modo: 'secuencial',
+      a: { ...a }, b: { ...b },
+      poomsae1: poomsaeSecA, poomsae2: poomsaeSecB,
+      notasA1: JSON.parse(JSON.stringify(notasSecA[a.id]?.p1?.jueces || {})),
+      notasA2: JSON.parse(JSON.stringify(notasSecA[a.id]?.p2?.jueces || {})),
+      notasB1: JSON.parse(JSON.stringify(notasSecB[b.id]?.p1?.jueces || {})),
+      notasB2: JSON.parse(JSON.stringify(notasSecB[b.id]?.p2?.jueces || {})),
+      totA1, totB1, totA2, totB2,
+      promA, promB, ganador
+    });
+
     const bloqueRes = document.getElementById('bloque-resultado-sec');
+
     bloqueRes.classList.remove('hidden');
     bloqueRes.innerHTML = `
       <div class="resultado-final">
