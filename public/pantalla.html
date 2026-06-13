@@ -282,10 +282,21 @@
   </div>
 
     /* ── CUTOFF ── */
-    #vista-cutoff { flex: 1; display: none; }
-    #vista-cutoff.visible { display: grid; grid-template-columns: 1fr; }
+       #vista-cutoff { flex: 1; display: none; width: 100%; }
+    #vista-cutoff.visible { display: flex; }
+    .panel-turno {
+      flex: 1; width: 100%;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      background: #0a0a0a; padding: 30px 60px;
+    }
+    #cut-tabla { width: 100%; max-width: 1100px; }
+    #cut-tabla th { font-size: 16px; padding: 12px; }
+    #cut-tabla td { font-size: 30px; padding: 14px; }
+    #cut-tabla td.jcol { font-size: 22px; }
+    #cut-tabla td.totcol { font-size: 34px; }
+
     .turno-etiqueta { font-size: 10px; font-weight: 700; letter-spacing: 5px; color: #444; text-transform: uppercase; margin-bottom: 12px; }
-    .turno-nombre-grande { font-family: 'Bebas Neue', sans-serif; font-size: 72px; letter-spacing: 6px; text-align: center; margin-bottom: 16px; }
+    .turno-nombre-grande { font-family: 'Bebas Neue', sans-serif; font-size: 90px; letter-spacing: 6px; text-align: center; margin-bottom: 16px; }
     .turno-score-grande { font-family: 'Bebas Neue', sans-serif; font-size: 180px; line-height: 1; color: #c9a84c; text-shadow: 0 10px 60px rgba(201,168,76,0.4); }
     .panel-ranking { background: #0f0f0f; border-left: 1px solid #1a1a1a; display: flex; flex-direction: column; overflow: hidden; }
     .ranking-header { padding: 14px 18px; border-bottom: 1px solid #1a1a1a; font-size: 9px; font-weight: 700; letter-spacing: 4px; color: #555; text-transform: uppercase; }
@@ -547,7 +558,7 @@
 
   <!-- CUTOFF -->
   <div id="vista-cutoff">
-       <div class="panel-turno">
+    <div class="panel-turno">
       <div class="turno-etiqueta" id="turno-etiqueta">—</div>
       <div class="turno-nombre-grande" id="turno-nombre">—</div>
       <div class="sec-poomsae" id="cut-poomsae" style="margin-bottom:10px">—</div>
@@ -559,14 +570,14 @@
       </table>
       <div class="turno-score-grande" id="turno-score" style="font-size:110px">—</div>
     </div>
-
-    <div class="panel-ranking">
-      <div class="ranking-header">Ranking</div>
-      <div class="ranking-scroll" id="ranking-lista"></div>
-    </div>
   </div>
 
-</div>
+    <!-- OVERLAY RANKING CUTOFF -->
+  <div id="overlay-ranking" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.94);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;z-index:160">
+    <div class="resumen-titulo-txt">Tabla de Posiciones</div>
+    <div id="overlay-ranking-lista" style="width:90%;max-width:600px;max-height:70vh;overflow-y:auto"></div>
+  </div>
+
 <!-- OVERLAY RESUMEN FINAL -->
 <div id="overlay-resumen" class="hidden"></div>
 
@@ -779,7 +790,7 @@
 
   let rankingTimer = null;
 
-  function renderRanking(ranking, topN) {
+   function renderRanking(ranking, topN) {
     const lista = document.getElementById('overlay-ranking-lista');
     const medalla = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
     let html = '';
@@ -787,21 +798,16 @@
       let clase = '';
       if (topN != null) clase = i < topN ? 'pasa' : 'fuera';
       if (topN != null && i === topN) html += `<div style="border-top:1px dashed #c9a84c;margin:8px 0"></div>`;
-      html += `<div class="rank-item ${clase}" style="padding:14px 18px">
-        <span class="rank-pos" style="font-size:26px;width:40px">${medalla(i)}</span>
-        <span class="rank-nombre" style="font-size:18px">${c.nombre}</span>
-        <span class="rank-total" style="font-size:26px">${c.total != null ? c.total.toFixed(2) : '—'}</span>
+      html += `<div class="rank-item ${clase}" style="padding:16px 22px">
+        <span class="rank-pos" style="font-size:30px;width:48px">${medalla(i)}</span>
+        <span class="rank-nombre" style="font-size:22px">${c.nombre}</span>
+        <span class="rank-total" style="font-size:30px">${c.total != null ? c.total.toFixed(2) : '—'}</span>
       </div>`;
     });
     lista.innerHTML = html;
-
-    // Mostrar a pantalla completa 6 segundos
     document.getElementById('overlay-ranking').classList.remove('hidden');
-    if (rankingTimer) clearTimeout(rankingTimer);
-    rankingTimer = setTimeout(() => {
-      document.getElementById('overlay-ranking').classList.add('hidden');
-    }, 6000);
   }
+
 
 
 
@@ -1213,6 +1219,8 @@
     }
     if (esCut()) {
       if (data.accion === 'iniciar') {
+          document.getElementById('overlay-ranking').classList.add('hidden');
+
         initCutTabla();
         document.getElementById('turno-score').textContent = '—';
         if (!esFS()) {
