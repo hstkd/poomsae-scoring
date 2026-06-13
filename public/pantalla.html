@@ -62,7 +62,7 @@
     .espera-sub { font-size: 10px; font-weight: 700; letter-spacing: 6px; color: #2a2a2a; text-transform: uppercase; }
 
     /* ── CUERPO ── */
-    #cuerpo { flex: 1; display: flex; position: relative; overflow: hidden; min-height: 0; }
+    #cuerpo { flex: 1; display: flex; position: relative; overflow: hidden; min-height: 0; width: 100%; }
 
     /* ── OVERLAY POOMSAE (sorteo y ejecución) ── */
     #overlay-poomsae {
@@ -198,8 +198,8 @@
     .jcircle.listo { background: #16a34a; border-color: #22c55e; color: #fff; box-shadow: 0 0 12px rgba(34,197,94,0.5); }
 
     /* ── 1V1 ── */
-    #vista-1v1 { flex: 1; display: none; }
-    #vista-1v1.visible { display: flex; }
+    #vista-1v1 { flex: 1; display: none; width: 100%; }
+    #vista-1v1.visible { display: flex; width: 100%; }
 
     .lado {
       flex: 1; display: flex; flex-direction: column;
@@ -574,6 +574,8 @@
     <div class="resumen-titulo-txt">Tabla de Posiciones</div>
     <div id="overlay-ranking-lista" style="width:90%;max-width:600px;max-height:70vh;overflow-y:auto"></div>
   </div>
+
+</div><!-- fin #cuerpo -->
 
 <!-- OVERLAY RESUMEN FINAL -->
 <div id="overlay-resumen" class="hidden"></div>
