@@ -163,10 +163,11 @@
     .fade-in { animation: fadeIn 0.4s ease-out; }
 
     /* ── CRONÓMETRO ── */
-    #crono-wrap {
-      position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
-      z-index: 20; text-align: center; pointer-events: none;
+      #crono-wrap {
+      position: fixed; top: 90px; left: 30px; transform: none;
+      z-index: 100; text-align: left; pointer-events: none;
     }
+
     .crono-label-txt {
       font-size: 9px; font-weight: 700; letter-spacing: 3px;
       color: #444; text-transform: uppercase; margin-bottom: 2px;
