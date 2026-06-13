@@ -2089,19 +2089,20 @@
             <span>2da Poomsae: <strong>${p2 || '—'}</strong></span>
           </div>
 
-          <!-- POOMSAE 1 -->
+                   <!-- POOMSAE 1 -->
           <div class="poomsae-bloque-titulo">Poomsae 1 — ${p1 || '—'}</div>
           <div class="dos-columnas">
-            ${tablaCompetidor(a.nombre, colorA, notasP1snap, a.id, totA1, p1)}
-            ${tablaCompetidor(b.nombre, colorB, notasP1snap, b.id, totB1, p1)}
+            ${tabP1A}
+            ${tabP1B}
           </div>
 
           <!-- POOMSAE 2 -->
           <div class="poomsae-bloque-titulo">Poomsae 2 — ${p2 || '—'}</div>
           <div class="dos-columnas">
-            ${tablaCompetidor(a.nombre, colorA, notasP2snap, a.id, totA2, p2)}
-            ${tablaCompetidor(b.nombre, colorB, notasP2snap, b.id, totB2, p2)}
+            ${tabP2A}
+            ${tabP2B}
           </div>
+
 
           <!-- RESUMEN -->
           <div class="resumen-final">
