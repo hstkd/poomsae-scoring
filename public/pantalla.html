@@ -282,13 +282,14 @@
   </div>
 
     /* ── CUTOFF ── */
-       #vista-cutoff { flex: 1; display: none; width: 100%; }
-    #vista-cutoff.visible { display: flex; }
+          #vista-cutoff { display: none; }
+    #vista-cutoff.visible { display: flex; flex: 1 1 100%; width: 100%; }
     .panel-turno {
       flex: 1; width: 100%;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       background: #0a0a0a; padding: 30px 60px;
     }
+
     #cut-tabla { width: 100%; max-width: 1100px; }
     #cut-tabla th { font-size: 16px; padding: 12px; }
     #cut-tabla td { font-size: 30px; padding: 14px; }
