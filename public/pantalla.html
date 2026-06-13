@@ -777,23 +777,32 @@
     document.getElementById('jueces-bar').innerHTML = html;
   }
 
-    function renderRanking(ranking, topN) {
-    const lista = document.getElementById('ranking-lista');
-          const divisor = 1;   // el servidor ya envía promedio/P1 correcto
+  let rankingTimer = null;
 
+  function renderRanking(ranking, topN) {
+    const lista = document.getElementById('overlay-ranking-lista');
+    const medalla = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
     let html = '';
     ranking.forEach((c, i) => {
       let clase = '';
       if (topN != null) clase = i < topN ? 'pasa' : 'fuera';
-      if (topN != null && i === topN) html += `<div style="border-top:1px dashed #c9a84c;margin:6px 0"></div>`;
-      html += `<div class="rank-item ${clase}">
-        <span class="rank-pos">${i+1}</span>
-        <span class="rank-nombre">${c.nombre}</span>
-        <span class="rank-total">${c.total != null ? (c.total / divisor).toFixed(2) : '—'}</span>
+      if (topN != null && i === topN) html += `<div style="border-top:1px dashed #c9a84c;margin:8px 0"></div>`;
+      html += `<div class="rank-item ${clase}" style="padding:14px 18px">
+        <span class="rank-pos" style="font-size:26px;width:40px">${medalla(i)}</span>
+        <span class="rank-nombre" style="font-size:18px">${c.nombre}</span>
+        <span class="rank-total" style="font-size:26px">${c.total != null ? c.total.toFixed(2) : '—'}</span>
       </div>`;
     });
     lista.innerHTML = html;
+
+    // Mostrar a pantalla completa 6 segundos
+    document.getElementById('overlay-ranking').classList.remove('hidden');
+    if (rankingTimer) clearTimeout(rankingTimer);
+    rankingTimer = setTimeout(() => {
+      document.getElementById('overlay-ranking').classList.add('hidden');
+    }, 6000);
   }
+
 
 
   function resetVista1v1() {
