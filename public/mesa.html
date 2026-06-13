@@ -2038,6 +2038,29 @@
           </table>
         </div>`;
     }
+    // Variante secuencial: recibe el objeto de jueces directo
+    function tablaCompetidorDirecta(nombre, color, juecesObj, totalP, poomsaeNombre) {
+      let filas = '';
+      for (let j = 1; j <= numJueces; j++) {
+        const d = juecesObj?.[j];
+        if (!d) {
+          filas += `<tr><td>J${j}</td><td colspan="5" style="color:#aaa;text-align:center">—</td></tr>`;
+        } else {
+          const prec=(d.prec||0).toFixed(2), vel=(d.vel||0).toFixed(2), rit=(d.rit||0).toFixed(2), exp=(d.exp||0).toFixed(2), pres=(d.presentacion||0).toFixed(2);
+          const subtot=((d.prec||0)+(d.vel||0)+(d.rit||0)+(d.exp||0)+(d.presentacion||0)).toFixed(2);
+          filas += `<tr><td>J${j}</td><td>${prec}</td><td>${vel}</td><td>${rit}</td><td>${exp}</td><td>${pres}</td><td><strong>${subtot}</strong></td></tr>`;
+        }
+      }
+      return `
+        <div class="comp-bloque" style="border-left:4px solid ${color}">
+          <div class="comp-titulo" style="color:${color}">${nombre}<span class="poomsae-tag">${poomsaeNombre || '—'}</span></div>
+          <table>
+            <thead><tr><th>Juez</th><th>Precisión</th><th>Velocidad / Potencia</th><th>Ritmo / Tiempo</th><th>Expresión Energía</th><th>Presentación</th><th>Subtotal</th></tr></thead>
+            <tbody>${filas}</tbody>
+            <tfoot><tr><td colspan="6" style="text-align:right;font-weight:700;padding-right:8px">Total Poomsae</td><td><strong>${totalP != null ? totalP.toFixed(2) : '—'}</strong></td></tr></tfoot>
+          </table>
+        </div>`;
+    }
 
     let seccionesHTML = '';
     historialEnfrentamientos.forEach((enf, idx) => {
