@@ -53,14 +53,16 @@
 
     /* ── ESPERA ── */
     #estado-espera {
-      flex: 1; display: flex; flex-direction: column;
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
       justify-content: center; align-items: center; gap: 14px;
+      background: #0a0a0a; z-index: 10;
     }
     .espera-logo { font-family: 'Bebas Neue', sans-serif; font-size: 100px; letter-spacing: 14px; color: #141414; }
     .espera-sub { font-size: 10px; font-weight: 700; letter-spacing: 6px; color: #2a2a2a; text-transform: uppercase; }
 
     /* ── CUERPO ── */
-    #cuerpo { flex: 1; display: flex; position: relative; overflow: hidden; }
+    #cuerpo { flex: 1; display: flex; position: relative; overflow: hidden; min-height: 0; }
 
     /* ── OVERLAY POOMSAE (sorteo y ejecución) ── */
     #overlay-poomsae {
@@ -401,7 +403,7 @@
   text-align: center; animation: fadeIn 0.6s ease-out;
 }
     /* ── VISTA SECUENCIAL ── */
-    #vista-sec { flex: 1; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
+    #vista-sec { flex: 1; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 30px; width: 100%; }
     #vista-sec.visible { display: flex; }
     .sec-poomsae { font-family:'Bebas Neue',sans-serif; font-size: 30px; letter-spacing: 6px; color: #c9a84c; }
     .sec-nombre { font-family:'Bebas Neue',sans-serif; font-size: 72px; letter-spacing: 6px; line-height: 1.1; margin-bottom: 18px; }
@@ -1039,21 +1041,18 @@
 
     // Ocultar espera, mostrar cuerpo
     document.getElementById('estado-espera').classList.add('hidden');
-document.getElementById('cuerpo').classList.remove('hidden');
-
-// Ocultar todas las vistas primero
-document.getElementById('vista-1v1').classList.remove('visible');
-document.getElementById('vista-cutoff').classList.remove('visible');
-document.getElementById('vista-sec').classList.remove('visible');
-
-// Activar la correcta según el modo
-if (sala.modo === 'cutoff') {
-  document.getElementById('vista-cutoff').classList.add('visible');
-} else if (sala.modo === '1v1-secuencial') {
-  document.getElementById('vista-sec').classList.add('visible');
-} else {
-  document.getElementById('vista-1v1').classList.add('visible');
-}
+    document.getElementById('cuerpo').classList.remove('hidden');
+    // Ocultar TODAS las vistas primero, luego activar la correcta
+    document.getElementById('vista-1v1').classList.remove('visible');
+    document.getElementById('vista-cutoff').classList.remove('visible');
+    document.getElementById('vista-sec').classList.remove('visible');
+    if (sala.modo === 'cutoff') {
+      document.getElementById('vista-cutoff').classList.add('visible');
+    } else if (sala.modo === '1v1-secuencial') {
+      document.getElementById('vista-sec').classList.add('visible');
+    } else {
+      document.getElementById('vista-1v1').classList.add('visible');
+    }
 
     // Fijar IDs y nombres
     compIdA = compA.id;
@@ -1134,17 +1133,20 @@ if (sala.modo === 'cutoff') {
     document.getElementById('nombre-A').textContent = compA.nombre || '—';
     document.getElementById('nombre-B').textContent = compB.nombre || '—';
     document.getElementById('estado-espera').classList.add('hidden');
-        document.getElementById('cuerpo').classList.remove('hidden');
+    document.getElementById('cuerpo').classList.remove('hidden');
+    // Ocultar TODAS las vistas primero
+    document.getElementById('vista-1v1').classList.remove('visible');
+    document.getElementById('vista-sec').classList.remove('visible');
+    document.getElementById('vista-cutoff').classList.remove('visible');
     if (d.modo === '1v1-secuencial') {
       document.getElementById('vista-sec').classList.add('visible');
-      document.getElementById('vista-1v1').classList.remove('visible');
       sec.nomA = compA.nombre; sec.nomB = compB.nombre;
       secReset();
-  } else {
-  document.getElementById('vista-1v1').classList.add('visible');
-  document.getElementById('vista-sec').classList.remove('visible');
-  document.getElementById('vista-cutoff').classList.remove('visible'); // ← AGREGAR
-}
+    } else if (d.modo === 'cutoff') {
+      document.getElementById('vista-cutoff').classList.add('visible');
+    } else {
+      document.getElementById('vista-1v1').classList.add('visible');
+    }
 
     initNotasGrid('A');
     initNotasGrid('B');
@@ -1176,19 +1178,22 @@ if (sala.modo === 'cutoff') {
   socket.on('turno-actualizado', (d) => {
     const t = d.turno;
     if (!t) return;
+    // Ocultar TODAS las vistas antes de activar la correcta
+    document.getElementById('vista-1v1').classList.remove('visible');
+    document.getElementById('vista-sec').classList.remove('visible');
+    document.getElementById('vista-cutoff').classList.remove('visible');
+
     if (t.tipo === '1v1-simultaneo' || t.tipo === '1v1-secuencial') {
       compIdA = t.competidorA?.id ?? null;
       compIdB = t.competidorB?.id ?? null;
-            sec.nomA = t.competidorA?.nombre || '—';
+      sec.nomA = t.competidorA?.nombre || '—';
       sec.nomB = t.competidorB?.nombre || '—';
       if (t.tipo === '1v1-secuencial') {
         document.getElementById('vista-sec').classList.add('visible');
-        document.getElementById('vista-1v1').classList.remove('visible');
-        document.getElementById('vista-cutoff').classList.remove('visible'); // ← AGREGAR
         secReset();
         return;
       }
-
+      document.getElementById('vista-1v1').classList.add('visible');
       if (document.getElementById('nombre-A'))
         document.getElementById('nombre-A').textContent = t.competidorA?.nombre || '—';
       if (document.getElementById('nombre-B'))
@@ -1199,11 +1204,8 @@ if (sala.modo === 'cutoff') {
       document.getElementById('turno-nombre').textContent = c?.nombre || '—';
       document.getElementById('turno-score').textContent = '—';
       document.getElementById('vista-cutoff').classList.add('visible');
-      document.getElementById('vista-1v1').classList.remove('visible');
-      document.getElementById('vista-sec').classList.remove('visible'); // ← AGREGAR
       document.getElementById('cut-poomsae').textContent = esFS() ? 'FREESTYLE' : '—';
       initCutTabla();
-
     }
   });
 
