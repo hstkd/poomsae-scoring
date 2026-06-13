@@ -3,107 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Poomsae Scoring</title>
+  <title>Poomsae Scoring System</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: #0a0a0a; color: white;
-      font-family: 'Inter', sans-serif;
+      background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif;
       min-height: 100vh; display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      padding: 30px;
+      align-items: center; justify-content: center; padding: 24px;
+      user-select: none; -webkit-user-select: none;
     }
-
-    .logo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 64px; letter-spacing: 12px; color: #c9a84c;
-      text-shadow: 0 0 40px rgba(201,168,76,0.3);
-      text-align: center; line-height: 1;
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 12px;
+      color: #c9a84c; text-shadow: 0 0 40px rgba(201,168,76,0.35); line-height: 1; }
+    .sub { font-size: 10px; font-weight: 700; letter-spacing: 6px; color: #555;
+      text-transform: uppercase; margin-top: 2px; margin-bottom: 36px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 520px; }
+    .card {
+      background: #141414; border: 1px solid #222; border-radius: 16px;
+      padding: 26px 18px; text-align: center; cursor: pointer; text-decoration: none;
+      color: #fff; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px;
     }
-    .logo-sub {
-      font-size: 10px; font-weight: 700; letter-spacing: 6px;
-      color: #444; text-transform: uppercase;
-      text-align: center; margin-top: 8px; margin-bottom: 50px;
-    }
-
-    .menu {
-      display: flex; flex-direction: column;
-      gap: 12px; width: 100%; max-width: 340px;
-    }
-
-    .menu-btn {
-      display: flex; align-items: center; gap: 16px;
-      background: #141414; border: 1px solid #222;
-      border-radius: 12px; padding: 18px 20px;
-      text-decoration: none; color: white;
-      transition: all 0.2s; cursor: pointer;
-    }
-    .menu-btn:active { border-color: #c9a84c; background: #1a1500; }
-
-    .menu-icon {
-      font-size: 28px; width: 40px; text-align: center; flex-shrink: 0;
-    }
-    .menu-texto { flex: 1; }
-    .menu-titulo {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px; letter-spacing: 3px; color: #fff;
-      line-height: 1;
-    }
-    .menu-desc {
-      font-size: 10px; font-weight: 700; letter-spacing: 2px;
-      color: #555; text-transform: uppercase; margin-top: 3px;
-    }
-    .menu-arrow {
-      font-size: 18px; color: #333;
-    }
-
-    .menu-btn.gold { border-color: #c9a84c; }
-    .menu-btn.gold .menu-titulo { color: #c9a84c; }
-    .menu-btn.gold .menu-arrow { color: #c9a84c; }
-
-    .footer-line {
-      margin-top: 50px;
-      font-size: 9px; font-weight: 700; letter-spacing: 3px;
-      color: #2a2a2a; text-transform: uppercase; text-align: center;
-    }
+    .card:hover { border-color: #c9a84c; background: #16130a; transform: translateY(-2px); }
+    .card:active { transform: translateY(0); }
+    .card-icon { font-size: 34px; line-height: 1; }
+    .card-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: #c9a84c; }
+    .card-desc { font-size: 10px; color: #777; letter-spacing: 0.5px; line-height: 1.4; }
+    .footer { margin-top: 32px; font-size: 9px; letter-spacing: 2px; color: #2a2a2a; text-transform: uppercase; }
+    @media (max-width: 420px) { .grid { grid-template-columns: 1fr; } .logo { font-size: 48px; letter-spacing: 8px; } }
   </style>
 </head>
 <body>
 
   <div class="logo">POOMSAE</div>
-  <div class="logo-sub">Sistema de Calificación</div>
+  <div class="sub">Sistema de Calificación</div>
 
-  <div class="menu">
-    <a href="/mesa.html" class="menu-btn gold">
-      <div class="menu-icon">⚙️</div>
-      <div class="menu-texto">
-        <div class="menu-titulo">Mesa Central</div>
-        <div class="menu-desc">Control y administración</div>
-      </div>
-      <div class="menu-arrow">›</div>
+  <div class="grid">
+    <a class="card" href="/mesa.html">
+      <div class="card-icon">🥋</div>
+      <div class="card-titulo">Mesa Competencia</div>
+      <div class="card-desc">1v1 simultáneo, secuencial y cut off</div>
     </a>
 
-    <a href="/juez.html" class="menu-btn">
-      <div class="menu-icon">🥋</div>
-      <div class="menu-texto">
-        <div class="menu-titulo">Juez</div>
-        <div class="menu-desc">Ingresar calificaciones</div>
-      </div>
-      <div class="menu-arrow">›</div>
+    <a class="card" href="/liga.html">
+      <div class="card-icon">📋</div>
+      <div class="card-titulo">Mesa Liga</div>
+      <div class="card-desc">Carga por Excel · corrida continua por grupos</div>
     </a>
 
-    <a href="/pantalla.html" class="menu-btn">
-      <div class="menu-icon">📺</div>
-      <div class="menu-texto">
-        <div class="menu-titulo">Pantalla</div>
-        <div class="menu-desc">Resultados en vivo</div>
-      </div>
-      <div class="menu-arrow">›</div>
+    <a class="card" href="/juez.html">
+      <div class="card-icon">⚖️</div>
+      <div class="card-titulo">Juez</div>
+      <div class="card-desc">Calificar desde el móvil</div>
+    </a>
+
+    <a class="card" href="/pantalla.html">
+      <div class="card-icon">📺</div>
+      <div class="card-titulo">Pantalla</div>
+      <div class="card-desc">Resultados para el público</div>
     </a>
   </div>
 
-  <div class="footer-line">HS-SS Taekwondo · Poomsae Scoring System</div>
+  <div class="footer">Henry Sigchos Taekwondo · HSTKD</div>
 
 </body>
 </html>
