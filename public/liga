@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Liga / Cancha - Poomsae</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0d0d0d; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; padding: 12px; user-select: none; -webkit-user-select: none; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #1a1a1a; }
+    .header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 4px; color: #c9a84c; }
+    .header-badge { background: #1a1a1a; border: 1px solid #333; color: #888; font-size: 9px; font-weight: 700; letter-spacing: 2px; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+    .panel { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .panel-titulo { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 12px; }
+    .input-field { width: 100%; background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 8px; color: #fff; padding: 11px 12px; font-size: 15px; font-family: 'Bebas Neue', sans-serif; letter-spacing: 2px; outline: none; margin-bottom: 8px; }
+    .input-field:focus { border-color: #c9a84c; }
+    select.input-field { cursor: pointer; }
+    .input-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 5px; display: block; }
+    .btn-gold { width: 100%; background: #c9a84c; color: #000; border: none; padding: 13px; font-family: 'Bebas Neue', sans-serif; font-size: 17px; letter-spacing: 3px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
+    .btn-gold:active { filter: brightness(0.85); }
+    .btn-dark { width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; color: #888; padding: 11px; font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
+    .btn-dark:active { border-color: #c9a84c; color: #c9a84c; }
+    .btn-green { width: 100%; background: #16a34a; color: #fff; border: none; padding: 13px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
+    .btn-green:active { filter: brightness(0.85); }
+    .btn-red { width: 100%; background: #dc2626; color: #fff; border: none; padding: 13px; font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; }
+    .btn-red:active { filter: brightness(0.85); }
+    .btn-next { width: 100%; background: #7c3aed; color: #fff; border: none; padding: 14px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-bottom: 6px; }
+    .btn-next:active { filter: brightness(0.85); }
+    .hidden { display: none !important; }
+    .sala-codigo { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 6px; color: #c9a84c; text-align: center; line-height: 1; }
+    .sala-sub { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; text-align: center; margin-top: 4px; }
+    .jueces-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .juez-chip { display: flex; align-items: center; gap: 6px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 20px; padding: 5px 12px; }
+    .juez-dot { width: 7px; height: 7px; border-radius: 50%; background: #333; }
+    .juez-dot.activo { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+    .juez-txt { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #444; text-transform: uppercase; }
+    .juez-chip.activo .juez-txt { color: #22c55e; }
+
+    /* Carga Excel */
+    .drop-zone { border: 2px dashed #2a2a2a; border-radius: 12px; padding: 28px 16px; text-align: center; cursor: pointer; transition: all 0.2s; }
+    .drop-zone:hover, .drop-zone.drag { border-color: #c9a84c; background: #16130a; }
+    .drop-icon { font-size: 36px; margin-bottom: 8px; }
+    .drop-txt { font-size: 12px; color: #888; letter-spacing: 1px; }
+    .drop-sub { font-size: 10px; color: #555; margin-top: 4px; }
+
+    /* Grupos detectados */
+    .grupo-item { display: flex; align-items: center; gap: 10px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
+    .grupo-item.activo { border-color: #c9a84c; background: #16130a; }
+    .grupo-item.hecho { opacity: 0.5; }
+    .grupo-num { font-family: 'Bebas Neue', sans-serif; font-size: 16px; color: #555; width: 24px; }
+    .grupo-info { flex: 1; }
+    .grupo-nombre { font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+    .grupo-meta { font-size: 9px; color: #666; margin-top: 2px; letter-spacing: 1px; }
+    .grupo-poomsae { font-family: 'Bebas Neue', sans-serif; font-size: 13px; color: #c9a84c; letter-spacing: 1px; }
+
+    .turno-card { background: #0a0a0a; border: 1px solid #c9a84c; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 12px; }
+    .turno-label { font-size: 8px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 8px; }
+    .turno-nombre { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: #fff; }
+    .turno-poomsae { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: #c9a84c; margin-top: 4px; }
+    .turno-extra { font-size: 10px; color: #666; letter-spacing: 1px; margin-top: 6px; text-transform: uppercase; }
+
+    .fase-badge { display: inline-block; padding: 5px 16px; border-radius: 20px; font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 2px; margin-bottom: 10px; }
+    .fase-badge.ejecucion { background: #16a34a; color: #fff; }
+    .fase-badge.sorteo { background: #c9a84c; color: #000; }
+    .fase-badge.detenido { background: #dc2626; color: #fff; }
+    .fase-badge.resultado { background: #7c3aed; color: #fff; }
+
+    .cronometro-card { background: #0a0a0a; border: 1px solid #333; border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 10px; }
+    .cronometro-label { font-size: 9px; font-weight: 700; letter-spacing: 3px; color: #555; text-transform: uppercase; margin-bottom: 6px; }
+    .cronometro-display { font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 4px; color: #c9a84c; line-height: 1; text-shadow: 0 0 20px rgba(201,168,76,0.4); }
+    .cronometro-display.rojo { color: #dc2626; }
+    .crono-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+
+    .notas-comp { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 10px; padding: 10px; }
+    .notas-comp-titulo { font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 2px; margin-bottom: 8px; text-align: center; color: #c9a84c; }
+    .nota-juez-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; border-bottom: 1px solid #1a1a1a; font-size: 10px; }
+    .nota-juez-row:last-child { border-bottom: none; }
+    .nota-juez-num { color: #555; letter-spacing: 1px; }
+    .nota-juez-val { font-family: 'Bebas Neue', sans-serif; font-size: 14px; color: #c9a84c; }
+    .nota-juez-detalle { color: #444; font-size: 9px; }
+    .total-comp { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; padding-top: 6px; border-top: 1px solid #2a2a2a; }
+    .total-comp-label { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: #555; text-transform: uppercase; }
+    .total-comp-val { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: #fff; }
+
+    .rank-item { display: flex; align-items: center; gap: 10px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; margin-bottom: 6px; }
+    .rank-pos { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; width: 36px; }
+    .rank-nombre { flex: 1; font-size: 13px; font-weight: 700; }
+    .rank-sub { font-size: 9px; color: #666; font-weight: 400; }
+    .rank-total { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: #c9a84c; }
+    .btn-finalizar { width: 100%; background: #c9a84c; color: #000; border: none; padding: 14px; font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 4px; border-radius: 10px; cursor: pointer; margin-top: 10px; }
+    #log { font-size: 9px; color: #444; margin-top: 10px; max-height: 60px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">POOMSAE · LIGA</div>
+  <div class="header-badge" id="header-badge">Mesa Liga</div>
+</div>
+
+<!-- ════════ SETUP ════════ -->
+<div id="seccion-setup">
+  <div class="panel">
+    <div class="panel-titulo">Crear Cancha</div>
+    <label class="input-label">Código de Sala</label>
+    <input class="input-field" id="input-codigo" type="text" maxlength="8" placeholder="CANCHA1" style="text-transform:uppercase">
+    <label class="input-label">Nombre del Evento</label>
+    <input class="input-field" id="input-evento" type="text" placeholder="ej: COPA HSTKD 2026" style="text-transform:uppercase;font-size:13px">
+    <label class="input-label">Número de Jueces</label>
+    <select class="input-field" id="input-jueces">
+      <option value="3">3 Jueces</option>
+      <option value="5">5 Jueces</option>
+      <option value="7">7 Jueces</option>
+    </select>
+    <button class="btn-gold" onclick="crearSala()">CREAR CANCHA</button>
+    <div id="error-sala-msg" class="hidden" style="background:#1a0505;border:1px solid #7f1d1d;border-radius:8px;padding:10px 12px;font-size:11px;color:#ff8888;line-height:1.5">
+      ⚠️ <strong>Esa sala ya existe.</strong> Usa otro código o resetéala.
+    </div>
+  </div>
+</div>
+
+<!-- ════════ SALA ACTIVA ════════ -->
+<div id="seccion-sala" class="hidden">
+
+  <div class="panel">
+    <div class="sala-codigo" id="display-codigo">—</div>
+    <div class="sala-sub" id="display-evento">—</div>
+    <div class="jueces-grid" id="display-jueces"></div>
+    <div id="log"></div>
+    <button class="btn-dark" onclick="confirmarReset()" style="color:#dc2626;border-color:#3a0000;font-size:10px;padding:8px;margin-top:10px">✕ RESETEAR CANCHA</button>
+  </div>
+
+  <!-- CARGA EXCEL -->
+  <div class="panel" id="panel-carga">
+    <div class="panel-titulo">Cargar Atletas</div>
+    <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-excel').click()">
+      <div class="drop-icon">📄</div>
+      <div class="drop-txt">Toca para elegir tu archivo Excel</div>
+      <div class="drop-sub">Columnas: Nombre · Categoría · Género · Cinturón · Academia</div>
+    </div>
+    <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" class="hidden" onchange="cargarExcel(event)">
+    <div id="resumen-carga" class="hidden" style="margin-top:10px;font-size:11px;color:#aaa;text-align:center"></div>
+  </div>
+
+  <!-- GRUPOS DETECTADOS -->
+  <div class="panel hidden" id="panel-grupos">
+    <div class="panel-titulo">Grupos Detectados (<span id="num-grupos">0</span>)</div>
+    <div id="lista-grupos"></div>
+    <button class="btn-green" onclick="iniciarLiga()" style="margin-top:6px">▶ INICIAR COMPETENCIA</button>
+  </div>
+
+  <!-- CONTROL DE GRUPO ACTIVO -->
+  <div class="panel hidden" id="panel-control">
+    <div class="panel-titulo">Grupo Actual · <span id="grupo-actual-nombre">—</span></div>
+
+    <div style="text-align:center;margin-bottom:10px">
+      <span class="fase-badge sorteo" id="fase-badge">Listo</span>
+    </div>
+
+    <div id="display-turno"></div>
+
+    <!-- CRONÓMETRO -->
+    <div class="cronometro-card hidden" id="bloque-crono">
+      <div class="cronometro-label" id="crono-label">Tiempo de Ejecución</div>
+      <div class="cronometro-display" id="crono-display">1:30</div>
+      <div class="crono-btns">
+        <button class="btn-green" onclick="iniciarCrono()">▶ INICIAR</button>
+        <button class="btn-red" onclick="detenerCrono()">⏹ DETENER</button>
+      </div>
+      <button class="btn-dark" onclick="restablecerCrono()" style="margin-top:6px">↺ RESTABLECER</button>
+    </div>
+
+    <!-- NEXT -->
+    <button class="btn-next hidden" id="btn-next" onclick="presionarNext()" style="margin-top:8px">CONFIRMAR Y SIGUIENTE ›</button>
+
+    <!-- NOTAS -->
+    <div id="bloque-notas" class="hidden" style="margin-top:8px">
+      <div class="panel-titulo">Notas del Atleta</div>
+      <div class="notas-comp">
+        <div class="notas-comp-titulo" id="nombre-notas">—</div>
+        <div id="notas-rows"></div>
+        <div class="total-comp">
+          <span class="total-comp-label">Total</span>
+          <span class="total-comp-val" id="total-atleta">—</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RANKING DEL GRUPO -->
+  <div class="panel hidden" id="panel-ranking">
+    <div class="panel-titulo">Ranking · <span id="ranking-grupo-nombre">—</span></div>
+    <div id="display-ranking"></div>
+    <button class="btn-finalizar hidden" id="btn-siguiente-grupo" onclick="siguienteGrupo()">SIGUIENTE GRUPO ›</button>
+    <button class="btn-dark hidden" id="btn-exportar-pdf" onclick="exportarPDF()" style="margin-top:6px;color:#c9a84c;border-color:#3a2800;letter-spacing:2px">↓ EXPORTAR RESULTADOS PDF</button>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#141414;border:1px solid #333;border-radius:14px;padding:24px;width:100%;max-width:340px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#dc2626;margin-bottom:6px" id="modal-titulo">Confirmar</div>
+    <div id="modal-body" style="font-size:12px;color:#aaa;line-height:1.6;margin-bottom:16px"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn-dark" onclick="cerrarModal()" style="margin:0">CANCELAR</button>
+      <button class="btn-red" onclick="ejecutarModal()" style="margin:0">CONFIRMAR</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io({ reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+
+  // ── TABLA CINTURÓN → POOMSAE ──
+  const POOMSAE_POR_CINTURON = {
+    'BLANCO': 'Taegeuk 1 Jang',
+    'BLANCO/AMARILLO': 'Taegeuk 1 Jang',
+    'AMARILLO': 'Taegeuk 2 Jang',
+    'AMARILLO/VERDE': 'Taegeuk 3 Jang',
+    'VERDE': 'Taegeuk 4 Jang',
+    'VERDE/AZUL': 'Taegeuk 5 Jang',
+    'AZUL': 'Taegeuk 6 Jang',
+    'AZUL/ROJO': 'Taegeuk 6 Jang',
+    'ROJO': 'Taegeuk 7 Jang',
+    'ROJO/NEGRO': 'Taegeuk 7 Jang'
+  };
+
+  // ── ESTADO ──
+  let salaActual = null;
+  let nombreEvento = '';
+  let numJueces = 3;
+  let atletas = [];          // todos los del Excel: {nombre, categoria, genero, cinturon, academia, poomsae}
+  let grupos = [];           // [{id, nombre, categoria, genero, cinturon, poomsae, atletas:[...], resultados:[...]}]
+  let grupoIdx = 0;          // grupo en curso
+  let atletaIdx = 0;         // atleta en curso dentro del grupo
+  let fase = 'listo';        // listo | corriendo | detenido | atleta_completo | grupo_ranking
+  let notasActual = { jueces: {}, total: null };
+
+  let cronoInterval = null, cronoSegundos = 90, cronoOriginal = 90;
+
+  // ── NORMALIZAR TEXTO (para emparejar cinturón) ──
+  function norm(s) {
+    return (s || '').toString().trim().toUpperCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // quitar tildes
+      .replace(/\s*\/\s*/g, '/')                          // normalizar separador
+      .replace(/\s+/g, ' ');
+  }
+
+  function poomsaeDeCinturon(cint) {
+    return POOMSAE_POR_CINTURON[norm(cint)] || '(sin poomsae)';
+  }
+
+  // ── CREAR SALA ──
+  function crearSala() {
+    const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
+    nombreEvento = document.getElementById('input-evento').value.trim().toUpperCase();
+    numJueces = parseInt(document.getElementById('input-jueces').value);
+    if (!codigo) return alert('Ingresa un código de sala');
+    salaActual = codigo;
+    // Modo liga corre sobre cutoff en el servidor (1 poomsae, ranking)
+    socket.emit('mesa-crear-sala', {
+      codigo, tipo: 'traditional', modo: 'cutoff',
+      numJueces, categoria: nombreEvento || 'LIGA', ronda: 'LIGA', grupoCategoria: 'liga'
+    });
+  }
+
+  // ── CARGAR EXCEL ──
+  function cargarExcel(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const wb = XLSX.read(data, { type: 'array' });
+        const hoja = wb.Sheets[wb.SheetNames[0]];
+        const filas = XLSX.utils.sheet_to_json(hoja, { defval: '' });
+        procesarFilas(filas);
+      } catch (err) {
+        alert('No se pudo leer el archivo: ' + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // Busca una columna por varios nombres posibles (tolerante a mayúsculas/tildes)
+  function getCampo(fila, posibles) {
+    const claves = Object.keys(fila);
+    for (const p of posibles) {
+      const hit = claves.find(k => norm(k) === norm(p));
+      if (hit) return fila[hit];
+    }
+    return '';
+  }
+
+  function procesarFilas(filas) {
+    atletas = [];
+    filas.forEach(f => {
+      const nombre = getCampo(f, ['Nombre','NOMBRE']);
+      if (!nombre || !nombre.toString().trim()) return; // saltar filas vacías
+      const categoria = getCampo(f, ['Categoria','Categoría','CATEGORIA']);
+      const genero    = getCampo(f, ['Genero','Género','GENERO','Sexo']);
+      const cinturon  = getCampo(f, ['Cinturon','Cinturón','CINTURON','Grado']);
+      const academia  = getCampo(f, ['Academia','ACADEMIA','Club','Escuela']);
+      atletas.push({
+        nombre: nombre.toString().trim().toUpperCase(),
+        categoria: categoria.toString().trim().toUpperCase(),
+        genero: norm(genero).startsWith('F') ? 'F' : 'M',
+        cinturon: cinturon.toString().trim().toUpperCase(),
+        academia: academia.toString().trim().toUpperCase(),
+        poomsae: poomsaeDeCinturon(cinturon)
+      });
+    });
+
+    if (!atletas.length) { alert('No se encontraron atletas. Revisa que la primera fila tenga los encabezados.'); return; }
+
+    construirGrupos();
+
+    document.getElementById('resumen-carga').classList.remove('hidden');
+    document.getElementById('resumen-carga').innerHTML =
+      `✅ ${atletas.length} atletas · ${grupos.length} grupos`;
+    log(`Excel cargado: ${atletas.length} atletas en ${grupos.length} grupos`);
+  }
+
+  // ── AGRUPAR por Categoría + Género + Cinturón ──
+  function construirGrupos() {
+    const mapa = {};
+    atletas.forEach(a => {
+      const clave = `${a.categoria}||${a.genero}||${a.cinturon}`;
+      if (!mapa[clave]) {
+        mapa[clave] = {
+          id: Object.keys(mapa).length,
+          categoria: a.categoria, genero: a.genero, cinturon: a.cinturon,
+          poomsae: a.poomsae,
+          nombre: `${a.categoria} · ${a.genero} · ${a.cinturon}`,
+          atletas: [], resultados: []
+        };
+      }
+      mapa[clave].atletas.push(a);
+    });
+    grupos = Object.values(mapa);
+    renderGrupos();
+  }
+
+  function renderGrupos() {
+    document.getElementById('num-grupos').textContent = grupos.length;
+    document.getElementById('lista-grupos').innerHTML = grupos.map((g, i) => `
+      <div class="grupo-item ${i === grupoIdx ? 'activo' : ''} ${i < grupoIdx ? 'hecho' : ''}">
+        <span class="grupo-num">${i + 1}</span>
+        <div class="grupo-info">
+          <div class="grupo-nombre">${g.nombre}</div>
+          <div class="grupo-meta">${g.atletas.length} atletas · ${g.atletas.map(a => a.academia).filter((v,k,arr)=>arr.indexOf(v)===k).length} academias</div>
+        </div>
+        <span class="grupo-poomsae">${g.poomsae}</span>
+      </div>`).join('');
+    document.getElementById('panel-grupos').classList.remove('hidden');
+  }
+
+  // ── INICIAR LIGA ──
+  function iniciarLiga() {
+    if (!grupos.length) return alert('Carga el Excel primero');
+    grupoIdx = 0;
+    document.getElementById('panel-carga').classList.add('hidden');
+    document.getElementById('panel-grupos').classList.add('hidden');
+    document.getElementById('panel-control').classList.remove('hidden');
+    arrancarGrupo();
+  }
+
+  // ── ARRANCAR UN GRUPO ──
+  function arrancarGrupo() {
+    const g = grupos[grupoIdx];
+    if (!g) { finDeLiga(); return; }
+    atletaIdx = 0;
+    g.resultados = [];
+    document.getElementById('grupo-actual-nombre').textContent = g.nombre;
+    document.getElementById('panel-ranking').classList.add('hidden');
+    document.getElementById('panel-control').classList.remove('hidden');
+    // Enviar competidores de este grupo al servidor (reusa cutoff)
+    const comps = g.atletas.map(a => ({ nombre: a.nombre }));
+    socket.emit('mesa-iniciar', { codigo: salaActual, competidores: comps, modo: 'cutoff', tipo: 'traditional' });
+    log(`▶ Grupo ${grupoIdx + 1}: ${g.nombre} (${g.atletas.length} atletas)`);
+    // arrancarAtleta se llama al recibir competencia-iniciada
+  }
+
+  // ── ARRANCAR UN ATLETA ──
+  function arrancarAtleta() {
+    const g = grupos[grupoIdx];
+    const a = g.atletas[atletaIdx];
+    if (!a) { mostrarRankingGrupo(); return; }
+    fase = 'listo';
+    notasActual = { jueces: {}, total: null };
+
+    document.getElementById('nombre-notas').textContent = a.nombre;
+    document.getElementById('notas-rows').innerHTML = '';
+    document.getElementById('total-atleta').textContent = '—';
+    document.getElementById('bloque-notas').classList.remove('hidden');
+    document.getElementById('btn-next').classList.add('hidden');
+
+    document.getElementById('display-turno').innerHTML = `
+      <div class="turno-card">
+        <div class="turno-label">Atleta ${atletaIdx + 1} de ${g.atletas.length}</div>
+        <div class="turno-nombre">${a.nombre}</div>
+        <div class="turno-poomsae">${g.poomsae}</div>
+        <div class="turno-extra">${a.academia} · ${a.cinturon}</div>
+      </div>`;
+
+    socket.emit('mesa-turno', { codigo: salaActual, turnoIndex: atletaIdx, modo: 'cutoff' });
+    setCrono(90, `${a.nombre} · ${g.poomsae}`);
+    document.getElementById('bloque-crono').classList.remove('hidden');
+    actualizarBadge();
+  }
+
+  function actualizarBadge() {
+    const badge = document.getElementById('fase-badge');
+    const g = grupos[grupoIdx];
+    const a = g?.atletas[atletaIdx];
+    if (fase === 'corriendo') { badge.className = 'fase-badge ejecucion'; badge.textContent = `▶ ${a?.nombre || ''} · En ejecución`; }
+    else if (fase === 'detenido') { badge.className = 'fase-badge detenido'; badge.textContent = `⏹ ${a?.nombre || ''} · Jueces califican`; }
+    else { badge.className = 'fase-badge ejecucion'; badge.textContent = `▶ ${a?.nombre || ''} · Listo`; }
+  }
+
+  // ── CRONÓMETRO ──
+  function setCrono(seg, label) {
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    cronoSegundos = seg; cronoOriginal = seg;
+    document.getElementById('crono-label').textContent = label;
+    pintarCrono();
+  }
+  function pintarCrono() {
+    const m = Math.floor(cronoSegundos / 60), s = cronoSegundos % 60;
+    const el = document.getElementById('crono-display');
+    el.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+    el.className = (cronoSegundos <= 10 && cronoSegundos > 0) ? 'cronometro-display rojo' : 'cronometro-display';
+  }
+  function iniciarCrono() {
+    if (cronoInterval) return;
+    fase = 'corriendo';
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'iniciar', fase: 'p1_corriendo', poomsaeNum: 1 });
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'iniciar', duracion: cronoSegundos });
+    document.getElementById('btn-next').classList.add('hidden');
+    actualizarBadge();
+    cronoInterval = setInterval(() => {
+      cronoSegundos--; pintarCrono();
+      socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'tick', duracion: cronoSegundos });
+      if (cronoSegundos <= 0) detenerCrono();
+    }, 1000);
+  }
+  function detenerCrono() {
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    fase = 'detenido';
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'detener', duracion: cronoSegundos });
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'detener', fase: 'p1_detenido' });
+    document.getElementById('btn-next').classList.remove('hidden');
+    actualizarBadge();
+  }
+  function restablecerCrono() {
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    fase = 'listo';
+    cronoSegundos = cronoOriginal; pintarCrono();
+    document.getElementById('btn-next').classList.add('hidden');
+    socket.emit('mesa-cronometro', { codigo: salaActual, accion: 'restablecer', duracion: cronoOriginal });
+    socket.emit('mesa-control', { codigo: salaActual, accion: 'restablecer', fase: 'p1_listo' });
+    actualizarBadge();
+  }
+
+  // ── NOTAS ──
+  function actualizarNotas(data) {
+    const g = grupos[grupoIdx];
+    const a = g.atletas[atletaIdx];
+    if (!a) return;
+    notasActual.jueces[data.juezNum] = { ...data.desglose, presentacion: data.presentacion };
+    if (data.totalComp != null) {
+      notasActual.total = data.totalComp;
+      document.getElementById('total-atleta').textContent = data.totalComp.toFixed(2);
+    }
+    let html = '';
+    for (let i = 1; i <= numJueces; i++) {
+      const d = notasActual.jueces[i];
+      if (!d) {
+        html += `<div class="nota-juez-row"><span class="nota-juez-num">J${i}</span><span class="nota-juez-detalle" style="color:#333">—</span></div>`;
+      } else {
+        const tot = ((d.prec||0)+(d.vel||0)+(d.rit||0)+(d.exp||0)).toFixed(2);
+        html += `<div class="nota-juez-row"><span class="nota-juez-num">J${i}</span>
+          <span class="nota-juez-detalle">${(d.prec||0).toFixed(1)}/${(d.vel||0).toFixed(1)} ${(d.rit||0).toFixed(1)} ${(d.exp||0).toFixed(1)}</span>
+          <span class="nota-juez-val">${tot}</span></div>`;
+      }
+    }
+    document.getElementById('notas-rows').innerHTML = html;
+  }
+
+  // ── NEXT: confirmar atleta y pasar al siguiente ──
+  function presionarNext() {
+    if (notasActual.total == null) {
+      log('⏳ Faltan puntajes de jueces...');
+      return;
+    }
+    document.getElementById('btn-next').classList.add('hidden');
+    const g = grupos[grupoIdx];
+    const a = g.atletas[atletaIdx];
+    g.resultados.push({
+      nombre: a.nombre, academia: a.academia, cinturon: a.cinturon,
+      poomsae: g.poomsae, total: notasActual.total,
+      jueces: JSON.parse(JSON.stringify(notasActual.jueces))
+    });
+    socket.emit('mesa-revelar', { codigo: salaActual, turnoIndex: atletaIdx });
+    log(`✅ ${a.nombre}: ${notasActual.total.toFixed(2)}`);
+    atletaIdx++;
+    if (g.atletas[atletaIdx]) {
+      socket.emit('mesa-control', { codigo: salaActual, accion: 'nueva-competencia', fase: 'p1_listo' });
+      arrancarAtleta();
+    } else {
+      mostrarRankingGrupo();
+    }
+  }
+
+  // ── RANKING DEL GRUPO ──
+  function mostrarRankingGrupo() {
+    fase = 'grupo_ranking';
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    const g = grupos[grupoIdx];
+    document.getElementById('panel-control').classList.add('hidden');
+    document.getElementById('panel-ranking').classList.remove('hidden');
+    document.getElementById('ranking-grupo-nombre').textContent = g.nombre;
+
+    const orden = [...g.resultados].sort((x, y) => y.total - x.total);
+    const medalla = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+    document.getElementById('display-ranking').innerHTML = orden.map((r, i) => `
+      <div class="rank-item" style="${i === 0 ? 'border-color:#c9a84c' : ''}">
+        <span class="rank-pos">${medalla(i)}</span>
+        <span class="rank-nombre">${r.nombre}<div class="rank-sub">${r.academia}</div></span>
+        <span class="rank-total">${r.total.toFixed(2)}</span>
+      </div>`).join('');
+
+    const btnSig = document.getElementById('btn-siguiente-grupo');
+    btnSig.textContent = grupos[grupoIdx + 1] ? 'SIGUIENTE GRUPO ›' : 'FINALIZAR COMPETENCIA ✓';
+    btnSig.classList.remove('hidden');
+    document.getElementById('btn-exportar-pdf').classList.remove('hidden');
+    renderGrupos();
+    log(`🏆 Grupo ${grupoIdx + 1} terminado`);
+  }
+
+  // ── SIGUIENTE GRUPO ──
+  function siguienteGrupo() {
+    document.getElementById('btn-siguiente-grupo').classList.add('hidden');
+    if (!grupos[grupoIdx + 1]) { finDeLiga(); return; }
+    grupoIdx++;
+    arrancarGrupo();
+  }
+
+  function finDeLiga() {
+    document.getElementById('panel-control').classList.add('hidden');
+    document.getElementById('display-ranking').insertAdjacentHTML('afterbegin',
+      `<div style="text-align:center;color:#22c55e;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;margin-bottom:10px">COMPETENCIA FINALIZADA</div>`);
+    log('🏁 Liga finalizada');
+  }
+
+  // ── PDF (todos los grupos) ──
+  function exportarPDF() {
+    if (!grupos.some(g => g.resultados.length)) return alert('Aún no hay resultados.');
+    const fecha = new Date().toLocaleDateString('es-EC', { day:'2-digit', month:'long', year:'numeric' });
+    let secciones = '';
+    grupos.forEach((g, gi) => {
+      if (!g.resultados.length) return;
+      const orden = [...g.resultados].sort((x, y) => y.total - x.total);
+      const medalla = i => i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+      let filas = orden.map((r, i) => {
+        let cols = '';
+        for (let j = 1; j <= numJueces; j++) {
+          const d = r.jueces?.[j];
+          cols += d ? `<td>${((d.prec||0)+(d.vel||0)+(d.rit||0)+(d.exp||0)).toFixed(2)}</td>` : `<td style="color:#aaa">—</td>`;
+        }
+        return `<tr>
+          <td style="text-align:center;font-weight:700">${medalla(i)}</td>
+          <td>${r.nombre}</td>
+          <td style="font-size:9px;color:#666">${r.academia}</td>
+          ${cols}
+          <td style="font-weight:700">${r.total.toFixed(2)}</td>
+        </tr>`;
+      }).join('');
+      let thJueces = '';
+      for (let j = 1; j <= numJueces; j++) thJueces += `<th>J${j}</th>`;
+      secciones += `
+        <div class="grupo">
+          <div class="grupo-titulo">Grupo ${gi + 1}: ${g.nombre} <span style="color:#c9a84c">· ${g.poomsae}</span></div>
+          <table>
+            <thead><tr><th>Pos</th><th>Atleta</th><th>Academia</th>${thJueces}<th>Total</th></tr></thead>
+            <tbody>${filas}</tbody>
+          </table>
+        </div>`;
+    });
+    const html = `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Resultados ${nombreEvento}</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:Arial,sans-serif;font-size:11px;color:#111;padding:20px}
+  h1{font-size:18px;letter-spacing:2px;text-transform:uppercase;margin-bottom:2px}
+  .meta{font-size:10px;color:#999;margin-bottom:20px;border-bottom:2px solid #c9a84c;padding-bottom:8px}
+  .grupo{margin-bottom:24px;page-break-inside:avoid}
+  .grupo-titulo{font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:#1a1a1a;color:#fff;padding:6px 10px;border-radius:4px;margin-bottom:6px}
+  table{width:100%;border-collapse:collapse;font-size:10px}
+  th{background:#1a1a1a;color:#c9a84c;padding:4px 5px;text-align:center;font-size:9px}
+  td{padding:3px 6px;border-bottom:1px solid #eee}
+  @page{margin:15mm}
+</style></head><body>
+  <h1>Resultados — ${nombreEvento || 'Liga'}</h1>
+  <div class="meta">Sala: ${salaActual} · Fecha: ${fecha} · Jueces: ${numJueces}</div>
+  ${secciones}
+  <div style="margin-top:20px;font-size:9px;color:#bbb;text-align:center;border-top:1px solid #eee;padding-top:8px">Generado el ${fecha} — Sistema de Calificación Poomsae</div>
+</body></html>`;
+    const v = window.open('', '_blank');
+    v.document.write(html); v.document.close(); v.onload = () => v.print();
+  }
+
+  // ── MODAL ──
+  let _accionModal = null;
+  function confirmarReset() {
+    _accionModal = () => socket.emit('mesa-eliminar-sala', { codigo: salaActual });
+    document.getElementById('modal-titulo').textContent = 'RESETEAR CANCHA';
+    document.getElementById('modal-body').innerHTML = `Se elimina la sala <strong style="color:#c9a84c">${salaActual}</strong> y todos sus datos. Los jueces serán desconectados.`;
+    document.getElementById('modal-overlay').classList.remove('hidden');
+  }
+  function cerrarModal() { document.getElementById('modal-overlay').classList.add('hidden'); _accionModal = null; }
+  function ejecutarModal() { const a = _accionModal; cerrarModal(); if (typeof a === 'function') a(); }
+
+  // ── RENDER JUECES ──
+  function renderJueces(jueces) {
+    let html = '';
+    for (let i = 1; i <= numJueces; i++) {
+      const c = jueces.find(j => j.num === i);
+      html += `<div class="juez-chip ${c ? 'activo' : ''}"><div class="juez-dot ${c ? 'activo' : ''}"></div>
+        <span class="juez-txt">J${i}${c?.nombre ? ' · ' + c.nombre : ''}</span></div>`;
+    }
+    document.getElementById('display-jueces').innerHTML = html;
+  }
+
+  function log(msg) {
+    const div = document.getElementById('log');
+    div.innerHTML += `<div>${new Date().toLocaleTimeString()} — ${msg}</div>`;
+    div.scrollTop = div.scrollHeight;
+  }
+
+  // ════════ SOCKET ════════
+  socket.on('connect', () => { if (salaActual) socket.emit('mesa-reconectar', { codigo: salaActual }); });
+
+  socket.on('error-sala', () => {
+    salaActual = null;
+    document.getElementById('error-sala-msg').classList.remove('hidden');
+  });
+
+  socket.on('sala-creada', (data) => {
+    numJueces = data.numJueces;
+    document.getElementById('seccion-setup').classList.add('hidden');
+    document.getElementById('seccion-sala').classList.remove('hidden');
+    document.getElementById('display-codigo').textContent = data.codigo;
+    document.getElementById('display-evento').textContent = nombreEvento || 'LIGA';
+    document.getElementById('header-badge').textContent = data.codigo;
+    renderJueces([]);
+    log('Cancha creada');
+  });
+
+  socket.on('competencia-iniciada', () => {
+    // Servidor confirmó el grupo cargado → arrancar primer atleta
+    arrancarAtleta();
+  });
+
+  socket.on('juez-conectado', (data) => { renderJueces(data.jueces); if (data.numJuez > 0) log(`Juez ${data.numJuez} conectado`); });
+  socket.on('juez-desconectado', (data) => { renderJueces(data.jueces); });
+
+  socket.on('puntaje-recibido', (data) => {
+    if (!data.desglose) return;
+    actualizarNotas(data);
+  });
+
+  socket.on('sala-eliminada', () => {
+    salaActual = null; atletas = []; grupos = []; grupoIdx = 0; atletaIdx = 0;
+    if (cronoInterval) { clearInterval(cronoInterval); cronoInterval = null; }
+    document.getElementById('seccion-sala').classList.add('hidden');
+    document.getElementById('seccion-setup').classList.remove('hidden');
+    document.getElementById('panel-control').classList.add('hidden');
+    document.getElementById('panel-ranking').classList.add('hidden');
+    document.getElementById('panel-carga').classList.remove('hidden');
+    document.getElementById('panel-grupos').classList.add('hidden');
+    document.getElementById('header-badge').textContent = 'Mesa Liga';
+    log('Cancha resateada');
+  });
+</script>
+</body>
+</html>
