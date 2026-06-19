@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración · Poomsae Scoring</title>
+  <link href="/fonts/fonts.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh; padding: 24px; }
+    .wrap { max-width: 720px; margin: 0 auto; }
+    .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 6px; color: #c9a84c; }
+    .links a, .links button {
+      font-size: 11px; letter-spacing: 1px; color: #c9a84c; background: none;
+      border: 1px solid #3a3000; border-radius: 8px; padding: 7px 12px; cursor: pointer;
+      text-decoration: none; margin-left: 8px;
+    }
+    .panel { background: #141414; border: 1px solid #222; border-radius: 16px; padding: 22px; margin-bottom: 18px; }
+    .panel h2 { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: #c9a84c; margin-bottom: 14px; }
+    label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #777; text-transform: uppercase; display: block; margin-bottom: 4px; }
+    input, select {
+      background: #0e0e0e; border: 1px solid #2a2a2a; border-radius: 10px; color: #fff;
+      padding: 10px 12px; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; width: 100%;
+    }
+    input:focus, select:focus { border-color: #c9a84c; }
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+    .btn { background: #c9a84c; color: #000; border: none; padding: 11px 16px; font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px; letter-spacing: 2px; border-radius: 10px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; font-size: 10px; letter-spacing: 2px; color: #666; text-transform: uppercase; padding: 8px; border-bottom: 1px solid #222; }
+    td { padding: 10px 8px; border-bottom: 1px solid #1a1a1a; font-size: 14px; }
+    .rol { font-family: 'Bebas Neue', sans-serif; letter-spacing: 1px; color: #c9a84c; }
+    .estado-ok { color: #22c55e; } .estado-off { color: #ff6b6b; }
+    .mini { font-size: 11px; padding: 5px 9px; border-radius: 7px; border: 1px solid #333; background: none; color: #ccc; cursor: pointer; margin-left: 6px; }
+    .mini.danger { color: #ff6b6b; border-color: #3a0000; }
+    .error { color: #ff6b6b; font-size: 12px; min-height: 16px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <div class="logo">ADMINISTRACIÓN</div>
+      <div class="links">
+        <a href="/index.html">← Inicio</a>
+        <button onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Crear / actualizar usuario</h2>
+      <div class="row">
+        <div><label>Usuario</label><input id="nuevo-usuario" autocapitalize="none"></div>
+        <div><label>Contraseña</label><input id="nueva-clave" type="text" placeholder="mín. 6 caracteres"></div>
+        <div><label>Rol</label>
+          <select id="nuevo-rol">
+            <option value="juez">Juez</option>
+            <option value="mesa">Mesa / Operador</option>
+            <option value="pantalla">Pantalla</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <div><button class="btn" onclick="crear()">GUARDAR</button></div>
+      </div>
+      <div class="error" id="error-crear"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Usuarios</h2>
+      <table>
+        <thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="tabla-usuarios"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function cargar() {
+      const r = await fetch('/api/users');
+      if (!r.ok) { document.body.innerHTML = '<p style="padding:40px">No autorizado.</p>'; return; }
+      const users = await r.json();
+      const tb = document.getElementById('tabla-usuarios');
+      tb.innerHTML = users.map(u => `
+        <tr>
+          <td>${u.username}</td>
+          <td class="rol">${u.role.toUpperCase()}</td>
+          <td class="${u.enabled ? 'estado-ok' : 'estado-off'}">${u.enabled ? 'Activo' : 'Deshabilitado'}</td>
+          <td style="text-align:right">
+            <button class="mini" onclick="habilitar('${u.username}', ${!u.enabled})">${u.enabled ? 'Deshabilitar' : 'Habilitar'}</button>
+            <button class="mini danger" onclick="eliminar('${u.username}')">Eliminar</button>
+          </td>
+        </tr>`).join('');
+    }
+    async function crear() {
+      const err = document.getElementById('error-crear'); err.textContent = '';
+      const body = {
+        username: document.getElementById('nuevo-usuario').value.trim(),
+        password: document.getElementById('nueva-clave').value,
+        role: document.getElementById('nuevo-rol').value,
+      };
+      const r = await fetch('/api/users', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const d = await r.json();
+      if (!r.ok) { err.textContent = d.error || 'Error'; return; }
+      document.getElementById('nuevo-usuario').value = '';
+      document.getElementById('nueva-clave').value = '';
+      cargar();
+    }
+    async function habilitar(username, enabled) {
+      await fetch('/api/users/habilitar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username, enabled }) });
+      cargar();
+    }
+    async function eliminar(username) {
+      if (!confirm(`¿Eliminar al usuario "${username}"?`)) return;
+      const r = await fetch('/api/users/eliminar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username }) });
+      if (!r.ok) { const d = await r.json(); alert(d.error || 'Error'); }
+      cargar();
+    }
+    async function cerrarSesion() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    }
+    cargar();
+  </script>
+</body>
+</html>

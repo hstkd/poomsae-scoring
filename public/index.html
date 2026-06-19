@@ -63,7 +63,23 @@
     </a>
   </div>
 
+  <div style="margin-top:24px; display:flex; gap:10px">
+    <a id="link-admin" href="/admin.html" style="display:none; font-size:11px; letter-spacing:1px; color:#c9a84c; border:1px solid #3a3000; border-radius:8px; padding:7px 14px; text-decoration:none">⚙ Administración</a>
+    <button onclick="cerrarSesion()" style="font-size:11px; letter-spacing:1px; color:#888; background:none; border:1px solid #2a2a2a; border-radius:8px; padding:7px 14px; cursor:pointer">Cerrar sesión</button>
+  </div>
+
   <div class="footer">Henry Sigchos Taekwondo · HSTKD</div>
+
+  <script>
+    // Mostrar "Administración" solo si el usuario es admin
+    fetch('/api/me').then(r => r.ok ? r.json() : null).then(u => {
+      if (u && u.role === 'admin') document.getElementById('link-admin').style.display = 'inline-block';
+    }).catch(() => {});
+    async function cerrarSesion() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    }
+  </script>
 
 </body>
 </html>
