@@ -125,10 +125,10 @@
   <div class="panel">
     <div class="panel-titulo">Crear Sala</div>
     <label class="input-label">Código de Sala</label>
-    <input class="input-field" id="input-codigo" type="text" maxlength="8" placeholder="FINAL1" style="text-transform:uppercase"
+    <input class="input-field" id="input-codigo" type="text" maxlength="8" aria-label="Código de sala" placeholder="FINAL1" style="text-transform:uppercase"
       oninput="limpiarErrorSala()">
     <label class="input-label">Categoría</label>
-    <input class="input-field" id="input-categoria" type="text" placeholder="ej: CADETE MASCULINO" style="text-transform:uppercase;font-size:13px;letter-spacing:1px">
+    <input class="input-field" id="input-categoria" type="text" aria-label="Categoría" placeholder="ej: CADETE MASCULINO" style="text-transform:uppercase;font-size:13px;letter-spacing:1px">
     <label class="input-label">Ronda</label>
     <select class="input-field" id="input-ronda">
       <option value="ELIMINATORIA">Eliminatoria</option>
@@ -206,8 +206,8 @@
   <div class="panel" id="panel-competidores">
     <div class="panel-titulo">Competidores</div>
     <div class="add-row" style="margin-bottom:10px">
-      <input class="input-field" id="input-competidor" type="text" placeholder="NOMBRE" style="text-transform:uppercase">
-      <button class="btn-add" onclick="agregarCompetidor()">+</button>
+      <input class="input-field" id="input-competidor" type="text" aria-label="Nombre del competidor" placeholder="NOMBRE" style="text-transform:uppercase">
+      <button class="btn-add" onclick="agregarCompetidor()" aria-label="Agregar competidor">+</button>
     </div>
     <div id="lista-competidores"></div>
     <button class="btn-green" onclick="iniciarCompetencia()" style="margin-top:4px">INICIAR COMPETENCIA</button>
@@ -303,8 +303,8 @@
       <label class="input-label">Poomsae Atleta Azul</label>
       <div class="add-row" style="margin-bottom:6px">
         <input class="input-field" id="input-poomsae-sec-A" type="text"
-          placeholder="ej: KORYO" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
-        <button class="btn-add" onclick="confirmarPoomsaeSec('A')">✓</button>
+          aria-label="Poomsae del atleta azul" placeholder="ej: KORYO" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
+        <button class="btn-add" onclick="confirmarPoomsaeSec('A')" aria-label="Confirmar poomsae del atleta azul">✓</button>
       </div>
       <div id="display-poomsae-sec-A"
         style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;
@@ -312,8 +312,8 @@
       <label class="input-label">Poomsae Atleta Rojo</label>
       <div class="add-row" style="margin-bottom:6px">
         <input class="input-field" id="input-poomsae-sec-B" type="text"
-          placeholder="ej: KEUMGANG" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
-        <button class="btn-add" onclick="confirmarPoomsaeSec('B')">✓</button>
+          aria-label="Poomsae del atleta rojo" placeholder="ej: KEUMGANG" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
+        <button class="btn-add" onclick="confirmarPoomsaeSec('B')" aria-label="Confirmar poomsae del atleta rojo">✓</button>
       </div>
       <div id="display-poomsae-sec-B"
         style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;
@@ -412,16 +412,16 @@
       <label class="input-label">1ra Poomsae</label>
       <div class="add-row" style="margin-bottom:6px">
         <input class="input-field" id="input-poomsae-cut-1" type="text"
-          placeholder="ej: KORYO" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
-        <button class="btn-add" onclick="confirmarPoomsaeCut(1)">✓</button>
+          aria-label="Primera poomsae" placeholder="ej: KORYO" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
+        <button class="btn-add" onclick="confirmarPoomsaeCut(1)" aria-label="Confirmar primera poomsae">✓</button>
       </div>
       <div id="display-poomsae-cut-1"
         style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#333;text-align:center;margin-bottom:8px">— Sin confirmar —</div>
       <label class="input-label">2da Poomsae</label>
       <div class="add-row" style="margin-bottom:6px">
         <input class="input-field" id="input-poomsae-cut-2" type="text"
-          placeholder="ej: KEUMGANG" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
-        <button class="btn-add" onclick="confirmarPoomsaeCut(2)">✓</button>
+          aria-label="Segunda poomsae" placeholder="ej: KEUMGANG" style="text-transform:uppercase;letter-spacing:2px;margin-bottom:0">
+        <button class="btn-add" onclick="confirmarPoomsaeCut(2)" aria-label="Confirmar segunda poomsae">✓</button>
       </div>
       <div id="display-poomsae-cut-2"
         style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#333;text-align:center;margin-bottom:4px">— Sin confirmar —</div>
@@ -478,7 +478,7 @@
     <div class="panel-titulo">Ranking en Vivo</div>
     <div id="display-ranking"></div>
     <div class="corte-row">
-      <input class="input-field" id="input-topN" type="number" placeholder="Top N pasan" min="1">
+      <input class="input-field" id="input-topN" type="number" aria-label="Cantidad que pasa el corte" placeholder="Top N pasan" min="1">
       <button class="btn-gold" style="width:auto;padding:11px 16px;white-space:nowrap" onclick="definirCorte()">CORTE</button>
     </div>
   </div>
@@ -490,6 +490,29 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io({ reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+
+  // ── SEGURIDAD: token de mesa ──
+  // Se recibe del servidor al crear/reconectar la sala y se adjunta
+  // automáticamente a todos los eventos de control (mesa-*) salvo la creación.
+  let mesaToken = null;
+  const _emitOriginal = socket.emit.bind(socket);
+  socket.emit = function (evento, payload, ...resto) {
+    if (typeof evento === 'string' && evento.startsWith('mesa-') &&
+        evento !== 'mesa-crear-sala' && mesaToken &&
+        payload && typeof payload === 'object') {
+      payload = Object.assign({}, payload, { token: mesaToken });
+    }
+    return _emitOriginal(evento, payload, ...resto);
+  };
+  function guardarToken(codigo, token) {
+    if (!token) return;
+    mesaToken = token;
+    try { localStorage.setItem('mesaToken:' + codigo, token); } catch (e) {}
+  }
+  function cargarToken(codigo) {
+    if (mesaToken) return;
+    try { mesaToken = localStorage.getItem('mesaToken:' + codigo); } catch (e) {}
+  }
 
   // ── ESTADO GLOBAL ──
   let salaActual = null;
@@ -541,7 +564,7 @@
     grupoCategoria = document.getElementById('input-grupo').value;
     tipo = document.getElementById('input-tipo').value;
     modo = document.getElementById('input-modo').value;
-    numJueces = parseInt(document.getElementById('input-jueces').value);
+    numJueces = parseInt(document.getElementById('input-jueces').value, 10);
     if (!codigo) return alert('Ingresa un código de sala');
     if (!categoria) return alert('Ingresa la categoría');
     limpiarErrorSala();
@@ -570,8 +593,8 @@
           <div class="comp-item" id="comp-item-${i}">
             <span class="comp-num" style="${colorLabel}">${i + 1}</span>
             <span class="comp-nombre">${c.nombre}</span>
-            <button class="btn-edit" onclick="iniciarEdicion(${i})" title="Editar nombre">✏️</button>
-            <button class="btn-del" onclick="eliminarCompetidor(${i})">✕</button>
+            <button class="btn-edit" onclick="iniciarEdicion(${i})" aria-label="Editar nombre del competidor ${i + 1}" title="Editar nombre">✏️</button>
+            <button class="btn-del" onclick="eliminarCompetidor(${i})" aria-label="Eliminar competidor ${i + 1}">✕</button>
           </div>`;
       }).join('');
 }
@@ -1788,7 +1811,7 @@
 
 
     function definirCorte() {
-    const topN = parseInt(document.getElementById('input-topN').value);
+    const topN = parseInt(document.getElementById('input-topN').value, 10);
     if (!topN) return alert('Ingresa cuántos pasan');
     if (tipo === 'freestyle') {
       topNLocalFS = topN;
@@ -1876,9 +1899,10 @@
     item.innerHTML = `
       <span class="comp-num" style="${colorLabel}">${i + 1}</span>
       <input class="comp-edit-input" id="edit-input-${i}" value="${nombreActual}" maxlength="40"
+        aria-label="Nuevo nombre del competidor ${i + 1}"
         onkeydown="if(event.key==='Enter')confirmarEdicion(${i});if(event.key==='Escape')cancelarEdicion()">
-      <button class="btn-edit-ok" onclick="confirmarEdicion(${i})">✓</button>
-      <button class="btn-edit-cancel" onclick="cancelarEdicion()" style="padding:6px 8px">✕</button>
+      <button class="btn-edit-ok" onclick="confirmarEdicion(${i})" aria-label="Guardar nombre">✓</button>
+      <button class="btn-edit-cancel" onclick="cancelarEdicion()" aria-label="Cancelar edición" style="padding:6px 8px">✕</button>
     `;
     setTimeout(() => {
       const inp = document.getElementById(`edit-input-${i}`);
@@ -2188,6 +2212,7 @@
   socket.on('connect', () => {
     if (salaActual) {
       // Re-emitir unión a sala para recibir estado actual
+      cargarToken(salaActual);
       socket.emit('mesa-reconectar', { codigo: salaActual });
     }
   });
@@ -2200,6 +2225,7 @@
 
   socket.on('sala-creada', (data) => {
     // Guardar variables de sala desde servidor (fuente de verdad al reconectar)
+    guardarToken(data.codigo, data.token);   // SEGURIDAD: token de control
     numJueces      = data.numJueces;
     modo           = data.modo;
     tipo           = data.tipo;

@@ -104,9 +104,9 @@
   <div class="panel">
     <div class="panel-titulo">Crear Cancha</div>
     <label class="input-label">Código de Sala</label>
-    <input class="input-field" id="input-codigo" type="text" maxlength="8" placeholder="CANCHA1" style="text-transform:uppercase">
+    <input class="input-field" id="input-codigo" type="text" maxlength="8" aria-label="Código de cancha" placeholder="CANCHA1" style="text-transform:uppercase">
     <label class="input-label">Nombre del Evento</label>
-    <input class="input-field" id="input-evento" type="text" placeholder="ej: COPA HSTKD 2026" style="text-transform:uppercase;font-size:13px">
+    <input class="input-field" id="input-evento" type="text" aria-label="Nombre del evento" placeholder="ej: COPA HSTKD 2026" style="text-transform:uppercase;font-size:13px">
     <label class="input-label">Número de Jueces</label>
     <select class="input-field" id="input-jueces">
       <option value="3">3 Jueces</option>
@@ -139,7 +139,7 @@
       <div class="drop-txt">Toca para elegir tu archivo Excel</div>
       <div class="drop-sub">Columnas: Nombre · Categoría · Género · Cinturón · Academia</div>
     </div>
-    <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" class="hidden" onchange="cargarExcel(event)">
+    <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" class="hidden" aria-label="Cargar archivo Excel de atletas" onchange="cargarExcel(event)">
     <div id="resumen-carga" class="hidden" style="margin-top:10px;font-size:11px;color:#aaa;text-align:center"></div>
   </div>
 
@@ -215,6 +215,27 @@
 <script>
   const socket = io({ reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
 
+  // ── SEGURIDAD: token de mesa (se adjunta a todos los eventos mesa-*) ──
+  let mesaToken = null;
+  const _emitOriginal = socket.emit.bind(socket);
+  socket.emit = function (evento, payload, ...resto) {
+    if (typeof evento === 'string' && evento.startsWith('mesa-') &&
+        evento !== 'mesa-crear-sala' && mesaToken &&
+        payload && typeof payload === 'object') {
+      payload = Object.assign({}, payload, { token: mesaToken });
+    }
+    return _emitOriginal(evento, payload, ...resto);
+  };
+  function guardarToken(codigo, token) {
+    if (!token) return;
+    mesaToken = token;
+    try { localStorage.setItem('mesaToken:' + codigo, token); } catch (e) {}
+  }
+  function cargarToken(codigo) {
+    if (mesaToken) return;
+    try { mesaToken = localStorage.getItem('mesaToken:' + codigo); } catch (e) {}
+  }
+
   // ── TABLA CINTURÓN → POOMSAE ──
   const POOMSAE_POR_CINTURON = {
     'BLANCO': 'Taegeuk 1 Jang',
@@ -258,7 +279,7 @@
   function crearSala() {
     const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
     nombreEvento = document.getElementById('input-evento').value.trim().toUpperCase();
-    numJueces = parseInt(document.getElementById('input-jueces').value);
+    numJueces = parseInt(document.getElementById('input-jueces').value, 10);
     if (!codigo) return alert('Ingresa un código de sala');
     salaActual = codigo;
     // Modo liga corre sobre cutoff en el servidor (1 poomsae, ranking)
@@ -643,7 +664,7 @@
   }
 
   // ════════ SOCKET ════════
-  socket.on('connect', () => { if (salaActual) socket.emit('mesa-reconectar', { codigo: salaActual }); });
+  socket.on('connect', () => { if (salaActual) { cargarToken(salaActual); socket.emit('mesa-reconectar', { codigo: salaActual }); } });
 
   socket.on('error-sala', () => {
     salaActual = null;
@@ -651,6 +672,7 @@
   });
 
   socket.on('sala-creada', (data) => {
+    guardarToken(data.codigo, data.token);   // SEGURIDAD: token de control
     numJueces = data.numJueces;
     document.getElementById('seccion-setup').classList.add('hidden');
     document.getElementById('seccion-sala').classList.remove('hidden');

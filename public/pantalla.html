@@ -481,6 +481,76 @@
     body.claro .footer { background: #f4f4f0; border-top-color: #ddd; }
     body.claro .footer-txt { color: #999; }
 
+    /* Botón de tema */
+    body.claro #btn-tema { border-color: #b8860b; color: #b8860b; }
+
+    /* Login */
+    body.claro #overlay-login { background: #f4f4f0; }
+    body.claro .login-titulo { color: #b8860b; text-shadow: none; }
+    body.claro .login-sub { color: #999; }
+    body.claro .login-input { background: #fff; border-color: #ccc; color: #1a1a1a; }
+    body.claro .login-input:focus { border-color: #b8860b; }
+    body.claro .espera-sub { color: #bbb; }
+
+    /* Animación de sorteo */
+    body.claro #overlay-sorteo { background: rgba(244,244,240,0.94); }
+    body.claro .sorteo-titulo { color: #999; }
+    body.claro .sorteo-ruleta, body.claro .sorteo-card-nombre { color: #b8860b; text-shadow: none; }
+    body.claro .sorteo-card { background: #fff; border-color: #e0e0e0; }
+    body.claro .sorteo-card.activa { border-color: #b8860b; box-shadow: 0 0 20px rgba(184,134,11,0.25); }
+    body.claro .sorteo-card-label { color: #999; }
+
+    /* Banner de poomsae */
+    body.claro .poomsae-banner { background: rgba(255,255,255,0.9); border-bottom-color: #b8860b; }
+    body.claro .poomsae-banner-nombre, body.claro .poomsae-banner-ambas { color: #b8860b; text-shadow: none; }
+    body.claro .poomsae-banner-label { color: #999; }
+
+    /* Chips de score P1 */
+    body.claro .score-p1-chip { background: rgba(255,255,255,0.92); border-color: #ddd; }
+    body.claro .score-p1-chip-label { color: #999; }
+    body.claro .score-p1-chip-nombre { color: #777; }
+    body.claro .score-p1-chip-val { color: #b8860b; }
+
+    /* Etiquetas y textos secundarios */
+    body.claro .comp-etiqueta, body.claro .turno-etiqueta, body.claro .sec-total-label,
+    body.claro .crono-label-txt, body.claro .resumen-fila-label,
+    body.claro .resumen-promedio-label, body.claro .nota-juez-id { color: #999; }
+
+    /* Círculos de jueces */
+    body.claro .jcircle { background: #e8e8e0; border-color: #ccc; color: #aaa; }
+    body.claro .jdot { background: #ddd; border-color: #ccc; }
+
+    /* VS central */
+    body.claro .vs-txt, body.claro .resumen-vs { color: #ccc; }
+    body.claro .centro-vs { border-left-color: #e0e0e0; border-right-color: #e0e0e0; }
+
+    /* Nombres por lado (mejor contraste sobre fondo claro) */
+    body.claro .lado-rojo .comp-nombre-g, body.claro .sec-nombre.rojo { color: #c0392b; }
+    body.claro .lado-azul .comp-nombre-g, body.claro .sec-nombre.azul { color: #2a5bd7; }
+    body.claro .lado-rojo.ganador { background: linear-gradient(135deg,#ffe0e0,#ffd0d0); }
+    body.claro .lado-azul.ganador { background: linear-gradient(225deg,#e0e8ff,#d0ddff); }
+
+    /* Overlay de ganador (texto blanco → legible) */
+    body.claro .ganador-overlay { background: rgba(244,244,240,0.7); }
+    body.claro .ganador-texto-grande { color: #b8860b; text-shadow: none; }
+    body.claro .ganador-nombre-sub { color: #1a1a1a; }
+
+    /* Valores grandes que eran blancos */
+    body.claro .resumen-promedio-val, body.claro .cmp-val { color: #1a1a1a; }
+    body.claro .resumen-promedio { border-top-color: rgba(0,0,0,0.15); }
+    body.claro .resumen-fila-score { border-bottom-color: rgba(0,0,0,0.08); }
+    body.claro .resumen-ganador-banner { color: #b8860b; }
+
+    /* Tarjetas de comparación (resumen y secuencial) */
+    body.claro .resumen-comp-card.rojo-card,
+    body.claro .cmp-card.rojo { background: linear-gradient(135deg,#fff0f0,#ffe5e5); border-color: #dc2626; }
+    body.claro .resumen-comp-card.azul-card,
+    body.claro .cmp-card.azul { background: linear-gradient(135deg,#f0f4ff,#e5ecff); border-color: #3b82f6; }
+    body.claro .resumen-comp-card.rojo-card .resumen-comp-nombre,
+    body.claro .cmp-card.rojo .cmp-nombre { color: #c0392b; }
+    body.claro .resumen-comp-card.azul-card .resumen-comp-nombre,
+    body.claro .cmp-card.azul .cmp-nombre { color: #2a5bd7; }
+
   </style>
 </head>
 <body>
@@ -490,7 +560,7 @@
   <div class="login-titulo">POOMSAE</div>
   <div class="login-sub">Pantalla de Resultados</div>
   <input class="login-input" id="input-sala" type="text" maxlength="8"
-    placeholder="CÓDIGO" style="text-transform:uppercase"
+    aria-label="Código de sala" placeholder="CÓDIGO" style="text-transform:uppercase"
     onkeydown="if(event.key==='Enter') conectar()">
   <button class="btn-login" onclick="conectar()">CONECTAR</button>
 </div>
@@ -500,7 +570,7 @@
   <div class="header-logo">POOMSAE</div>
   <div class="header-centro" id="header-centro">—</div>
   <div class="header-derecha">
-    <button onclick="toggleTema()" style="background:none;border:1px solid #c9a84c;color:#c9a84c;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:14px">◐</button>
+    <button id="btn-tema" onclick="toggleTema()" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar a modo claro" style="background:none;border:1px solid #c9a84c;color:#c9a84c;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:14px">◐</button>
     <div class="header-sala" id="header-sala">—</div>
     <div class="jueces-dots" id="jueces-dots"></div>
   </div>
@@ -684,9 +754,25 @@
     if (!codigo) return;
     socket.emit('juez-unirse', { codigo, nombre: 'Pantalla', numJuez: 0 });
   }
-    function toggleTema() {
-    document.body.classList.toggle('claro');
+    function aplicarTema(claro) {
+    document.body.classList.toggle('claro', claro);
+    const btn = document.getElementById('btn-tema');
+    if (btn) {
+      btn.textContent = claro ? '☀' : '◐';
+      btn.title = claro ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro';
+    }
   }
+  function toggleTema() {
+    const claro = !document.body.classList.contains('claro');
+    try { localStorage.setItem('pantallaTema', claro ? 'claro' : 'oscuro'); } catch (e) {}
+    aplicarTema(claro);
+  }
+  // Aplicar el tema guardado al cargar (el script corre tras <body>, body ya existe)
+  (function initTema() {
+    let guardado = null;
+    try { guardado = localStorage.getItem('pantallaTema'); } catch (e) {}
+    aplicarTema(guardado === 'claro');
+  })();
 
   // ── ANIMACIÓN DE SORTEO ──
   let sorteoP1 = null, sorteoP2 = null;
@@ -975,7 +1061,7 @@
 
   function secParseFase(f) {       // 'p1A_corriendo' → {p:1, atleta:'A'}
     if (!f || f.length < 3) return null;
-    return { p: parseInt(f[1]), atleta: f[2] };
+    return { p: parseInt(f[1], 10), atleta: f[2] };
   }
 
     function secReset() {
