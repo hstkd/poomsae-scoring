@@ -16,6 +16,47 @@ app.use(express.static('public'));
 
 const salas = {};
 
+// ── SEGURIDAD: saneo de nombres (anti-XSS) ──
+// Los nombres se renderizan vía innerHTML/atributos/onclick en los clientes.
+// Quitamos los caracteres que permiten romper esos contextos (< > " ' & `).
+// Un nombre de persona nunca necesita estos caracteres.
+function sanitizeName(s) {
+  return String(s == null ? '' : s)
+    .replace(/[<>"'`&]/g, '')
+    .trim()
+    .slice(0, 40);
+}
+
+// ── SEGURIDAD: validación de puntajes ──
+function numEnRango(v, min, max) {
+  return typeof v === 'number' && isFinite(v) && v >= min && v <= max;
+}
+
+// Valida y normaliza el desglose técnico (acepta solo números 0-10).
+function sanitizeDesglose(d) {
+  if (!d || typeof d !== 'object') return {};
+  const out = {};
+  for (const k of ['prec', 'vel', 'rit', 'exp']) {
+    out[k] = numEnRango(d[k], 0, 10) ? d[k] : 0;
+  }
+  return out;
+}
+
+// ── SEGURIDAD: token de mesa ──
+// Cada sala emite un token secreto en su creación. Solo quien lo posee puede
+// emitir eventos de control (iniciar, eliminar, reconectar como mesa, etc.).
+function generarToken() {
+  return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+}
+
+// Devuelve true si el socket está autorizado como mesa de esa sala.
+function autorizarMesa(sala, token, socket) {
+  if (!sala) return false;
+  if (sala.mesaToken && token === sala.mesaToken) return true;
+  socket.emit('error-sala', { msg: 'No autorizado para controlar esta sala' });
+  return false;
+}
+
 function calcularTotal(puntajes, numJueces) {
   if (puntajes.length < numJueces) return null;
   const valores = puntajes.map(p => p.precision + p.presentacion);
@@ -94,6 +135,7 @@ io.on('connection', (socket) => {
       socket.emit('error-sala', { msg: 'Esa sala ya existe' });
       return;
     }
+    const mesaToken = generarToken();
     salas[codigo] = {
       codigo, tipo, modo, numJueces,
       categoria, ronda, grupoCategoria,
@@ -102,6 +144,7 @@ io.on('connection', (socket) => {
       turnoIndex: 0,
       estado: 'setup',
       mesaId: socket.id,
+      mesaToken,                // SEGURIDAD: secreto de control de la mesa
       poomsae1: null,
       poomsae2: null,
       faseActual: 'sorteo',
@@ -110,17 +153,22 @@ io.on('connection', (socket) => {
       notasSnapshot: {},        // FIX #2: almacén de notas para replay
     };
     socket.join(codigo);
-    socket.emit('sala-creada', { codigo, tipo, modo, numJueces, categoria, ronda, grupoCategoria });
+    socket.emit('sala-creada', { codigo, tipo, modo, numJueces, categoria, ronda, grupoCategoria, token: mesaToken });
     console.log(`Sala creada: ${codigo}`);
   });
 
   // ── MESA: INICIAR COMPETENCIA ──
-  socket.on('mesa-iniciar', ({ codigo, competidores, modo, tipo }) => {
+  socket.on('mesa-iniciar', ({ codigo, competidores, modo, tipo, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
+    if (!Array.isArray(competidores) || competidores.length === 0 || competidores.length > 200) {
+      socket.emit('error-sala', { msg: 'Lista de competidores inválida' });
+      return;
+    }
     sala.competidores = competidores.map((c, i) => ({
       id: i,
-      nombre: c.nombre,
+      nombre: sanitizeName(c && c.nombre),
       puntajesP1: [],
       puntajesP2: [],
       totalP1: null,
@@ -141,9 +189,10 @@ io.on('connection', (socket) => {
   });
 
   // ── MESA: TURNO ──
-  socket.on('mesa-turno', ({ codigo, turnoIndex }) => {
+  socket.on('mesa-turno', ({ codigo, turnoIndex, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     // FIX #6: resetear snapshot solo cuando cambia el enfrentamiento
     if (sala.turnoIndex !== turnoIndex) {
       sala.notasSnapshot = {};
@@ -213,17 +262,19 @@ io.on('connection', (socket) => {
   });
 
   // ── MESA: FASE ──
-  socket.on('mesa-fase', ({ codigo, fase }) => {
+  socket.on('mesa-fase', ({ codigo, fase, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     sala.faseActual = fase;
     io.to(codigo).emit('fase-actualizada', { fase });
   });
 
   // ── MESA: CONTROL ──
-  socket.on('mesa-control', ({ codigo, accion, fase, poomsae }) => {
+  socket.on('mesa-control', ({ codigo, accion, fase, poomsae, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     if (fase) sala.faseActual = fase;
     sala.cronoActivo = (accion === 'iniciar');
     // Limpiar snapshot al iniciar nueva competencia o nueva poomsae
@@ -239,6 +290,7 @@ io.on('connection', (socket) => {
   socket.on('juez-precision', ({ codigo, competidorId, precision, poomsae }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!numEnRango(precision, 0, 10)) return; // SEGURIDAD: rango válido
     const numJuez = socket.data.numJuez;
     io.to(codigo).emit('precision-recibida', {
       competidorId, juezNum: numJuez, precision, poomsae,
@@ -249,6 +301,15 @@ io.on('connection', (socket) => {
   socket.on('juez-puntaje', ({ codigo, competidorId, precision, presentacion, desglose, poomsae }) => {
     const sala = salas[codigo];
     if (!sala) return;
+
+    // SEGURIDAD: validar puntajes antes de aceptarlos (no confiar en el cliente)
+    if (!numEnRango(precision, 0, 10) || !numEnRango(presentacion, 0, 10)) {
+      console.log(`⚠️ Puntaje fuera de rango rechazado en sala ${codigo}: prec=${precision} pres=${presentacion}`);
+      socket.emit('error-sala', { msg: 'Puntaje fuera de rango (0-10)' });
+      return;
+    }
+    if (poomsae !== 1 && poomsae !== 2) return;
+    desglose = sanitizeDesglose(desglose);
 
     const comp = sala.competidores.find(c => c.id === competidorId);
     if (!comp) {
@@ -318,9 +379,10 @@ io.on('connection', (socket) => {
 
 
   // ── MESA: REVELAR ──
-  socket.on('mesa-revelar', ({ codigo, turnoIndex }) => {
+  socket.on('mesa-revelar', ({ codigo, turnoIndex, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     let datos = {};
     if (sala.modo === '1v1-simultaneo' || sala.modo === '1v1-secuencial') {
       datos = {
@@ -339,18 +401,20 @@ io.on('connection', (socket) => {
   });
 
   // ── SORTEO POOMSAE ──
-  socket.on('mesa-sortear-poomsae', ({ codigo, numero, poomsae }) => {
+  socket.on('mesa-sortear-poomsae', ({ codigo, numero, poomsae, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     if (numero === 1) sala.poomsae1 = poomsae;
     else sala.poomsae2 = poomsae;
     io.to(codigo).emit('poomsae-sorteada', { numero, poomsae });
   });
 
   // ── CRONÓMETRO ──
-  socket.on('mesa-cronometro', ({ codigo, accion, duracion }) => {
+  socket.on('mesa-cronometro', ({ codigo, accion, duracion, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     if (accion === 'iniciar') sala.cronoActivo = true;
     if (accion === 'detener' || accion === 'restablecer') sala.cronoActivo = false;
     if (duracion !== undefined) sala.cronoSegundos = duracion; // FIX #9
@@ -358,19 +422,21 @@ io.on('connection', (socket) => {
   });
 
   // ── CORTE ──
-  socket.on('mesa-corte', ({ codigo, topN }) => {
+  socket.on('mesa-corte', ({ codigo, topN, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     io.to(codigo).emit('corte-aplicado', { ranking: getRanking(sala), topN });
   });
 
   // ── MESA: RECONECTAR ── FIX #1: snapshot completo
-  socket.on('mesa-reconectar', ({ codigo }) => {
+  socket.on('mesa-reconectar', ({ codigo, token }) => {
     const sala = salas[codigo];
     if (!sala) {
       socket.emit('error-sala', { msg: 'Sala no encontrada al reconectar' });
       return;
     }
+    if (!autorizarMesa(sala, token, socket)) return;
     socket.join(codigo);
     sala.mesaId = socket.id;
 
@@ -379,6 +445,7 @@ io.on('connection', (socket) => {
       codigo: sala.codigo, tipo: sala.tipo, modo: sala.modo,
       numJueces: sala.numJueces, categoria: sala.categoria,
       ronda: sala.ronda, grupoCategoria: sala.grupoCategoria,
+      token: sala.mesaToken,
     });
 
     // 2. Jueces conectados
@@ -421,41 +488,46 @@ io.on('connection', (socket) => {
   });
 
   // ── ELIMINAR SALA ──
-  socket.on('mesa-eliminar-sala', ({ codigo }) => {
+  socket.on('mesa-eliminar-sala', ({ codigo, token }) => {
     const sala = salas[codigo];
     if (!sala) {
       socket.emit('sala-eliminada', { codigo });
       return;
     }
+    if (!autorizarMesa(sala, token, socket)) return;
     io.to(codigo).emit('sala-eliminada', { codigo });
     delete salas[codigo];
     console.log(`Sala eliminada: ${codigo}`);
   });
 
   // ── RENOMBRAR COMPETIDOR ──
-  socket.on('mesa-renombrar-competidor', ({ codigo, competidorId, nombre }) => {
+  socket.on('mesa-renombrar-competidor', ({ codigo, competidorId, nombre, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     const comp = sala.competidores.find(c => c.id === competidorId);
     if (!comp) return;
-    comp.nombre = nombre;
-    io.to(codigo).emit('competidor-renombrado', { competidorId, nombre });
-    console.log(`Renombrado id=${competidorId} → "${nombre}" en sala ${codigo}`);
+    const nombreLimpio = sanitizeName(nombre);
+    comp.nombre = nombreLimpio;
+    io.to(codigo).emit('competidor-renombrado', { competidorId, nombre: nombreLimpio });
+    console.log(`Renombrado id=${competidorId} → "${nombreLimpio}" en sala ${codigo}`);
   });
 
   // ── FIN DE SALA ──
-  socket.on('mesa-fin-sala', ({ codigo }) => {
+  socket.on('mesa-fin-sala', ({ codigo, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     io.to(codigo).emit('sala-finalizada');
     delete salas[codigo];
     console.log(`Sala finalizada: ${codigo}`);
   });
 
   // ── RESTAURAR SALA ── FIX #9 + #10
-  socket.on('mesa-restaurar', ({ codigo }) => {
+  socket.on('mesa-restaurar', ({ codigo, token }) => {
     const sala = salas[codigo];
     if (!sala) return;
+    if (!autorizarMesa(sala, token, socket)) return;
     sala.competidores = [];
     sala.turnoIndex = 0;
     sala.estado = 'setup';

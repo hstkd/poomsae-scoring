@@ -215,6 +215,27 @@
 <script>
   const socket = io({ reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
 
+  // ── SEGURIDAD: token de mesa (se adjunta a todos los eventos mesa-*) ──
+  let mesaToken = null;
+  const _emitOriginal = socket.emit.bind(socket);
+  socket.emit = function (evento, payload, ...resto) {
+    if (typeof evento === 'string' && evento.startsWith('mesa-') &&
+        evento !== 'mesa-crear-sala' && mesaToken &&
+        payload && typeof payload === 'object') {
+      payload = Object.assign({}, payload, { token: mesaToken });
+    }
+    return _emitOriginal(evento, payload, ...resto);
+  };
+  function guardarToken(codigo, token) {
+    if (!token) return;
+    mesaToken = token;
+    try { localStorage.setItem('mesaToken:' + codigo, token); } catch (e) {}
+  }
+  function cargarToken(codigo) {
+    if (mesaToken) return;
+    try { mesaToken = localStorage.getItem('mesaToken:' + codigo); } catch (e) {}
+  }
+
   // ── TABLA CINTURÓN → POOMSAE ──
   const POOMSAE_POR_CINTURON = {
     'BLANCO': 'Taegeuk 1 Jang',
@@ -643,7 +664,7 @@
   }
 
   // ════════ SOCKET ════════
-  socket.on('connect', () => { if (salaActual) socket.emit('mesa-reconectar', { codigo: salaActual }); });
+  socket.on('connect', () => { if (salaActual) { cargarToken(salaActual); socket.emit('mesa-reconectar', { codigo: salaActual }); } });
 
   socket.on('error-sala', () => {
     salaActual = null;
@@ -651,6 +672,7 @@
   });
 
   socket.on('sala-creada', (data) => {
+    guardarToken(data.codigo, data.token);   // SEGURIDAD: token de control
     numJueces = data.numJueces;
     document.getElementById('seccion-setup').classList.add('hidden');
     document.getElementById('seccion-sala').classList.remove('hidden');

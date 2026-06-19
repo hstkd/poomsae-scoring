@@ -491,6 +491,29 @@
 <script>
   const socket = io({ reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
 
+  // ── SEGURIDAD: token de mesa ──
+  // Se recibe del servidor al crear/reconectar la sala y se adjunta
+  // automáticamente a todos los eventos de control (mesa-*) salvo la creación.
+  let mesaToken = null;
+  const _emitOriginal = socket.emit.bind(socket);
+  socket.emit = function (evento, payload, ...resto) {
+    if (typeof evento === 'string' && evento.startsWith('mesa-') &&
+        evento !== 'mesa-crear-sala' && mesaToken &&
+        payload && typeof payload === 'object') {
+      payload = Object.assign({}, payload, { token: mesaToken });
+    }
+    return _emitOriginal(evento, payload, ...resto);
+  };
+  function guardarToken(codigo, token) {
+    if (!token) return;
+    mesaToken = token;
+    try { localStorage.setItem('mesaToken:' + codigo, token); } catch (e) {}
+  }
+  function cargarToken(codigo) {
+    if (mesaToken) return;
+    try { mesaToken = localStorage.getItem('mesaToken:' + codigo); } catch (e) {}
+  }
+
   // ── ESTADO GLOBAL ──
   let salaActual = null;
   let turnoIndex = 0;
@@ -2188,6 +2211,7 @@
   socket.on('connect', () => {
     if (salaActual) {
       // Re-emitir unión a sala para recibir estado actual
+      cargarToken(salaActual);
       socket.emit('mesa-reconectar', { codigo: salaActual });
     }
   });
@@ -2200,6 +2224,7 @@
 
   socket.on('sala-creada', (data) => {
     // Guardar variables de sala desde servidor (fuente de verdad al reconectar)
+    guardarToken(data.codigo, data.token);   // SEGURIDAD: token de control
     numJueces      = data.numJueces;
     modo           = data.modo;
     tipo           = data.tipo;
