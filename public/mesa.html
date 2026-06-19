@@ -564,7 +564,7 @@
     grupoCategoria = document.getElementById('input-grupo').value;
     tipo = document.getElementById('input-tipo').value;
     modo = document.getElementById('input-modo').value;
-    numJueces = parseInt(document.getElementById('input-jueces').value);
+    numJueces = parseInt(document.getElementById('input-jueces').value, 10);
     if (!codigo) return alert('Ingresa un código de sala');
     if (!categoria) return alert('Ingresa la categoría');
     limpiarErrorSala();
@@ -1811,7 +1811,7 @@
 
 
     function definirCorte() {
-    const topN = parseInt(document.getElementById('input-topN').value);
+    const topN = parseInt(document.getElementById('input-topN').value, 10);
     if (!topN) return alert('Ingresa cuántos pasan');
     if (tipo === 'freestyle') {
       topNLocalFS = topN;

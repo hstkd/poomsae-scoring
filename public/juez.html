@@ -618,7 +618,7 @@
   function conectarse() {
     const codigo = document.getElementById('input-sala').value.trim().toUpperCase();
     const nombre = document.getElementById('input-nombre').value.trim() || 'Juez';
-    numJuez = parseInt(document.getElementById('input-numjuez').value);
+    numJuez = parseInt(document.getElementById('input-numjuez').value, 10);
     if (!codigo) return alert('Ingresa el código de sala');
     socket.emit('juez-unirse', { codigo, nombre, numJuez });
   }
@@ -894,7 +894,7 @@
   }
 
   function actualizarModulo(key, modId, raw) {
-    const val = parseInt(raw) / 10;
+    const val = parseInt(raw, 10) / 10;
     modulosVal[key][modId] = val;
     const el = document.getElementById(`mod-val-${key}-${modId}`);
     if (el) el.textContent = val.toFixed(1);
@@ -1135,7 +1135,7 @@
     const sel = document.getElementById('input-numjuez');
     if (!sel) return;
     Array.from(sel.options).forEach(opt => {
-      const num = parseInt(opt.value);
+      const num = parseInt(opt.value, 10);
       if (ocupados.includes(num)) {
         opt.disabled = true;
         opt.textContent = `JUEZ ${num} — Conectado`;

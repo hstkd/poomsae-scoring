@@ -279,7 +279,7 @@
   function crearSala() {
     const codigo = document.getElementById('input-codigo').value.trim().toUpperCase();
     nombreEvento = document.getElementById('input-evento').value.trim().toUpperCase();
-    numJueces = parseInt(document.getElementById('input-jueces').value);
+    numJueces = parseInt(document.getElementById('input-jueces').value, 10);
     if (!codigo) return alert('Ingresa un código de sala');
     salaActual = codigo;
     // Modo liga corre sobre cutoff en el servidor (1 poomsae, ranking)

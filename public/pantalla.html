@@ -1061,7 +1061,7 @@
 
   function secParseFase(f) {       // 'p1A_corriendo' → {p:1, atleta:'A'}
     if (!f || f.length < 3) return null;
-    return { p: parseInt(f[1]), atleta: f[2] };
+    return { p: parseInt(f[1], 10), atleta: f[2] };
   }
 
     function secReset() {

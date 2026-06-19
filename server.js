@@ -4,12 +4,11 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
+// Nota: reconnection/reconnectionAttempts/reconnectionDelay son opciones del
+// CLIENTE (io()), no del servidor; aquí solo aplican ping/pong.
 const io = new Server(server, {
   pingTimeout: 60000,
   pingInterval: 25000,
-  reconnection: true,
-  reconnectionAttempts: Infinity,
-  reconnectionDelay: 1000,
 });
 
 app.use(express.static('public'));
@@ -57,6 +56,31 @@ function autorizarMesa(sala, token, socket) {
   return false;
 }
 
+// ── LIMPIEZA DE SALAS INACTIVAS (anti fuga de memoria) ──
+// Cuando una sala queda sin ningún socket conectado durante el periodo de
+// gracia, se elimina. Si alguien reconecta antes, se cancela la limpieza.
+const GRACIA_LIMPIEZA_MS = 60 * 60 * 1000; // 1 hora
+
+function cancelarLimpieza(sala) {
+  if (sala && sala.limpiezaTimer) {
+    clearTimeout(sala.limpiezaTimer);
+    sala.limpiezaTimer = null;
+  }
+}
+
+function programarLimpieza(codigo) {
+  const sala = salas[codigo];
+  if (!sala) return;
+  cancelarLimpieza(sala);
+  sala.limpiezaTimer = setTimeout(() => {
+    const room = io.sockets.adapter.rooms.get(codigo);
+    if (!room || room.size === 0) {
+      delete salas[codigo];
+      console.log(`Sala ${codigo} eliminada por inactividad`);
+    }
+  }, GRACIA_LIMPIEZA_MS);
+}
+
 function calcularTotal(puntajes, numJueces) {
   if (puntajes.length < numJueces) return null;
   const valores = puntajes.map(p => p.precision + p.presentacion);
@@ -71,10 +95,17 @@ function calcularTotal(puntajes, numJueces) {
   return Math.round(resultado * 100) / 100;
 }
 
+// Suma de presentación de un competidor (criterio de desempate WT).
+function presentacionTotal(c) {
+  const sum = arr => (arr || []).reduce((s, p) => s + (p.presentacion || 0), 0);
+  return sum(c.puntajesP1) + sum(c.puntajesP2);
+}
+
 function getRanking(sala) {
   return sala.competidores
     .filter(c => c.total !== null)
-    .sort((a, b) => b.total - a.total)
+    // Empate por total → desempata mayor presentación (regla WT)
+    .sort((a, b) => (b.total - a.total) || (presentacionTotal(b) - presentacionTotal(a)))
     .map((c, i) => ({ ...c, pos: i + 1 }));
 }
 
@@ -153,6 +184,7 @@ io.on('connection', (socket) => {
       notasSnapshot: {},        // FIX #2: almacén de notas para replay
     };
     socket.join(codigo);
+    socket.data.codigo = codigo;   // para limpieza al desconectar
     socket.emit('sala-creada', { codigo, tipo, modo, numJueces, categoria, ronda, grupoCategoria, token: mesaToken });
     console.log(`Sala creada: ${codigo}`);
   });
@@ -209,6 +241,7 @@ io.on('connection', (socket) => {
       socket.emit('error-sala', { msg: 'Sala no encontrada' });
       return;
     }
+    cancelarLimpieza(sala);   // alguien volvió: no eliminar la sala
 
     // Bloquear posición ya ocupada por OTRO socket — excepto Pantalla (numJuez 0)
     if (numJuez !== 0) {
@@ -437,7 +470,9 @@ io.on('connection', (socket) => {
       return;
     }
     if (!autorizarMesa(sala, token, socket)) return;
+    cancelarLimpieza(sala);   // la mesa volvió: no eliminar la sala
     socket.join(codigo);
+    socket.data.codigo = codigo;   // para limpieza al desconectar
     sala.mesaId = socket.id;
 
     // 1. Info de sala (incluye grupoCategoria — FIX #14)
@@ -495,6 +530,7 @@ io.on('connection', (socket) => {
       return;
     }
     if (!autorizarMesa(sala, token, socket)) return;
+    cancelarLimpieza(sala);
     io.to(codigo).emit('sala-eliminada', { codigo });
     delete salas[codigo];
     console.log(`Sala eliminada: ${codigo}`);
@@ -518,6 +554,7 @@ io.on('connection', (socket) => {
     const sala = salas[codigo];
     if (!sala) return;
     if (!autorizarMesa(sala, token, socket)) return;
+    cancelarLimpieza(sala);
     io.to(codigo).emit('sala-finalizada');
     delete salas[codigo];
     console.log(`Sala finalizada: ${codigo}`);
@@ -557,6 +594,8 @@ io.on('connection', (socket) => {
         });
       }
     }
+    // Si la sala quedó sin sockets, programar su limpieza (anti fuga de memoria)
+    if (codigo && salas[codigo]) programarLimpieza(codigo);
   });
 });
 
