@@ -1,5 +1,6 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 const auth = require('./auth');
 const license = require('./license');
@@ -108,15 +109,16 @@ app.use((req, res, next) => {
   if (license.estado().valid) return next();
   const ruta = req.path;
   const permitidoSinLicencia =
-    ruta === '/licencia.html' || ruta === '/admin.html' ||
+    ruta === '/login.html' || ruta === '/licencia.html' || ruta === '/admin.html' ||
     ruta === '/api/me' || ruta === '/api/logout' ||
-    ruta.startsWith('/api/licencia') || ruta.startsWith('/api/users');
+    ruta.startsWith('/api/licencia') || ruta.startsWith('/api/users') ||
+    ruta.startsWith('/fonts/') || ruta.startsWith('/vendor/');
   if (permitidoSinLicencia) return next();
   if (ruta.startsWith('/api/')) return res.status(403).json({ error: 'Licencia inválida o vencida' });
   return res.redirect('/licencia.html');
 });
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 const salas = {};
 

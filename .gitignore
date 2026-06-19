@@ -9,3 +9,6 @@ data/
 # Clave PRIVADA del proveedor para firmar licencias: NUNCA versionar.
 # (la clave pública license-public.pem SÍ se versiona y viaja con el producto)
 vendor/
+
+# Salida del build protegido (se genera con `npm run build`)
+dist/

@@ -82,6 +82,29 @@ El sistema no funciona sin una licencia válida firmada por el proveedor.
 > podría editarlo para saltar la validación. El blindaje fuerte contra eso
 > (empaquetado binario / ofuscación del servidor) corresponde a la Fase 3.
 
+## Paquete protegido (build para entregar al cliente)
+
+Para no entregar el código fuente legible, genera un paquete con el servidor
+compilado a **bytecode** y el cliente **minificado**:
+
+```bash
+npm install        # una vez, con Internet (trae las herramientas de build)
+npm run build      # genera dist/
+```
+
+`dist/` contiene `server.jsc/auth.jsc/license.jsc` (bytecode, no editable como
+texto), el cliente con el JS minificado, `node_modules`, la clave pública y un
+`package.json` de producción. Entrega **esa carpeta** al cliente:
+
+```bash
+cd dist && node server.js
+```
+
+> El bytecode requiere ejecutarse con la **misma versión mayor de Node** con la
+> que se construyó. Honestamente, el bytecode y la minificación **dificultan**
+> mucho leer o alterar el código, pero no son cifrado: un atacante muy decidido
+> podría revertirlos. Suben el listón a un nivel razonable para producto comercial.
+
 ## Notas de mantenimiento
 
 - `node_modules/` y `package-lock.json` se versionan **a propósito** para el

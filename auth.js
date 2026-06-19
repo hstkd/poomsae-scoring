@@ -157,7 +157,11 @@ function init() {
   SECRET = cargarSecreto();
   cargarUsuarios();
   if (usuarios.length === 0) {
-    const passInicial = process.env.ADMIN_PASSWORD || crypto.randomBytes(6).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 10);
+    let passInicial = process.env.ADMIN_PASSWORD;
+    if (!passInicial || String(passInicial).length < 6) {
+      if (passInicial) console.log('⚠️ ADMIN_PASSWORD inválida (mín. 6 caracteres); se generará una aleatoria.');
+      passInicial = crypto.randomBytes(9).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 10);
+    }
     crearUsuario({ username: 'admin', password: passInicial, role: 'admin' });
     console.log('────────────────────────────────────────────');
     console.log(' USUARIO ADMIN INICIAL CREADO');
