@@ -508,11 +508,11 @@
   <div class="login-sub">Sistema de Calificación</div>
   <div class="login-form">
     <div class="input-label">Código de Sala</div>
-    <input class="input-field" id="input-sala" type="text" maxlength="8" placeholder="SALA01" style="text-transform:uppercase">
+    <input class="input-field" id="input-sala" type="text" maxlength="8" aria-label="Código de sala" placeholder="SALA01" style="text-transform:uppercase">
     <div class="input-label">Tu Nombre</div>
-    <input class="input-field" id="input-nombre" type="text" placeholder="NOMBRE" style="font-size:14px;letter-spacing:2px">
+    <input class="input-field" id="input-nombre" type="text" aria-label="Tu nombre" placeholder="NOMBRE" style="font-size:14px;letter-spacing:2px">
     <div class="input-label">Posición</div>
-    <select class="input-field" id="input-numjuez">
+    <select class="input-field" id="input-numjuez" aria-label="Posición del juez">
       <option value="1">JUEZ 1</option><option value="2">JUEZ 2</option>
       <option value="3">JUEZ 3</option><option value="4">JUEZ 4</option>
       <option value="5">JUEZ 5</option><option value="6">JUEZ 6</option>
@@ -853,6 +853,7 @@
         <input type="range" class="modulo-slider"
           id="slider-${key}-${m.id}"
           min="5" max="20" value="10" step="1"
+          aria-label="${m.nombre}"
           oninput="actualizarModulo('${key}','${m.id}',this.value)">
         <div class="modulo-rangos">
           <span>0.5</span><span>1.0</span><span>1.5</span><span>2.0</span>

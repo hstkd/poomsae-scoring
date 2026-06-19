@@ -104,9 +104,9 @@
   <div class="panel">
     <div class="panel-titulo">Crear Cancha</div>
     <label class="input-label">Código de Sala</label>
-    <input class="input-field" id="input-codigo" type="text" maxlength="8" placeholder="CANCHA1" style="text-transform:uppercase">
+    <input class="input-field" id="input-codigo" type="text" maxlength="8" aria-label="Código de cancha" placeholder="CANCHA1" style="text-transform:uppercase">
     <label class="input-label">Nombre del Evento</label>
-    <input class="input-field" id="input-evento" type="text" placeholder="ej: COPA HSTKD 2026" style="text-transform:uppercase;font-size:13px">
+    <input class="input-field" id="input-evento" type="text" aria-label="Nombre del evento" placeholder="ej: COPA HSTKD 2026" style="text-transform:uppercase;font-size:13px">
     <label class="input-label">Número de Jueces</label>
     <select class="input-field" id="input-jueces">
       <option value="3">3 Jueces</option>
@@ -139,7 +139,7 @@
       <div class="drop-txt">Toca para elegir tu archivo Excel</div>
       <div class="drop-sub">Columnas: Nombre · Categoría · Género · Cinturón · Academia</div>
     </div>
-    <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" class="hidden" onchange="cargarExcel(event)">
+    <input type="file" id="file-excel" accept=".xlsx,.xls,.csv" class="hidden" aria-label="Cargar archivo Excel de atletas" onchange="cargarExcel(event)">
     <div id="resumen-carga" class="hidden" style="margin-top:10px;font-size:11px;color:#aaa;text-align:center"></div>
   </div>
 

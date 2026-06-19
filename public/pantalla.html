@@ -560,7 +560,7 @@
   <div class="login-titulo">POOMSAE</div>
   <div class="login-sub">Pantalla de Resultados</div>
   <input class="login-input" id="input-sala" type="text" maxlength="8"
-    placeholder="CÓDIGO" style="text-transform:uppercase"
+    aria-label="Código de sala" placeholder="CÓDIGO" style="text-transform:uppercase"
     onkeydown="if(event.key==='Enter') conectar()">
   <button class="btn-login" onclick="conectar()">CONECTAR</button>
 </div>
@@ -570,7 +570,7 @@
   <div class="header-logo">POOMSAE</div>
   <div class="header-centro" id="header-centro">—</div>
   <div class="header-derecha">
-    <button id="btn-tema" onclick="toggleTema()" title="Cambiar a modo claro" style="background:none;border:1px solid #c9a84c;color:#c9a84c;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:14px">◐</button>
+    <button id="btn-tema" onclick="toggleTema()" aria-label="Cambiar entre modo claro y oscuro" title="Cambiar a modo claro" style="background:none;border:1px solid #c9a84c;color:#c9a84c;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:14px">◐</button>
     <div class="header-sala" id="header-sala">—</div>
     <div class="jueces-dots" id="jueces-dots"></div>
   </div>
