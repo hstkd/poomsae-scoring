@@ -1,4 +1,4 @@
-node_modules/
-package-lock.json
+# node_modules y package-lock.json SÍ se versionan a propósito:
+# permiten arrancar el servidor sin Internet (sin `npm install`).
 npm-debug.log*
 .DS_Store
