@@ -5,3 +5,7 @@ npm-debug.log*
 
 # Datos por instalación (secreto de sesión + usuarios con hash): NO versionar
 data/
+
+# Clave PRIVADA del proveedor para firmar licencias: NUNCA versionar.
+# (la clave pública license-public.pem SÍ se versiona y viaja con el producto)
+vendor/

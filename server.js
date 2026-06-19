@@ -2,8 +2,17 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const auth = require('./auth');
+const license = require('./license');
 
 auth.init();
+
+// Estado de la licencia al arrancar (informativo)
+const _lic = license.estado();
+if (_lic.valid) {
+  console.log(`Licencia válida — cliente: ${_lic.cliente} · vence: ${new Date(_lic.vence).toISOString().slice(0, 10)}`);
+} else {
+  console.log(`⚠️ Licencia NO válida: ${_lic.motivo}. La app quedará bloqueada hasta instalar una licencia.`);
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -77,6 +86,34 @@ app.post('/api/users/eliminar', soloAdmin, (req, res) => {
     return res.status(400).json({ error: 'No puedes eliminar tu propio usuario' });
   try { auth.eliminarUsuario(req.body.username); res.json({ ok: true }); }
   catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ── LICENCIA: estado e instalación ──
+app.get('/api/licencia', (req, res) => {
+  const e = license.estado();
+  res.json({
+    valid: e.valid, motivo: e.motivo || null,
+    cliente: e.cliente || null, vence: e.vence || null,
+  });
+});
+app.post('/api/licencia/instalar', soloAdmin, (req, res) => {
+  try { const e = license.instalarLicencia(req.body.licencia); res.json({ ok: true, cliente: e.cliente, vence: e.vence }); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ── PUERTA DE LICENCIA: sin licencia válida, la app queda bloqueada ──
+// Se permite seguir gestionando usuarios e instalar la licencia (admin),
+// pero las páginas y APIs de competencia quedan inhabilitadas.
+app.use((req, res, next) => {
+  if (license.estado().valid) return next();
+  const ruta = req.path;
+  const permitidoSinLicencia =
+    ruta === '/licencia.html' || ruta === '/admin.html' ||
+    ruta === '/api/me' || ruta === '/api/logout' ||
+    ruta.startsWith('/api/licencia') || ruta.startsWith('/api/users');
+  if (permitidoSinLicencia) return next();
+  if (ruta.startsWith('/api/')) return res.status(403).json({ error: 'Licencia inválida o vencida' });
+  return res.redirect('/licencia.html');
 });
 
 app.use(express.static('public'));
@@ -228,8 +265,9 @@ function buildSnapshot(sala) {
   };
 }
 
-// ── AUTENTICACIÓN DEL SOCKET: exige sesión válida en la cookie ──
+// ── AUTENTICACIÓN DEL SOCKET: exige licencia válida + sesión válida ──
 io.use((socket, next) => {
+  if (!license.estado().valid) return next(new Error('Licencia inválida o vencida'));
   const cookies = auth.parseCookies(socket.handshake.headers.cookie);
   const user = auth.verificarToken(cookies[auth.COOKIE]);
   if (!user) return next(new Error('No autenticado'));
