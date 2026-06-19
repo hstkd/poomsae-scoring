@@ -318,6 +318,18 @@
     return '';
   }
 
+  // Limpia un nombre: solo letras (acentos/ñ/ü), espacios y guiones.
+  // Coincide con el saneo del servidor.
+  function limpiarNombre(s) {
+    return (s == null ? '' : String(s))
+      .normalize('NFC')
+      .replace(/[^\p{L}\s-]/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 40)
+      .toUpperCase();
+  }
+
   function procesarFilas(filas) {
     atletas = [];
     filas.forEach(f => {
@@ -328,7 +340,7 @@
       const cinturon  = getCampo(f, ['Cinturon','Cinturón','CINTURON','Grado']);
       const academia  = getCampo(f, ['Academia','ACADEMIA','Club','Escuela']);
       atletas.push({
-        nombre: nombre.toString().trim().toUpperCase(),
+        nombre: limpiarNombre(nombre),
         categoria: categoria.toString().trim().toUpperCase(),
         genero: norm(genero).startsWith('F') ? 'F' : 'M',
         cinturon: cinturon.toString().trim().toUpperCase(),
