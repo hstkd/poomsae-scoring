@@ -206,7 +206,7 @@
   <div class="panel" id="panel-competidores">
     <div class="panel-titulo">Competidores</div>
     <div class="add-row" style="margin-bottom:10px">
-      <input class="input-field" id="input-competidor" type="text" aria-label="Nombre del competidor" placeholder="NOMBRE" style="text-transform:uppercase">
+      <input class="input-field" id="input-competidor" type="text" aria-label="Nombre del competidor" placeholder="NOMBRE" style="text-transform:uppercase" oninput="filtrarNombreVivo(this)">
       <button class="btn-add" onclick="agregarCompetidor()" aria-label="Agregar competidor">+</button>
     </div>
     <div id="lista-competidores"></div>
@@ -573,8 +573,29 @@
   }
 
   // ── COMPETIDORES (panel setup) ──
+  // Limpia un nombre: solo letras (acentos/ñ/ü), espacios y guiones.
+  // Coincide con el saneo del servidor para que lo que escribes sea lo que se guarda.
+  function limpiarNombre(s) {
+    return (s || '')
+      .normalize('NFC')
+      .replace(/[^\p{L}\s-]/gu, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 40)
+      .toUpperCase();
+  }
+  // Filtro en vivo mientras se escribe (sin recortar espacios para no estorbar al teclear).
+  function filtrarNombreVivo(el) {
+    const limpio = el.value.replace(/[^\p{L}\s-]/gu, '').toUpperCase();
+    if (limpio !== el.value) {
+      const pos = el.selectionStart - (el.value.length - limpio.length);
+      el.value = limpio;
+      try { el.setSelectionRange(pos, pos); } catch (e) {}
+    }
+  }
+
   function agregarCompetidor() {
-    const nombre = document.getElementById('input-competidor').value.trim().toUpperCase();
+    const nombre = limpiarNombre(document.getElementById('input-competidor').value);
     if (!nombre) return;
     // FIX #3: en setup solo guardamos nombres; el ID real lo asigna el servidor
     competidoresSetup.push({ nombre });
@@ -1900,6 +1921,7 @@
       <span class="comp-num" style="${colorLabel}">${i + 1}</span>
       <input class="comp-edit-input" id="edit-input-${i}" value="${nombreActual}" maxlength="40"
         aria-label="Nuevo nombre del competidor ${i + 1}"
+        oninput="filtrarNombreVivo(this)"
         onkeydown="if(event.key==='Enter')confirmarEdicion(${i});if(event.key==='Escape')cancelarEdicion()">
       <button class="btn-edit-ok" onclick="confirmarEdicion(${i})" aria-label="Guardar nombre">✓</button>
       <button class="btn-edit-cancel" onclick="cancelarEdicion()" aria-label="Cancelar edición" style="padding:6px 8px">✕</button>
@@ -1913,7 +1935,7 @@
   function confirmarEdicion(i) {
     const inp = document.getElementById(`edit-input-${i}`);
     if (!inp) return;
-    const nuevoNombre = inp.value.trim().toUpperCase();
+    const nuevoNombre = limpiarNombre(inp.value);
     if (!nuevoNombre) return alert('El nombre no puede estar vacío');
     const nombreAnterior = competidoresSetup[i].nombre;
     if (nuevoNombre === nombreAnterior) { cancelarEdicion(); return; }

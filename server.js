@@ -15,13 +15,16 @@ app.use(express.static('public'));
 
 const salas = {};
 
-// ── SEGURIDAD: saneo de nombres (anti-XSS) ──
-// Los nombres se renderizan vía innerHTML/atributos/onclick en los clientes.
-// Quitamos los caracteres que permiten romper esos contextos (< > " ' & `).
-// Un nombre de persona nunca necesita estos caracteres.
+// ── SEGURIDAD: saneo de nombres (anti-XSS + calidad de datos) ──
+// Lista blanca: solo letras (cualquier idioma, incl. acentos/ñ/ü), espacios
+// y guiones. Esto elimina de raíz los caracteres peligrosos para los
+// contextos innerHTML/atributos/onclick (< > " ' & `) y además descarta
+// dígitos, símbolos y emojis que no van en un nombre de persona.
 function sanitizeName(s) {
   return String(s == null ? '' : s)
-    .replace(/[<>"'`&]/g, '')
+    .normalize('NFC')
+    .replace(/[^\p{L}\s-]/gu, '')
+    .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 40);
 }
