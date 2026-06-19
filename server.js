@@ -1,6 +1,19 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
+const auth = require('./auth');
+const license = require('./license');
+
+auth.init();
+
+// Estado de la licencia al arrancar (informativo)
+const _lic = license.estado();
+if (_lic.valid) {
+  console.log(`Licencia válida — cliente: ${_lic.cliente} · vence: ${new Date(_lic.vence).toISOString().slice(0, 10)}`);
+} else {
+  console.log(`⚠️ Licencia NO válida: ${_lic.motivo}. La app quedará bloqueada hasta instalar una licencia.`);
+}
 
 const app = express();
 const server = http.createServer(app);
@@ -11,7 +24,101 @@ const io = new Server(server, {
   pingInterval: 25000,
 });
 
-app.use(express.static('public'));
+app.use(express.json());
+
+const COOKIE_OPTS = `HttpOnly; SameSite=Lax; Path=/`;
+
+// ── AUTENTICACIÓN: login / logout (públicos) ──
+app.post('/api/login', (req, res) => {
+  const { username, password } = req.body || {};
+  const user = auth.verificarCredenciales(username, password);
+  if (!user) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+  const token = auth.firmarToken(user, 1); // sesión de 1 día
+  res.setHeader('Set-Cookie', `${auth.COOKIE}=${token}; ${COOKIE_OPTS}; Max-Age=${24 * 60 * 60}`);
+  res.json({ ok: true, role: user.role });
+});
+
+app.post('/api/logout', (req, res) => {
+  res.setHeader('Set-Cookie', `${auth.COOKIE}=; ${COOKIE_OPTS}; Max-Age=0`);
+  res.json({ ok: true });
+});
+
+// ── PUERTA DE ACCESO: exige sesión válida para todo lo demás ──
+app.use((req, res, next) => {
+  const ruta = req.path;
+  // Recursos públicos necesarios para la pantalla de login
+  if (ruta === '/login.html' || ruta.startsWith('/fonts/') ||
+      ruta.startsWith('/vendor/') || ruta.startsWith('/socket.io/') ||
+      ruta === '/favicon.ico') {
+    return next();
+  }
+  const cookies = auth.parseCookies(req.headers.cookie);
+  const user = auth.verificarToken(cookies[auth.COOKIE]);
+  if (!user) {
+    if (ruta.startsWith('/api/')) return res.status(401).json({ error: 'No autenticado' });
+    return res.redirect('/login.html');
+  }
+  // Control de acceso por página según rol
+  const pagina = (ruta === '/' ? '/index.html' : ruta);
+  if (pagina.endsWith('.html') && !auth.puedeAccederPagina(user.role, pagina)) {
+    return res.status(403).send('No autorizado para esta página');
+  }
+  req.user = user;
+  next();
+});
+
+// ── APIs autenticadas ──
+function soloAdmin(req, res, next) {
+  if (!req.user || req.user.role !== 'admin') return res.status(403).json({ error: 'Solo el administrador' });
+  next();
+}
+app.get('/api/me', (req, res) => res.json(req.user));
+app.get('/api/users', soloAdmin, (req, res) => res.json(auth.listarUsuarios()));
+app.post('/api/users', soloAdmin, (req, res) => {
+  try { res.json(auth.crearUsuario(req.body)); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+app.post('/api/users/habilitar', soloAdmin, (req, res) => {
+  try { res.json(auth.habilitarUsuario(req.body.username, req.body.enabled)); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+app.post('/api/users/eliminar', soloAdmin, (req, res) => {
+  if (String(req.body.username).toLowerCase() === req.user.username)
+    return res.status(400).json({ error: 'No puedes eliminar tu propio usuario' });
+  try { auth.eliminarUsuario(req.body.username); res.json({ ok: true }); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ── LICENCIA: estado e instalación ──
+app.get('/api/licencia', (req, res) => {
+  const e = license.estado();
+  res.json({
+    valid: e.valid, motivo: e.motivo || null,
+    cliente: e.cliente || null, vence: e.vence || null,
+  });
+});
+app.post('/api/licencia/instalar', soloAdmin, (req, res) => {
+  try { const e = license.instalarLicencia(req.body.licencia); res.json({ ok: true, cliente: e.cliente, vence: e.vence }); }
+  catch (e) { res.status(400).json({ error: e.message }); }
+});
+
+// ── PUERTA DE LICENCIA: sin licencia válida, la app queda bloqueada ──
+// Se permite seguir gestionando usuarios e instalar la licencia (admin),
+// pero las páginas y APIs de competencia quedan inhabilitadas.
+app.use((req, res, next) => {
+  if (license.estado().valid) return next();
+  const ruta = req.path;
+  const permitidoSinLicencia =
+    ruta === '/login.html' || ruta === '/licencia.html' || ruta === '/admin.html' ||
+    ruta === '/api/me' || ruta === '/api/logout' ||
+    ruta.startsWith('/api/licencia') || ruta.startsWith('/api/users') ||
+    ruta.startsWith('/fonts/') || ruta.startsWith('/vendor/');
+  if (permitidoSinLicencia) return next();
+  if (ruta.startsWith('/api/')) return res.status(403).json({ error: 'Licencia inválida o vencida' });
+  return res.redirect('/licencia.html');
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 const salas = {};
 
@@ -160,8 +267,33 @@ function buildSnapshot(sala) {
   };
 }
 
+// ── AUTENTICACIÓN DEL SOCKET: exige licencia válida + sesión válida ──
+io.use((socket, next) => {
+  if (!license.estado().valid) return next(new Error('Licencia inválida o vencida'));
+  const cookies = auth.parseCookies(socket.handshake.headers.cookie);
+  const user = auth.verificarToken(cookies[auth.COOKIE]);
+  if (!user) return next(new Error('No autenticado'));
+  socket.data.user = user;
+  next();
+});
+
 io.on('connection', (socket) => {
-  console.log('Conectado:', socket.id);
+  console.log(`Conectado: ${socket.id} (${socket.data.user.username}/${socket.data.user.role})`);
+
+  // Control de acceso por evento según el rol del usuario
+  socket.use(([evento], next) => {
+    const role = socket.data.user && socket.data.user.role;
+    if (typeof evento === 'string') {
+      if (evento.startsWith('mesa-') && !['admin', 'mesa'].includes(role)) {
+        return next(new Error('Rol no autorizado para controlar la mesa'));
+      }
+      if ((evento === 'juez-puntaje' || evento === 'juez-precision') &&
+          !['admin', 'mesa', 'juez'].includes(role)) {
+        return next(new Error('Rol no autorizado para calificar'));
+      }
+    }
+    next();
+  });
 
   // ── MESA: CREAR SALA ──
   socket.on('mesa-crear-sala', ({ codigo, tipo, modo, numJueces, categoria, ronda, grupoCategoria }) => {

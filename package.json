@@ -5,13 +5,18 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "check": "node --check server.js"
+    "check": "node --check server.js",
+    "build": "node build.js"
   },
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
+    "bytenode": "^1.5.7",
     "express": "^4.18.2",
     "socket.io": "^4.7.2"
+  },
+  "devDependencies": {
+    "terser": "^5.48.0"
   }
 }

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Licencia · Poomsae Scoring</title>
+  <link href="/fonts/fonts.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0a; color: #fff; font-family: 'Inter', sans-serif; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .logo { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 8px; color: #c9a84c; }
+    .sub { font-size: 10px; font-weight: 700; letter-spacing: 5px; color: #555; text-transform: uppercase; margin-bottom: 26px; }
+    .card { background: #141414; border: 1px solid #222; border-radius: 16px; padding: 26px; width: 100%; max-width: 520px; }
+    .estado { padding: 12px 16px; border-radius: 10px; font-size: 14px; margin-bottom: 18px; }
+    .estado.ok { background: #0f1f12; border: 1px solid #1f5130; color: #7ee2a0; }
+    .estado.mal { background: #1f0f0f; border: 1px solid #512020; color: #ff9b9b; }
+    label { font-size: 10px; font-weight: 700; letter-spacing: 2px; color: #777; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    textarea { width: 100%; min-height: 110px; background: #0e0e0e; border: 1px solid #2a2a2a; border-radius: 10px;
+      color: #fff; padding: 12px; font-family: monospace; font-size: 12px; outline: none; resize: vertical; }
+    textarea:focus { border-color: #c9a84c; }
+    button { background: #c9a84c; color: #000; border: none; margin-top: 12px; padding: 12px 18px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; border-radius: 10px; cursor: pointer; }
+    .msg { font-size: 12px; min-height: 16px; margin-top: 10px; }
+    .nota { font-size: 12px; color: #888; line-height: 1.5; }
+    .links { margin-top: 18px; display: flex; gap: 10px; }
+    .links a, .links button.sec { font-size: 11px; letter-spacing: 1px; color: #aaa; background: none;
+      border: 1px solid #2a2a2a; border-radius: 8px; padding: 7px 12px; text-decoration: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="logo">LICENCIA</div>
+  <div class="sub">Activación del sistema</div>
+
+  <div class="card">
+    <div class="estado" id="estado">Comprobando…</div>
+
+    <div id="zona-admin" style="display:none">
+      <label for="lic">Pega aquí la licencia entregada por el proveedor</label>
+      <textarea id="lic" placeholder="xxxxx.yyyyy"></textarea>
+      <button onclick="instalar()">ACTIVAR LICENCIA</button>
+      <div class="msg" id="msg"></div>
+    </div>
+
+    <div id="zona-no-admin" style="display:none">
+      <p class="nota">El sistema no tiene una licencia válida. Contacta al administrador
+      de tu organización o al proveedor para activarlo.</p>
+    </div>
+
+    <div class="links">
+      <a href="/">← Inicio</a>
+      <button class="sec" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <script>
+    async function cargar() {
+      const [meR, licR] = await Promise.all([fetch('/api/me'), fetch('/api/licencia')]);
+      const me = meR.ok ? await meR.json() : null;
+      const lic = await licR.json();
+      const est = document.getElementById('estado');
+      if (lic.valid) {
+        est.className = 'estado ok';
+        est.textContent = `✓ Licencia válida — ${lic.cliente} · vence ${new Date(lic.vence).toISOString().slice(0,10)}`;
+      } else {
+        est.className = 'estado mal';
+        est.textContent = `✕ ${lic.motivo || 'Licencia inválida'}`;
+      }
+      if (me && me.role === 'admin') document.getElementById('zona-admin').style.display = 'block';
+      else document.getElementById('zona-no-admin').style.display = 'block';
+    }
+    async function instalar() {
+      const msg = document.getElementById('msg'); msg.textContent = ''; msg.style.color = '#ff9b9b';
+      const licencia = document.getElementById('lic').value.trim();
+      const r = await fetch('/api/licencia/instalar', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ licencia })
+      });
+      const d = await r.json();
+      if (!r.ok) { msg.textContent = d.error || 'No se pudo activar'; return; }
+      msg.style.color = '#7ee2a0';
+      msg.textContent = `Activada para ${d.cliente}. Redirigiendo…`;
+      setTimeout(() => window.location.href = '/', 1200);
+    }
+    async function cerrarSesion() {
+      await fetch('/api/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    }
+    cargar();
+  </script>
+</body>
+</html>

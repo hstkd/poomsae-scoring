@@ -2,3 +2,13 @@
 # permiten arrancar el servidor sin Internet (sin `npm install`).
 npm-debug.log*
 .DS_Store
+
+# Datos por instalación (secreto de sesión + usuarios con hash): NO versionar
+data/
+
+# Clave PRIVADA del proveedor para firmar licencias: NUNCA versionar.
+# (la clave pública license-public.pem SÍ se versiona y viaja con el producto)
+vendor/
+
+# Salida del build protegido (se genera con `npm run build`)
+dist/
