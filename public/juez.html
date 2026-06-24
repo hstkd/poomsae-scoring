@@ -602,6 +602,24 @@
 
   const socket = io();
   let salaInfo = {}, numJuez = 1, turnoActual = null;
+  // Sesión del juez persistida para reingresar solo tras cambiar de app / reconectar
+  let juezCodigo = '', juezNombre = '';
+  function guardarSesionJuez() {
+    try { localStorage.setItem('juezSesion', JSON.stringify({ codigo: juezCodigo, nombre: juezNombre, numJuez })); } catch (e) {}
+  }
+  function limpiarSesionJuez() {
+    juezCodigo = '';
+    try { localStorage.removeItem('juezSesion'); } catch (e) {}
+  }
+  function reingresarJuez() {
+    if (juezCodigo) socket.emit('juez-unirse', { codigo: juezCodigo, nombre: juezNombre || 'Juez', numJuez });
+  }
+  (function cargarSesionJuez() {
+    try {
+      const s = JSON.parse(localStorage.getItem('juezSesion') || 'null');
+      if (s && s.codigo) { juezCodigo = s.codigo; juezNombre = s.nombre || 'Juez'; numJuez = s.numJuez || numJuez; }
+    } catch (e) {}
+  })();
   let precisionVal = { A: 4.0, B: 4.0, C: 4.0 };
   let historialPrec = { A: [], B: [], C: [] };
   let modulosVal = {
@@ -620,7 +638,9 @@
     const nombre = document.getElementById('input-nombre').value.trim() || 'Juez';
     numJuez = parseInt(document.getElementById('input-numjuez').value, 10);
     if (!codigo) return alert('Ingresa el código de sala');
-    socket.emit('juez-unirse', { codigo, nombre, numJuez });
+    juezCodigo = codigo; juezNombre = nombre;
+    guardarSesionJuez();
+    reingresarJuez();
   }
 
   function resetEstado() {
@@ -1217,6 +1237,7 @@
   // ── SOCKET ──
   socket.on('juez-ok', (data) => {
     salaInfo = data.sala;
+    if (data.sala && data.sala.codigo) { juezCodigo = data.sala.codigo; guardarSesionJuez(); }
     document.getElementById('overlay-login').classList.add('hidden');
     document.getElementById('login-error').style.display = 'none';
     document.getElementById('juez-badge').textContent = 'JUEZ ' + numJuez;
@@ -1229,6 +1250,9 @@
   });
 
   socket.on('error-sala', (d) => {
+    // Si falló el reingreso (sala inexistente, etc.), olvidar la sesión guardada
+    // para no quedar en un bucle de reintentos y mostrar el login.
+    limpiarSesionJuez();
     const err = document.getElementById('login-error');
     if (err) {
       err.textContent = d.msg;
@@ -1363,7 +1387,7 @@
     document.getElementById('overlay-login').classList.remove('hidden');
     // Limpiar el select de posiciones al salir
     actualizarSelectJueces([]);
-    salaInfo = {}; turnoActual = null;
+    salaInfo = {}; turnoActual = null; limpiarSesionJuez();
   });
 
   socket.on('sala-eliminada', () => {
@@ -1373,7 +1397,7 @@
     document.getElementById('panel-calificacion').classList.remove('visible');
     document.getElementById('overlay-login').classList.remove('hidden');
     actualizarSelectJueces([]);
-    salaInfo = {}; turnoActual = null;
+    salaInfo = {}; turnoActual = null; limpiarSesionJuez();
   });
 
   socket.on('puntaje-confirmado', (data) => {
@@ -1381,13 +1405,17 @@
   });
 
   socket.on('disconnect', () => console.log('Desconectado'));
-  socket.on('reconnect', () => {
-    if (salaInfo.codigo) {
-      socket.emit('juez-unirse', {
-        codigo: salaInfo.codigo,
-        nombre: document.getElementById('juez-badge').textContent.replace('JUEZ ','Juez '),
-        numJuez
-      });
+
+  // Reingreso automático a la sala en cada (re)conexión del socket.
+  // Cubre cuando el juez sale a otra app / atiende una llamada y vuelve.
+  socket.on('connect', reingresarJuez);
+
+  // Al volver a primer plano, si el socket se cayó, reconectar (y el evento
+  // 'connect' reingresará a la sala). Evita tener que actualizar a mano.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && juezCodigo) {
+      if (!socket.connected) socket.connect();
+      else reingresarJuez();
     }
   });
 </script>
