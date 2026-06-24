@@ -378,15 +378,23 @@ io.on('connection', (socket) => {
     }
     cancelarLimpieza(sala);   // alguien volvió: no eliminar la sala
 
-    // Bloquear posición ya ocupada por OTRO socket — excepto Pantalla (numJuez 0)
+    // Bloquear posición ya ocupada por OTRO usuario — excepto Pantalla (numJuez 0).
+    // El MISMO usuario puede reclamar su posición (reconexión tras cambiar de app),
+    // aunque su socket anterior siga colgado: se reemplaza por el nuevo.
     if (numJuez !== 0) {
+      const miUsuario = socket.data.user && socket.data.user.username;
       const ocupado = sala.jueces.find(j => j.num === numJuez);
-      if (ocupado && ocupado.id !== socket.id) {
+      if (ocupado && ocupado.id !== socket.id && ocupado.usuario && ocupado.usuario !== miUsuario) {
         socket.emit('error-sala', { msg: `Juez ${numJuez} ya está conectado en esta sala` });
         return;
       }
+      // Cerrar el socket anterior del mismo juez si quedó colgado
+      if (ocupado && ocupado.id !== socket.id) {
+        const viejo = io.sockets.sockets.get(ocupado.id);
+        if (viejo) viejo.disconnect(true);
+      }
       sala.jueces = sala.jueces.filter(j => j.num !== numJuez);
-      sala.jueces.push({ id: socket.id, num: numJuez, nombre });
+      sala.jueces.push({ id: socket.id, num: numJuez, nombre, usuario: miUsuario });
     }
 
     socket.join(codigo);
