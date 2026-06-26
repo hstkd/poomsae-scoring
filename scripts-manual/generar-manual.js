@@ -84,13 +84,15 @@ note('Sin internet:', 'El sistema funciona en red local. El router solo necesita
 
 // ───────── 2. ENCENDER ─────────
 band('2.  Encender el sistema (operador)');
-step(1, 'Enciende el router y conecta la computadora a su red WiFi.');
-step(2, 'Abre la carpeta del sistema. En la barra de dirección escribe "cmd" y presiona Enter.');
-step(3, 'En la ventana negra escribe el siguiente comando y presiona Enter:');
+step(1, 'Enciende el router (solo a la luz; no necesita internet) y conecta la computadora a su red WiFi.');
+step(2, 'Abre la carpeta del sistema. Es la que contiene juntos: "server.js", la carpeta "public" y la carpeta "node_modules". Esa es la carpeta correcta.');
+step(3, 'Dentro de esa carpeta, haz clic en la barra de direccion (arriba), escribe "cmd" y presiona Enter. Usa cmd, NO PowerShell.');
+step(4, 'En la ventana negra escribe el siguiente comando y presiona Enter:');
 code('node server.js');
-step(4, 'Cuando veas "Servidor en puerto 3000", ya está encendido. NO cierres esa ventana.');
-step(5, 'Anota la dirección IP: abre otra ventana "cmd", escribe "ipconfig" y busca "Direccion IPv4" (ej. 192.168.1.45).');
-note('Importante:', 'La ventana negra debe quedar abierta durante todo el evento. Para apagar el sistema: presiona Ctrl + C en esa ventana.');
+step(5, 'Cuando veas "Servidor en puerto 3000", ya esta encendido. NO cierres esa ventana.');
+step(6, 'Anota la direccion IP: abre otra ventana "cmd", escribe "ipconfig" y busca "Direccion IPv4" (ej. 192.168.1.45).');
+note('Si dice "Cannot find module server.js":', 'estas en la carpeta equivocada. Entra a la subcarpeta que contiene server.js y public, y abre cmd ahi (paso 3).');
+note('Importante:', 'Deja la ventana negra abierta durante todo el evento. Para apagar el sistema: presiona Ctrl + C en esa ventana.');
 
 // ───────── 3. INGRESO DEL ADMINISTRADOR / MESA ─────────
 band('3.  Ingreso del administrador (mesa)');
