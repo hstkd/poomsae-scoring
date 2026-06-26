@@ -60,23 +60,26 @@ El sistema no funciona sin una licencia válida firmada por el proveedor.
 
 1. **Una sola vez**, crea tu par de claves:
    ```bash
-   node tools/licencia.js init
+   node tools/licencia.js init        # usa --force si ya existe una (p. ej. la demo)
    ```
-   - `vendor/clave-privada.pem` → **guárdala en secreto y respáldala**; con
-     ella firmas las licencias. NO se versiona.
-   - `license-public.pem` → se versiona y viaja con el producto.
-2. Emite una licencia para cada cliente:
+   - `vendor/clave-privada.pem` → **tu llave maestra**: guárdala en secreto y
+     respáldala; con ella firmas las licencias. NO se versiona.
+   - `data/license-public.pem` → tu clave pública. Tiene **prioridad** sobre la
+     de demostración del repositorio y **se conserva al actualizar** (la carpeta
+     `data/` no se borra con `git pull`).
+2. Emite una licencia:
    ```bash
    node tools/licencia.js generar --cliente "ESCUELA X" --dias 365
    ```
-   Entrega ese texto al cliente.
-3. El cliente lo pega en **`/licencia.html`** (o el admin en su panel) para
-   activarlo. La licencia vence; para renovar, emite una nueva. Si no la
-   renuevas, la instalación queda bloqueada (control de acceso del proveedor).
+   Entrega ese texto al cliente (o, para tu propio uso, hazla de larga duración).
+3. Se pega en **`/licencia.html`** (o el admin en su panel) para activarla. La
+   licencia vence; para renovar, emite una nueva. Si no la renuevas, la
+   instalación queda bloqueada (control de acceso del proveedor).
 
-> El repositorio incluye una **clave pública de demostración** para que puedas
-> probar de inmediato. **Antes de vender, regenera tu propio par** con
-> `node tools/licencia.js init --force` y versiona tu nuevo `license-public.pem`.
+> El repositorio incluye una **clave pública de demostración** (`license-public.pem`)
+> para probar de inmediato. Al ejecutar `init`, tu clave queda en
+> `data/license-public.pem` y manda sobre la demo. **Respalda `vendor/` y `data/`**:
+> son tu llave maestra y tus datos (usuarios + licencia).
 
 > ⚠️ En modelo autohospedado el cliente tiene el código del servidor (Node) y
 > podría editarlo para saltar la validación. El blindaje fuerte contra eso

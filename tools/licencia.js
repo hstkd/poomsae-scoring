@@ -15,7 +15,9 @@ const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
 const PRIV = path.join(ROOT, 'vendor', 'clave-privada.pem');
-const PUB = path.join(ROOT, 'license-public.pem');
+// La clave pública propia va en data/ (no versionada): tiene prioridad sobre la
+// demo del repositorio y se conserva al actualizar el sistema.
+const PUB = path.join(ROOT, 'data', 'license-public.pem');
 
 function b64url(buf) {
   return Buffer.from(buf).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -42,11 +44,14 @@ function init(args) {
   }
   const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519');
   fs.mkdirSync(path.join(ROOT, 'vendor'), { recursive: true });
+  fs.mkdirSync(path.join(ROOT, 'data'), { recursive: true });
   fs.writeFileSync(PRIV, privateKey.export({ type: 'pkcs8', format: 'pem' }), { mode: 0o600 });
   fs.writeFileSync(PUB, publicKey.export({ type: 'spki', format: 'pem' }));
-  console.log('✓ Par de claves generado.');
-  console.log('  • vendor/clave-privada.pem  →  GUÁRDALA EN SECRETO y respáldala. NO la subas al repo.');
-  console.log('  • license-public.pem        →  versiónala; viaja con el producto.');
+  console.log('✓ Par de claves generado (reemplaza la clave de demostración).');
+  console.log('  • vendor/clave-privada.pem      →  TU LLAVE MAESTRA: guárdala en secreto y respáldala.');
+  console.log('  • data/license-public.pem       →  clave pública propia (se conserva al actualizar).');
+  console.log('');
+  console.log('  Ahora genera tu licencia:  node tools/licencia.js generar --cliente "TU NOMBRE" --dias 3650');
 }
 
 function generar(args) {

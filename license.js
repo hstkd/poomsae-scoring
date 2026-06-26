@@ -8,11 +8,15 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
-const PUB_FILE = path.join(__dirname, 'license-public.pem');
+const PUB_FILE = path.join(__dirname, 'license-public.pem');                 // demo (versionada)
+const PUB_FILE_PROPIA = path.join(__dirname, 'data', 'license-public.pem');  // del proveedor (no versionada)
 const LIC_FILE = path.join(__dirname, 'data', 'licencia.txt');
 
 function publicKey() {
   if (process.env.LICENSE_PUBLIC_KEY) return process.env.LICENSE_PUBLIC_KEY;
+  // Tu clave propia (en data/) tiene prioridad y sobrevive a las actualizaciones;
+  // la del repositorio (demo) queda solo como respaldo.
+  if (fs.existsSync(PUB_FILE_PROPIA)) return fs.readFileSync(PUB_FILE_PROPIA, 'utf8');
   if (fs.existsSync(PUB_FILE)) return fs.readFileSync(PUB_FILE, 'utf8');
   return null;
 }
