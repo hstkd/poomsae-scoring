@@ -64,8 +64,14 @@ async function build() {
     log(`cliente: ${f} (${bloques.length} bloques, -${(ahorro / 1024).toFixed(1)} KB)`);
   }
 
-  // 3) Activos de runtime
-  fs.copyFileSync(path.join(ROOT, 'license-public.pem'), path.join(DIST, 'license-public.pem'));
+  // 3) Activos de runtime — incluir TU clave pública (la de data/) si existe;
+  //    si no, la de demostración. Así el paquete valida las licencias que tú firmas.
+  const pubPropia = path.join(ROOT, 'data', 'license-public.pem');
+  const pubFuente = fs.existsSync(pubPropia) ? pubPropia : path.join(ROOT, 'license-public.pem');
+  fs.copyFileSync(pubFuente, path.join(DIST, 'license-public.pem'));
+  log(fs.existsSync(pubPropia)
+    ? 'clave publica PROPIA incluida (data/license-public.pem)'
+    : '⚠️ clave publica DEMO incluida — ejecuta "node tools/licencia.js init" para usar la tuya');
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
   delete pkg.devDependencies;
   pkg.scripts = { start: 'node server.js' };
