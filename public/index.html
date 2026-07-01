@@ -37,26 +37,26 @@
   <div class="logo">POOMSAE</div>
   <div class="sub">Sistema de Calificación</div>
 
-  <div class="grid">
-    <a class="card" href="/mesa.html">
+  <div class="grid" id="grid-menu">
+    <a class="card" href="/mesa.html" data-roles="admin,mesa" style="display:none">
       <div class="card-icon">🥋</div>
       <div class="card-titulo">Mesa Competencia</div>
       <div class="card-desc">1v1 simultáneo, secuencial y cut off</div>
     </a>
 
-    <a class="card" href="/liga.html">
+    <a class="card" href="/liga.html" data-roles="admin,mesa" style="display:none">
       <div class="card-icon">📋</div>
       <div class="card-titulo">Mesa Liga</div>
       <div class="card-desc">Carga por Excel · corrida continua por grupos</div>
     </a>
 
-    <a class="card" href="/juez.html">
+    <a class="card" href="/juez.html" data-roles="admin,mesa,juez" style="display:none">
       <div class="card-icon">⚖️</div>
       <div class="card-titulo">Juez</div>
       <div class="card-desc">Calificar desde el móvil</div>
     </a>
 
-    <a class="card" href="/pantalla.html">
+    <a class="card" href="/pantalla.html" data-roles="admin,mesa,pantalla" style="display:none">
       <div class="card-icon">📺</div>
       <div class="card-titulo">Pantalla</div>
       <div class="card-desc">Resultados para el público</div>
@@ -71,9 +71,15 @@
   <div class="footer">Henry Sigchos Taekwondo · HSTKD</div>
 
   <script>
-    // Mostrar "Administración" solo si el usuario es admin
+    // Mostrar solo las opciones que corresponden al rol; "Administración"
+    // solo si es admin Y se abre desde la propia computadora (localhost).
     fetch('/api/me').then(r => r.ok ? r.json() : null).then(u => {
-      if (u && u.role === 'admin') document.getElementById('link-admin').style.display = 'inline-block';
+      if (!u) return;
+      document.querySelectorAll('#grid-menu .card').forEach(card => {
+        const roles = (card.getAttribute('data-roles') || '').split(',');
+        if (roles.includes(u.role)) card.style.display = 'flex';
+      });
+      if (u.role === 'admin' && u.local) document.getElementById('link-admin').style.display = 'inline-block';
     }).catch(() => {});
     async function cerrarSesion() {
       await fetch('/api/logout', { method: 'POST' });
