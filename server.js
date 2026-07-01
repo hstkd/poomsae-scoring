@@ -43,6 +43,12 @@ app.post('/api/logout', (req, res) => {
   res.json({ ok: true });
 });
 
+// ¿La petición viene de la propia computadora del servidor (localhost)?
+function esLocal(req) {
+  const ip = (req.ip || (req.socket && req.socket.remoteAddress) || '').replace('::ffff:', '');
+  return ip === '127.0.0.1' || ip === '::1';
+}
+
 // ── PUERTA DE ACCESO: exige sesión válida para todo lo demás ──
 app.use((req, res, next) => {
   const ruta = req.path;
@@ -63,16 +69,22 @@ app.use((req, res, next) => {
   if (pagina.endsWith('.html') && !auth.puedeAccederPagina(user.role, pagina)) {
     return res.status(403).send('No autorizado para esta página');
   }
+  // La Administración solo se abre desde la propia computadora (localhost)
+  if (pagina === '/admin.html' && !esLocal(req)) {
+    return res.status(403).send('La administración solo está disponible desde la computadora del servidor (localhost).');
+  }
   req.user = user;
   next();
 });
 
 // ── APIs autenticadas ──
+// soloAdmin: exige rol admin Y que la petición venga de la computadora local.
 function soloAdmin(req, res, next) {
   if (!req.user || req.user.role !== 'admin') return res.status(403).json({ error: 'Solo el administrador' });
+  if (!esLocal(req)) return res.status(403).json({ error: 'La administración solo está disponible desde la computadora del servidor' });
   next();
 }
-app.get('/api/me', (req, res) => res.json(req.user));
+app.get('/api/me', (req, res) => res.json({ ...req.user, local: esLocal(req) }));
 app.get('/api/users', soloAdmin, (req, res) => res.json(auth.listarUsuarios()));
 app.post('/api/users', soloAdmin, (req, res) => {
   try { res.json(auth.crearUsuario(req.body)); }
